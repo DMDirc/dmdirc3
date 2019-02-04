@@ -6,17 +6,19 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.ButtonBar
 import tornadofx.*
 
-data class ConnectionDetails(val hostname: String, val password: String, val port: Int)
+data class ConnectionDetails(val hostname: String, val password: String, val port: Int, val tls: Boolean)
 
 class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
     val KEY_HOSTNAME = "hostname"
     val KEY_PORT = "port"
     val KEY_PASSWORD = "password"
     val KEY_REMEMBER = "remember"
+    val KEY_TLS = "tls"
 
     val hostname = bind { SimpleStringProperty(item?.hostname, null, app.config.string(KEY_HOSTNAME)) }
     val password = bind { SimpleStringProperty(item?.password, null, app.config.string(KEY_PASSWORD)) }
     val port = bind { SimpleIntegerProperty(item?.port, null, app.config.int(KEY_PORT, 6667)!!) }
+    val tls = bind { SimpleBooleanProperty(item?.tls, null, app.config.boolean(KEY_TLS, false)!!) }
     val remember = SimpleBooleanProperty(config.boolean(KEY_REMEMBER) ?: false)
 
     override fun onCommit() {
@@ -27,6 +29,7 @@ class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
                 if (password.value.isNotEmpty()) {
                     set(KEY_PASSWORD to password.value)
                 }
+                set(KEY_TLS to tls.value)
                 save()
             }
         }
@@ -47,11 +50,15 @@ class ConnectDialog : Fragment() {
             field("Password") {
                 textfield(model.password)
             }
+            field("TLS") {
+                checkbox(property = model.tls)
+            }
             field("Save Defaults") {
                 checkbox(property = model.remember)
             }
         }
         buttonbar {
+
             button("Connect", ButtonBar.ButtonData.OK_DONE) {
                 enableWhen(model.valid)
                 action {
@@ -59,7 +66,8 @@ class ConnectDialog : Fragment() {
                     controller.connect(
                         host = model.hostname.value,
                         port = model.port.value.toInt(),
-                        password = model.password.value
+                        password = model.password.value,
+                        tls = model.tls.value
                     )
                     close()
                 }
