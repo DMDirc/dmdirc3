@@ -44,8 +44,11 @@ class SettingsDialog : Fragment() {
                 model.rollback()
                 close()
             }
+            button("Reset", ButtonBar.ButtonData.OTHER).action {
+                model.rollback()
+            }
             button("Save", ButtonBar.ButtonData.OK_DONE) {
-                enableWhen(model.valid)
+                enableWhen(model.valid.and(model.dirty))
                 action {
                     model.commit()
                     close()
