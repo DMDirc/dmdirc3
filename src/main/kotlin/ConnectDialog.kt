@@ -10,7 +10,7 @@ class ConnectDialog: Fragment() {
                 textfield(controller.connectHostname)
             }
             field("Port") {
-                spinner(editable = true, property = controller.connectPort, max = Integer.MAX_VALUE)
+                spinner(editable = true, property = controller.connectPort, min = 1, max = Integer.MAX_VALUE)
             }
             field("Password") {
                 textfield(controller.connectPassword)
@@ -19,10 +19,13 @@ class ConnectDialog: Fragment() {
         buttonbar {
             button("Connect") {
                 isDefaultButton = true
+                enableWhen {
+                    controller.connectHostname.isNotEmpty
+                }
                 action {
                     controller.connect(
-                            host=controller.connectHostname.value,
-                            port=controller.connectPort.value,
+                            host=controller.connectHostname.value ?: "",
+                            port=controller.connectPort.value ?: 6667,
                             password=controller.connectPassword.value
                     )
                 }

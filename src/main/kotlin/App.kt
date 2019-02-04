@@ -9,9 +9,9 @@ import java.util.logging.LogManager
 class MainApp : App(MainView::class) {
     override fun start(stage: Stage) {
         val rootLogger = LogManager.getLogManager().getLogger("")
-        rootLogger.level = Level.FINEST
+        rootLogger.level = Level.OFF
         for (h in rootLogger.handlers) {
-            h.level = Level.FINEST
+            h.level = Level.OFF
         }
         with(stage) {
             minWidth = 800.0

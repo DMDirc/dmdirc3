@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import javafx.scene.control.TreeItem
 import javafx.scene.image.Image
 import javafx.scene.layout.Priority
 import org.fxmisc.flowless.VirtualizedScrollPane
@@ -10,6 +11,7 @@ class MainView : View() {
     private val controller: MainController by inject()
     private val users = controller.users
     private val channels = controller.channels
+    private val selectedChannel = controller.selectedChannel
     private val inputText = controller.inputText
     private val textArea = controller.textArea
     override val root =
@@ -18,22 +20,38 @@ class MainView : View() {
                 maxWidth = Double.MAX_VALUE
                 top = menubar {
                     menu("File") {
-                        item("Connect") {
-                            action {
-                                find<ConnectDialog>().openModal()
-                            }
-                        }
                         item("Quit") {
                             action {
                                 close()
                             }
                         }
                     }
+                    menu("IRC") {
+                        item("Connect") {
+                            action {
+                                find<ConnectDialog>().openModal()
+                            }
+                        }
+                        item("Join") {
+                            action {
+                                find<JoinDialog>().openModal()
+                            }
+                        }
+                    }
                 }
                 left = vbox {
                     scrollpane {
-                        listview(channels) {
+                        treeview<Window> {
+                            isShowRoot = false
+                            root = TreeItem(channels)
                             isFitToHeight = true
+                            bindSelected(selectedChannel)
+                            populate {
+                                it.value.children
+                            }
+                            cellFormat {
+                                text = it.name
+                            }
                         }
                         vboxConstraints {
                             vgrow = Priority.ALWAYS
@@ -79,7 +97,6 @@ class MainView : View() {
                 bottom = statusbar {
                     text = ""
                 }
-                //controller.connect()
                 addStageIcon(Image(resources.stream("/logo.png")))
             }
 }
