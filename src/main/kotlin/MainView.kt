@@ -38,6 +38,13 @@ class MainView : View() {
                             }
                         }
                     }
+                    menu("Settings") {
+                        item("Settings") {
+                            action {
+                                find<SettingsDialog>().openModal()
+                            }
+                        }
+                    }
                 }
                 left = vbox {
                     scrollpane {

@@ -14,7 +14,7 @@ class JoinDialog: Fragment() {
             button("Connect") {
                 isDefaultButton = true
                 enableWhen {
-                    controller.channelName.isNotEmpty
+                    controller.isConnected.and(controller.channelName.isNotEmpty)
                 }
                 action {
                     controller.joinChannel(

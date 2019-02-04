@@ -59,7 +59,5 @@ tasks.withType<Jar> {
     manifest.attributes.apply {
         put("Main-Class", mainClass)
     }
-    configurations.compile.get().toList().forEach { println(it)}
-    dependsOn(configurations.runtimeClasspath)
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
 }

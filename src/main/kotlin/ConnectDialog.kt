@@ -2,7 +2,7 @@ package com.dmdirc
 
 import tornadofx.*
 
-class ConnectDialog: Fragment() {
+class ConnectDialog : Fragment() {
     private val controller: MainController by inject()
     override val root = form {
         fieldset {
@@ -15,6 +15,9 @@ class ConnectDialog: Fragment() {
             field("Password") {
                 textfield(controller.connectPassword)
             }
+            field("Save Defaults") {
+                checkbox(property = controller.connectSave)
+            }
         }
         buttonbar {
             button("Connect") {
@@ -23,11 +26,19 @@ class ConnectDialog: Fragment() {
                     controller.connectHostname.isNotEmpty
                 }
                 action {
+                    if (controller.connectSave.value) {
+                        preferences("dmdirc3") {
+                            put("connecthost", controller.connectHostname.value)
+                            putInt("connectport", controller.connectPort.value)
+                            put("connectpassword", controller.connectPassword.value)
+                        }
+                    }
                     controller.connect(
-                            host=controller.connectHostname.value ?: "",
-                            port=controller.connectPort.value ?: 6667,
-                            password=controller.connectPassword.value
+                        host = controller.connectHostname.value ?: "",
+                        port = controller.connectPort.value ?: 6667,
+                        password = controller.connectPassword.value
                     )
+                    close()
                 }
             }
             button("Cancel") {

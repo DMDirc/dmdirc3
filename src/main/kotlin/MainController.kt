@@ -1,22 +1,20 @@
 package com.dmdirc
 
 import com.dmdirc.ktirc.IrcClientImpl
-import com.dmdirc.ktirc.events.ChannelJoined
-import com.dmdirc.ktirc.events.ChannelNamesFinished
-import com.dmdirc.ktirc.events.MessageReceived
-import com.dmdirc.ktirc.events.ServerConnected
-import com.dmdirc.ktirc.events.UserQuit
+import com.dmdirc.ktirc.events.*
 import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.model.Profile
 import com.dmdirc.ktirc.model.Server
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ObservableList
-import javafx.scene.control.TreeView
 import org.fxmisc.richtext.StyleClassedTextArea
-import tornadofx.*
+import tornadofx.Controller
+import tornadofx.observable
+import tornadofx.runLater
 import java.time.format.DateTimeFormatter
 
 enum class WindowType {
@@ -24,6 +22,7 @@ enum class WindowType {
     SERVER,
     CHANNEL
 }
+
 data class Window(val name: String, val children: ObservableList<Window>, val type: WindowType)
 
 class MainController : Controller() {
@@ -32,27 +31,56 @@ class MainController : Controller() {
     internal val selectedChannel = SimpleObjectProperty<Window>()
     internal val inputText = SimpleStringProperty()
     internal val textArea = StyleClassedTextArea()
-    internal val connectHostname = SimpleStringProperty()
+    internal val connectHostname = SimpleStringProperty("")
     internal val connectPort = SimpleIntegerProperty(6667)
-    internal val connectPassword = SimpleStringProperty()
+    internal val connectPassword = SimpleStringProperty("")
     internal val channelName = SimpleStringProperty()
-    private lateinit var client: IrcClientImpl
+    internal val connectSave = SimpleBooleanProperty(false)
+    private var client: IrcClientImpl? = null
+    private var serverName: String? = null
+    val isConnected = SimpleBooleanProperty(false)
 
-    fun connect(host: String, port: Int = 6667, tls: Boolean = false, password: String ?= null) {
+    init {
+        preferences("dmdirc3") {
+            connectHostname.set(get("connecthost", ""))
+            connectPassword.set(get("connectpassword", ""))
+            connectPort.set(getInt("connectport", 6667))
+        }
+    }
+
+    fun connect(host: String, port: Int = 6667, tls: Boolean = false, password: String? = null) {
+        serverName = host
         client = IrcClientImpl(
-                Server(host=host, port=port, password=password, tls=tls),
-                Profile(randomString(5), randomString(10), randomString(10)))
-        client.onEvent { event ->
+            Server(host = host, port = port, password = password, tls = tls),
+            Profile(initialNick = app.config.getProperty("nickname"), realName = app.config.getProperty("realname"), userName = app.config.getProperty("username"))
+        )
+        if (client == null) {
+            return
+        }
+        isConnected.set(true)
+        client!!.onEvent { event ->
             when (event) {
                 is ServerConnected -> {
-                    channels.children.add(Window("A Server", emptyList<Window>().toMutableList().observable(), WindowType.SERVER))
+                    channels.children.add(
+                        Window(
+                            serverName!!,
+                            emptyList<Window>().toMutableList().observable(),
+                            WindowType.SERVER
+                        )
+                    )
                 }
                 is ChannelJoined ->
-                    if (client.isLocalUser(event.user)) {
+                    if (client!!.isLocalUser(event.user)) {
                         runLater {
                             channels.children.find {
-                                it.name == "A Server"
-                            }?.children?.add(Window(event.channel, emptyList<Window>().toMutableList().observable(), WindowType.CHANNEL))
+                                it.name == serverName
+                            }?.children?.add(
+                                Window(
+                                    event.channel,
+                                    emptyList<Window>().toMutableList().observable(),
+                                    WindowType.CHANNEL
+                                )
+                            )
                         }
                     } else {
                         runLater {
@@ -66,7 +94,7 @@ class MainController : Controller() {
                     }
                 is ChannelNamesFinished ->
                     runAsync {
-                        client.channelState[event.channel]?.users?.map { it.nickname } ?: emptyList()
+                        client!!.channelState[event.channel]?.users?.map { it.nickname } ?: emptyList()
                     } ui {
                         users.clear()
                         users.addAll(it)
@@ -80,7 +108,7 @@ class MainController : Controller() {
                 }
             }
         }
-        client.connect()
+        client!!.connect()
     }
 
 
@@ -88,12 +116,13 @@ class MainController : Controller() {
         val selected = selectedChannel.value ?: return
         when (selected.type) {
             WindowType.CHANNEL ->
-                client.sendMessage(selected.name, message)
-            else -> {}
+                client!!.sendMessage(selected.name, message)
+            else -> {
+            }
         }
     }
 
     fun joinChannel(name: String) {
-        client.sendJoin(name)
+        client!!.sendJoin(name)
     }
 }
