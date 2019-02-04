@@ -32,6 +32,9 @@ dependencies {
     implementation("no.tornado:tornadofx-controlsfx:0.1")
     implementation("org.fxmisc.richtext:richtextfx:0.9.2")
     implementation("com.dmdirc:ktirc:+")
+    runtime("org.openjfx:javafx-graphics:$javafx.version:win")
+    runtime("org.openjfx:javafx-graphics:$javafx.version:linux")
+    runtime("org.openjfx:javafx-graphics:$javafx.version:mac")
 }
 
 tasks.withType<KotlinCompile> {
