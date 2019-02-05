@@ -7,7 +7,6 @@ import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.model.Profile
 import com.dmdirc.ktirc.model.Server
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ObservableList
@@ -31,22 +30,9 @@ class MainController : Controller() {
     internal val selectedChannel = SimpleObjectProperty<Window>()
     internal val inputText = SimpleStringProperty()
     internal val textArea = StyleClassedTextArea()
-    internal val connectHostname = SimpleStringProperty("")
-    internal val connectPort = SimpleIntegerProperty(6667)
-    internal val connectPassword = SimpleStringProperty("")
-    internal val channelName = SimpleStringProperty()
-    internal val connectSave = SimpleBooleanProperty(false)
     private var client: IrcClientImpl? = null
     private var serverName: String? = null
     val isConnected = SimpleBooleanProperty(false)
-
-    init {
-        preferences("dmdirc3") {
-            connectHostname.set(get("connecthost", ""))
-            connectPassword.set(get("connectpassword", ""))
-            connectPort.set(getInt("connectport", 6667))
-        }
-    }
 
     fun connect(host: String, port: Int = 6667, tls: Boolean = false, password: String? = null) {
         serverName = host
