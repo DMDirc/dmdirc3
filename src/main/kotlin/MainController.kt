@@ -52,7 +52,11 @@ class MainController : Controller() {
         serverName = host
         client = IrcClientImpl(
             Server(host = host, port = port, password = password, tls = tls),
-            Profile(initialNick = app.config.getProperty("nickname"), realName = app.config.getProperty("realname"), userName = app.config.getProperty("username"))
+            Profile(
+                initialNick = app.config.getProperty("nickname"),
+                realName = app.config.getProperty("realname"),
+                userName = app.config.getProperty("username")
+            )
         )
         if (client == null) {
             return

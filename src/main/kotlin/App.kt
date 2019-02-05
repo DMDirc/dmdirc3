@@ -3,7 +3,6 @@ package com.dmdirc
 import javafx.stage.Stage
 import tornadofx.App
 import tornadofx.launch
-import java.nio.file.Paths
 import java.util.logging.Level
 import java.util.logging.LogManager
 
@@ -27,9 +26,9 @@ fun main(args: Array<String>) {
 }
 
 fun randomString(length: Int = 16): String {
-    val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+    val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
     return (1..length)
-            .map { i -> kotlin.random.Random.nextInt(0, charPool.size) }
-            .map(charPool::get)
-            .joinToString("")
+        .map { _ -> kotlin.random.Random.nextInt(0, charPool.size) }
+        .map(charPool::get)
+        .joinToString("")
 }

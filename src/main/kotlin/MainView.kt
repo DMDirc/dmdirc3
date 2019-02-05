@@ -15,95 +15,95 @@ class MainView : View() {
     private val inputText = controller.inputText
     private val textArea = controller.textArea
     override val root =
-            borderpane {
-                maxHeight = Double.MAX_VALUE
-                maxWidth = Double.MAX_VALUE
-                top = menubar {
-                    menu("File") {
-                        item("Quit") {
-                            action {
-                                close()
-                            }
-                        }
-                    }
-                    menu("IRC") {
-                        item("Connect") {
-                            action {
-                                find<ConnectDialog>().openModal()
-                            }
-                        }
-                        item("Join") {
-                            action {
-                                find<JoinDialog>().openModal()
-                            }
-                        }
-                    }
-                    menu("Settings") {
-                        item("Settings") {
-                            action {
-                                find<SettingsDialog>().openModal()
-                            }
+        borderpane {
+            maxHeight = Double.MAX_VALUE
+            maxWidth = Double.MAX_VALUE
+            top = menubar {
+                menu("File") {
+                    item("Quit") {
+                        action {
+                            close()
                         }
                     }
                 }
-                left = vbox {
-                    scrollpane {
-                        treeview<Window> {
-                            isShowRoot = false
-                            root = TreeItem(channels)
-                            isFitToHeight = true
-                            bindSelected(selectedChannel)
-                            populate {
-                                it.value.children
-                            }
-                            cellFormat {
-                                text = it.name
-                            }
+                menu("IRC") {
+                    item("Connect") {
+                        action {
+                            find<ConnectDialog>().openModal()
                         }
-                        vboxConstraints {
-                            vgrow = Priority.ALWAYS
-                            hgrow = Priority.ALWAYS
+                    }
+                    item("Join") {
+                        action {
+                            find<JoinDialog>().openModal()
                         }
                     }
                 }
-                center = hbox {
-                    vbox {
-                        val moo = VirtualizedScrollPane(textArea)
-                        add(moo)
-                        textArea.isEditable = false
-                        textArea.isWrapText = true
-                        textArea.insertText(0, "")
-                        moo.vgrow = Priority.ALWAYS
-                        textfield(inputText) {
-                            action {
-                                if (inputText.value.isNotEmpty()) {
-                                    runAsync {
-                                        controller.sendMessage(inputText.value)
-                                        inputText.value = ""
-                                    }
+                menu("Settings") {
+                    item("Settings") {
+                        action {
+                            find<SettingsDialog>().openModal()
+                        }
+                    }
+                }
+            }
+            left = vbox {
+                scrollpane {
+                    treeview<Window> {
+                        isShowRoot = false
+                        root = TreeItem(channels)
+                        isFitToHeight = true
+                        bindSelected(selectedChannel)
+                        populate {
+                            it.value.children
+                        }
+                        cellFormat {
+                            text = it.name
+                        }
+                    }
+                    vboxConstraints {
+                        vgrow = Priority.ALWAYS
+                        hgrow = Priority.ALWAYS
+                    }
+                }
+            }
+            center = hbox {
+                vbox {
+                    val moo = VirtualizedScrollPane(textArea)
+                    add(moo)
+                    textArea.isEditable = false
+                    textArea.isWrapText = true
+                    textArea.insertText(0, "")
+                    moo.vgrow = Priority.ALWAYS
+                    textfield(inputText) {
+                        action {
+                            if (inputText.value.isNotEmpty()) {
+                                runAsync {
+                                    controller.sendMessage(inputText.value)
+                                    inputText.value = ""
                                 }
                             }
                         }
-                        vboxConstraints {
-                            vgrow = Priority.ALWAYS
-                            hgrow = Priority.ALWAYS
-                        }
+                    }
+                    vboxConstraints {
+                        vgrow = Priority.ALWAYS
+                        hgrow = Priority.ALWAYS
                     }
                 }
-                right = vbox {
-                    scrollpane {
-                        listview(users) {
-                            isFitToHeight = true
-                        }
-                        vboxConstraints {
-                            vgrow = Priority.ALWAYS
-                            hgrow = Priority.ALWAYS
-                        }
-                    }
-                }
-                bottom = statusbar {
-                    text = ""
-                }
-                addStageIcon(Image(resources.stream("/logo.png")))
             }
+            right = vbox {
+                scrollpane {
+                    listview(users) {
+                        isFitToHeight = true
+                    }
+                    vboxConstraints {
+                        vgrow = Priority.ALWAYS
+                        hgrow = Priority.ALWAYS
+                    }
+                }
+            }
+            bottom = statusbar {
+                text = ""
+            }
+            addStageIcon(Image(resources.stream("/logo.png")))
+        }
 }
