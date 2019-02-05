@@ -14,6 +14,7 @@ class MainView : View() {
     private val selectedChannel = controller.selectedChannel
     private val inputText = controller.inputText
     private val textArea = controller.textArea
+    private val document = textArea.document
     override val root =
         borderpane {
             maxHeight = Double.MAX_VALUE
@@ -68,12 +69,12 @@ class MainView : View() {
             }
             center = hbox {
                 vbox {
-                    val moo = VirtualizedScrollPane(textArea)
-                    add(moo)
-                    textArea.isEditable = false
-                    textArea.isWrapText = true
-                    textArea.insertText(0, "")
-                    moo.vgrow = Priority.ALWAYS
+                    add(VirtualizedScrollPane(textArea.apply {
+                        isEditable = false
+                        isWrapText = true
+                    }).apply {
+                        vgrow = Priority.ALWAYS
+                    })
                     textfield(inputText) {
                         action {
                             if (inputText.value.isNotEmpty()) {
