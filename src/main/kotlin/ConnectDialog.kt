@@ -15,18 +15,18 @@ class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
     val KEY_REMEMBER = "remember"
     val KEY_TLS = "tls"
 
-    val hostname = bind { SimpleStringProperty(item?.hostname, null, app.config.string(KEY_HOSTNAME)) }
-    val password = bind { SimpleStringProperty(item?.password, null, app.config.string(KEY_PASSWORD)) }
-    val port = bind { SimpleIntegerProperty(item?.port, null, app.config.int(KEY_PORT, 6667)!!) }
-    val tls = bind { SimpleBooleanProperty(item?.tls, null, app.config.boolean(KEY_TLS, false)!!) }
+    val hostname = bind { SimpleStringProperty(item?.hostname, null, config.string(KEY_HOSTNAME)) }
+    val password = bind { SimpleStringProperty(item?.password, null, config.string(KEY_PASSWORD)) }
+    val port = bind { SimpleIntegerProperty(item?.port, null, config.int(KEY_PORT, 6667)!!) }
+    val tls = bind { SimpleBooleanProperty(item?.tls, null, config.boolean(KEY_TLS, false)!!) }
     val remember = SimpleBooleanProperty(config.boolean(KEY_REMEMBER) ?: false)
 
     override fun onCommit() {
         if (remember.value) {
-            with(app.config) {
+            with(config) {
                 set(KEY_HOSTNAME to hostname.value)
                 set(KEY_PORT to port.value)
-                if (password.value.isNotEmpty()) {
+                if (password.value != null && password.value.isNotEmpty()) {
                     set(KEY_PASSWORD to password.value)
                 }
                 set(KEY_TLS to tls.value)
