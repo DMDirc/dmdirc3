@@ -7,19 +7,19 @@ import tornadofx.*
 data class Settings(val nickname: String, val realname: String, val username: String)
 
 class SettingsModel : ItemViewModel<Settings>() {
-    val KEY_NICKNAME = "nickname"
-    val KEY_REALNAME = "realname"
-    val KEY_USERNAME = "username"
+    private val keyNickname = "nickname"
+    private val keyRealname = "realname"
+    private val keyUsername = "username"
 
-    val nickname = bind { SimpleStringProperty(item?.nickname, null, app.config.string(KEY_NICKNAME)) }
-    val realname = bind { SimpleStringProperty(item?.realname, null, app.config.string(KEY_REALNAME)) }
-    val username = bind { SimpleStringProperty(item?.username, null, app.config.string(KEY_USERNAME)) }
+    val nickname = bind { SimpleStringProperty(item?.nickname, null, app.config.string(keyNickname)) }
+    val realname = bind { SimpleStringProperty(item?.realname, null, app.config.string(keyRealname)) }
+    val username = bind { SimpleStringProperty(item?.username, null, app.config.string(keyUsername)) }
 
     override fun onCommit() {
         with(app.config) {
-            set(KEY_NICKNAME to nickname.value)
-            set(KEY_REALNAME to realname.value)
-            set(KEY_USERNAME to username.value)
+            set(keyNickname to nickname.value)
+            set(keyRealname to realname.value)
+            set(keyUsername to username.value)
             save()
         }
     }
