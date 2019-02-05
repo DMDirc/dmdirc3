@@ -9,27 +9,27 @@ import tornadofx.*
 data class ConnectionDetails(val hostname: String, val password: String, val port: Int, val tls: Boolean)
 
 class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
-    val KEY_HOSTNAME = "hostname"
-    val KEY_PORT = "port"
-    val KEY_PASSWORD = "password"
-    val KEY_REMEMBER = "remember"
-    val KEY_TLS = "tls"
+    private val keyHostname = "hostname"
+    private val keyPort = "port"
+    private val keyPassword = "password"
+    private val keyRemember = "remember"
+    private val keyTLS = "tls"
 
-    val hostname = bind { SimpleStringProperty(item?.hostname, null, config.string(KEY_HOSTNAME)) }
-    val password = bind { SimpleStringProperty(item?.password, null, config.string(KEY_PASSWORD)) }
-    val port = bind { SimpleIntegerProperty(item?.port, null, config.int(KEY_PORT, 6667)!!) }
-    val tls = bind { SimpleBooleanProperty(item?.tls, null, config.boolean(KEY_TLS, false)!!) }
-    val remember = SimpleBooleanProperty(config.boolean(KEY_REMEMBER) ?: false)
+    val hostname = bind { SimpleStringProperty(item?.hostname, null, config.string(keyHostname)) }
+    val password = bind { SimpleStringProperty(item?.password, null, config.string(keyPassword)) }
+    val port = bind { SimpleIntegerProperty(item?.port, null, config.int(keyPort, 6667)!!) }
+    val tls = bind { SimpleBooleanProperty(item?.tls, null, config.boolean(keyTLS, false)!!) }
+    val remember = SimpleBooleanProperty(config.boolean(keyRemember) ?: false)
 
     override fun onCommit() {
         if (remember.value) {
             with(config) {
-                set(KEY_HOSTNAME to hostname.value)
-                set(KEY_PORT to port.value)
+                set(keyHostname to hostname.value)
+                set(keyPort to port.value)
                 if (password.value != null && password.value.isNotEmpty()) {
-                    set(KEY_PASSWORD to password.value)
+                    set(keyPassword to password.value)
                 }
-                set(KEY_TLS to tls.value)
+                set(keyTLS to tls.value)
                 save()
             }
         }
