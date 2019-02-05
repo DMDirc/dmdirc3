@@ -24,11 +24,3 @@ class MainApp : App(MainView::class) {
 fun main(args: Array<String>) {
     launch<MainApp>(args)
 }
-
-fun randomString(length: Int = 16): String {
-    val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-    return (1..length)
-        .map { _ -> kotlin.random.Random.nextInt(0, charPool.size) }
-        .map(charPool::get)
-        .joinToString("")
-}
