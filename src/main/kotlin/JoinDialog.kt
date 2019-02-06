@@ -18,7 +18,14 @@ class JoinDialog: Fragment() {
     override val root = form {
         fieldset {
             field("Channel Name") {
-                textfield(model.channel).required()
+                textfield(model.channel).apply {
+                    action {
+                        if (model.isValid) {
+                            model.commit()
+                            close()
+                        }
+                    }
+                }.required()
             }
         }
         buttonbar {
