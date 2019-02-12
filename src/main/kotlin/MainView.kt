@@ -1,6 +1,5 @@
 package com.dmdirc
 
-import javafx.scene.control.TreeItem
 import javafx.scene.image.Image
 import javafx.scene.layout.Priority
 import tornadofx.*
@@ -42,39 +41,24 @@ class MainView : View() {
             }
             left = vbox {
                 scrollpane {
-                    treeview<Window> {
-                        isShowRoot = false
-                        root = TreeItem(controller.root)
+                    listview(controller.windows) {
                         isFitToHeight = true
-                        onUserSelect {selected ->
-                            when (selected.type) {
-                                WindowType.SERVER -> {
-                                    center = controller.root.children.find {
-                                        it.type == WindowType.SERVER && it.connection == selected.connection
-                                    }?.windowUI?.root ?: vbox {}
-                                }
-                                WindowType.CHANNEL -> {
-                                    center = controller.root.children.find {
-                                        it.type == WindowType.SERVER && it.connection == selected.connection
-                                    }?.children?.find {
-                                        selected.name == it.name
-                                    }?.windowUI?.root ?: vbox {}
-                                }
-                                else -> {}
-                            }
-                        }
                         bindSelected(controller.selectedChannel)
-                        populate {
-                            it.value.children
-                        }
                         cellFormat {
-                            text = it.name
+                            text = "[${it.type}-${it.name}]"
                         }
+                        controller.selectedChannel.addListener(ChangeListener { _, _, newValue ->
+                                center = newValue.windowUI.root
+                            }
+                        )
                     }
                     vboxConstraints {
                         vgrow = Priority.ALWAYS
                         hgrow = Priority.ALWAYS
                     }
+                }
+                borderpaneConstraints {
+                    maxWidth = 150.00
                 }
             }
             center = vbox {

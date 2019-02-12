@@ -25,16 +25,6 @@ class WindowUI(connection: Connection?) : View("Right bit") {
                 }).apply {
                     vgrow = Priority.ALWAYS
                 })
-                textfield(inputText) {
-                    action {
-                        if (inputText.value.isNotEmpty()) {
-                            runAsync {
-                                myConnection.sendMessage(controller.selectedChannel.value.name, inputText.value)
-                                inputText.value = ""
-                            }
-                        }
-                    }
-                }
                 vboxConstraints {
                     vgrow = Priority.ALWAYS
                     hgrow = Priority.ALWAYS
@@ -49,6 +39,19 @@ class WindowUI(connection: Connection?) : View("Right bit") {
                 vboxConstraints {
                     vgrow = Priority.ALWAYS
                     hgrow = Priority.ALWAYS
+                }
+            }
+            borderpaneConstraints {
+                maxWidth = 150.00
+            }
+        }
+        bottom = textfield(inputText) {
+            action {
+                if (inputText.value.isNotEmpty()) {
+                    runAsync {
+                        myConnection.sendMessage(controller.selectedChannel.value.name, inputText.value)
+                        inputText.value = ""
+                    }
                 }
             }
         }

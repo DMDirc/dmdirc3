@@ -6,7 +6,6 @@ import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.ConfigProperties
-import tornadofx.observable
 import tornadofx.runLater
 import java.time.format.DateTimeFormatter
 
@@ -16,11 +15,10 @@ class Connection(
     private val password: String?,
     private val tls: Boolean,
     private val config: ConfigProperties,
-    private val root: Window
+    private val controller: MainController
 ) {
     private val window: Window = Window(
         host,
-        emptyList<Window>().toMutableList().observable(),
         WindowType.SERVER,
         WindowUI(this),
         this
@@ -42,7 +40,7 @@ class Connection(
 
     fun connect() {
         client.onEvent(this::handleEvent)
-        root.children.add(window)
+        controller.windows.add(window)
         client.connect()
     }
 
@@ -62,10 +60,9 @@ class Connection(
             is ChannelJoined -> {
                 if (client.isLocalUser(event.user)) {
                     runLater {
-                        window.children.add(
+                        controller.windows.add(
                             Window(
                                 event.channel,
-                                emptyList<Window>().toMutableList().observable(),
                                 WindowType.CHANNEL,
                                 WindowUI(this),
                                 this
@@ -74,8 +71,8 @@ class Connection(
                     }
                 } else {
                     runLater {
-                        val rb = window.children.find {
-                            event.channel == it.name
+                        val rb = controller.windows.find {
+                            it.connection == this && it.name == event.channel
                         }?.windowUI ?: return@runLater
                         rb.users.add(event.user.nickname)
                         rb.textArea.appendText("${event.channel} > ${event.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} ${event.user} Joined\n")
@@ -84,17 +81,16 @@ class Connection(
             }
             is MessageReceived -> {
                 runLater {
-                    println("Message: $event")
-                    val rb = window.children.find {
-                        event.target == it.name && WindowType.CHANNEL == it.type
+                    val rb = controller.windows.find {
+                        it.connection == this && it.name == event.target
                     }?.windowUI ?: return@runLater
                     rb.textArea.appendText("${event.target} > ${event.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} <${event.user.nickname}> ${event.message}\n")
                 }
             }
             is ChannelNamesFinished -> {
                 runLater {
-                    val rb = window.children.find {
-                        event.channel == it.name && WindowType.CHANNEL == it.type
+                    val rb = controller.windows.find {
+                        it.connection == this && it.name == event.channel
                     }?.windowUI ?: return@runLater
                     rb.users.clear()
                     rb.users.addAll(client.channelState[event.channel]?.users?.map { it.nickname } ?: emptyList())
@@ -102,11 +98,8 @@ class Connection(
             }
             is UserQuit -> {
                 runLater {
-                    root.children.forEach {
-                        it.windowUI.users.remove(event.user.nickname)
-                    }
-                    root.children.map { it.windowUI }.map { it.textArea }.forEach {
-                        it.appendText("${event.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} <${event.user}> Quit\n")
+                    controller.windows.forEach {
+                        it.windowUI.textArea.appendText("${event.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} <${event.user}> Quit\n")
                     }
                 }
             }
