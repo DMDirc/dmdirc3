@@ -29,6 +29,7 @@ class MainView : View() {
                         action {
                             find<JoinDialog>().openModal()
                         }
+                        enableWhen(controller.selectedChannel.isNotNull)
                     }
                 }
                 menu("Settings") {
@@ -45,7 +46,11 @@ class MainView : View() {
                         isFitToHeight = true
                         bindSelected(controller.selectedChannel)
                         cellFormat {
-                            text = "[${it.type}-${it.name}]"
+                            text = when (it.type) {
+                                WindowType.SERVER -> it.name
+                                WindowType.CHANNEL -> "\t${it.name}"
+                                else -> it.name
+                            }
                         }
                         controller.selectedChannel.addListener(ChangeListener { _, _, newValue ->
                                 center = newValue.windowUI.root
