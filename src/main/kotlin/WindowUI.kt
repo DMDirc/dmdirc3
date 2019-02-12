@@ -35,6 +35,7 @@ class WindowUI(connection: Connection?) : View("Right bit") {
             scrollpane {
                 listview(users) {
                     isFitToHeight = true
+                    prefWidth = 148.0
                 }
                 vboxConstraints {
                     vgrow = Priority.ALWAYS

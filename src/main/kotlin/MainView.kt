@@ -56,6 +56,7 @@ class MainView : View() {
                                 center = newValue.windowUI.root
                             }
                         )
+                        prefWidth = 148.0
                     }
                     vboxConstraints {
                         vgrow = Priority.ALWAYS
