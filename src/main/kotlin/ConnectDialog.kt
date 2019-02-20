@@ -17,8 +17,8 @@ class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
 
     val hostname = bind { SimpleStringProperty(item?.hostname, null, config.string(keyHostname)) }
     val password = bind { SimpleStringProperty(item?.password, null, config.string(keyPassword)) }
-    val port = bind { SimpleIntegerProperty(item?.port, null, config.int(keyPort, 6667)!!) }
-    val tls = bind { SimpleBooleanProperty(item?.tls, null, config.boolean(keyTLS, false)!!) }
+    val port = bind { SimpleIntegerProperty(item?.port, null, config.int(keyPort, 6667)) }
+    val tls = bind { SimpleBooleanProperty(item?.tls, null, config.boolean(keyTLS, false)) }
     val remember = SimpleBooleanProperty(config.boolean(keyRemember) ?: false)
 
     override fun onCommit() {
