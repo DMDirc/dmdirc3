@@ -25,12 +25,7 @@ class Connection(
     )
     private val connected = SimpleBooleanProperty(false)
     private val client: IrcClient = IrcClient {
-        server {
-            host = this@Connection.host
-            port = this@Connection.port
-            password = this@Connection.password
-            useTls = this@Connection.tls
-        }
+        server(host, port, tls, password)
         profile {
             nickname = config.getProperty("nickname")
             realName = config.getProperty("realname")
