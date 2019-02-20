@@ -49,10 +49,8 @@ class Connection(
 
     private fun handleEvent(event: IrcEvent) {
         when (event) {
-            is ServerConnected -> {
-                connected.value = true
-            }
-            is ChannelJoined -> {
+            is ServerConnected -> connected.value = true
+            is ChannelJoined ->
                 if (client.isLocalUser(event.user)) {
                     runLater {
                         controller.windows.add(
@@ -65,42 +63,42 @@ class Connection(
                         )
                     }
                 } else {
-                    runLater {
-                        val rb = controller.windows.find {
-                            it.connection == this && it.name == event.channel
-                        }?.windowUI ?: return@runLater
-                        rb.users.add(event.user.nickname)
-                        rb.textArea.appendText("${event.channel} > ${event.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} ${event.user} Joined\n")
+                    runLaterWithWindowUi(event.channel) {
+                        users.add(event.user.nickname)
+                        textArea.appendText("${event.metadata.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} ${event.user.nickname} Joined\n")
                     }
                 }
-            }
-            is MessageReceived -> {
-                runLater {
-                    val rb = controller.windows.find {
-                        it.connection == this && it.name == event.target
-                    }?.windowUI ?: return@runLater
-                    rb.textArea.appendText("${event.target} > ${event.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} <${event.user.nickname}> ${event.message}\n")
+            is MessageReceived ->
+                runLaterWithWindowUi(event.target) {
+                    textArea.appendText("${event.metadata.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} <${event.user.nickname}> ${event.message}\n")
                 }
-            }
-            is ChannelNamesFinished -> {
-                runLater {
-                    val rb = controller.windows.find {
-                        it.connection == this && it.name == event.channel
-                    }?.windowUI ?: return@runLater
-                    rb.users.clear()
-                    rb.users.addAll(client.channelState[event.channel]?.users?.map { it.nickname } ?: emptyList())
+            is ActionReceived ->
+                runLaterWithWindowUi(event.target) {
+                    textArea.appendText("${event.metadata.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} * ${event.user.nickname} ${event.action}\n")
                 }
-            }
-            is UserQuit -> {
-                runLater {
-                    controller.windows.forEach {
-                        it.windowUI.textArea.appendText("${event.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} <${event.user}> Quit\n")
-                    }
+            is ChannelNamesFinished ->
+                runLaterWithWindowUi(event.channel) {
+                    users.clear()
+                    users.addAll(client.channelState[event.channel]?.users?.map { it.nickname } ?: emptyList())
                 }
-            }
+            is ChannelQuit ->
+                runLaterWithWindowUi(event.channel) {
+                    users.remove(event.user.nickname)
+                    textArea.appendText("${event.metadata.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} -- ${event.user.nickname} Quit\n")
+                }
             else -> {
             }
         }
     }
+
+    private fun runLaterWithWindowUi(windowName: String, block: WindowUI.() -> Unit) =
+        runLater {
+            withWindowUi(windowName, block)
+        }
+
+    private fun withWindowUi(windowName: String, block: WindowUI.() -> Unit) =
+        controller.windows.find {
+            it.connection == this && it.name == windowName
+        }?.windowUI?.block()
 
 }
