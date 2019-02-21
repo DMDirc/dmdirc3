@@ -48,47 +48,65 @@ class Connection(
     }
 
     private fun handleEvent(event: IrcEvent) {
-        when (event) {
-            is ServerConnected -> connected.value = true
-            is ChannelJoined ->
-                if (client.isLocalUser(event.user)) {
-                    runLater {
-                        controller.windows.add(
-                            Window(
-                                event.channel,
-                                WindowType.CHANNEL,
-                                WindowUI(this),
-                                this
-                            )
-                        )
-                    }
-                } else {
-                    runLaterWithWindowUi(event.channel) {
-                        users.add(event.user.nickname)
-                        textArea.appendText("${event.metadata.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} ${event.user.nickname} Joined\n")
-                    }
-                }
-            is MessageReceived ->
-                runLaterWithWindowUi(event.target) {
-                    textArea.appendText("${event.metadata.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} <${event.user.nickname}> ${event.message}\n")
-                }
-            is ActionReceived ->
-                runLaterWithWindowUi(event.target) {
-                    textArea.appendText("${event.metadata.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} * ${event.user.nickname} ${event.action}\n")
-                }
-            is ChannelNamesFinished ->
-                runLaterWithWindowUi(event.channel) {
-                    users.clear()
-                    users.addAll(client.channelState[event.channel]?.users?.map { it.nickname } ?: emptyList())
-                }
-            is ChannelQuit ->
-                runLaterWithWindowUi(event.channel) {
-                    users.remove(event.user.nickname)
-                    textArea.appendText("${event.metadata.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))} -- ${event.user.nickname} Quit\n")
-                }
+        when {
+            event is BatchReceived -> event.events.forEach(this::handleEvent)
+            event is ServerConnected -> runLater {
+                window.windowUI.addLine("${event.timestamp} *** Connected")
+                connected.value = true
+            }
+            event is ServerDisconnected -> runLater {
+                window.windowUI.addLine("${event.timestamp} *** Disconnected")
+                connected.value = false
+            }
+            event is ServerConnectionError -> runLater {
+                window.windowUI.addLine("${event.timestamp} *** Error: ${event.error} ${event.details ?: ""}")
+            }
+            event is ChannelJoined && client.isLocalUser(event.user) -> runLater {
+                controller.windows.add(
+                    Window(
+                        event.target,
+                        WindowType.CHANNEL,
+                        WindowUI(this),
+                        this
+                    )
+                )
+            }
+            event is TargetedEvent -> runLaterWithWindowUi(event.target) { handleTargetedEvent(event) }
             else -> {
             }
         }
+    }
+
+    private fun WindowUI.handleTargetedEvent(event: TargetedEvent) {
+        when (event) {
+            is ChannelJoined -> {
+                users.add(event.user.nickname)
+                addLine("${event.timestamp} -- ${event.user.nickname} Joined")
+            }
+            is ChannelParted -> {
+                users.remove(event.user.nickname)
+                addLine("${event.timestamp} -- ${event.user.nickname} Left${if (event.reason.isNotEmpty()) " ${event.reason}" else ""}")
+            }
+            is MessageReceived -> addLine("${event.timestamp} <${event.user.nickname}> ${event.message}")
+            is ActionReceived -> addLine("${event.timestamp} * ${event.user.nickname} ${event.action}")
+            is ChannelNamesFinished -> {
+                users.clear()
+                users.addAll(client.channelState[event.target]?.users?.map { it.nickname } ?: emptyList())
+            }
+            is ChannelQuit -> {
+                users.remove(event.user.nickname)
+                addLine("${event.timestamp} -- ${event.user.nickname} Quit")
+            }
+            else -> {
+            }
+        }
+    }
+
+    private val IrcEvent.timestamp: String
+        get() = metadata.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+
+    private fun WindowUI.addLine(line: String) {
+        textArea.appendText("$line\n")
     }
 
     private fun runLaterWithWindowUi(windowName: String, block: WindowUI.() -> Unit) =
