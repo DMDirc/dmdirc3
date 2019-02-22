@@ -32,9 +32,16 @@ dependencies {
     implementation("no.tornado:tornadofx-controlsfx:0.1")
     implementation("org.fxmisc.richtext:richtextfx:0.9.2")
     implementation("com.dmdirc:ktirc:+")
+    implementation("com.uchuhimo:konf:0.13.1")
+
     runtime("org.openjfx:javafx-graphics:$javafx.version:win")
     runtime("org.openjfx:javafx-graphics:$javafx.version:linux")
     runtime("org.openjfx:javafx-graphics:$javafx.version:mac")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.4.0")
+    testImplementation("io.mockk:mockk:1.9.1")
+    testImplementation("com.google.jimfs:jimfs:1.1")
 }
 
 tasks.withType<KotlinCompile> {
