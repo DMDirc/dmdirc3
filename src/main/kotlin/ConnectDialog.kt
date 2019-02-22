@@ -1,25 +1,40 @@
 package com.dmdirc
 
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleIntegerProperty
-import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.*
 import javafx.scene.control.ButtonBar
 import tornadofx.*
 
 data class ConnectionDetails(val hostname: String, val password: String, val port: Int, val tls: Boolean)
 
-class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
+interface ConnectionViewModel {
+    val hostname: Property<String>
+    val password: Property<String>
+    val port: Property<Number>
+    val tls: Property<Boolean>
+    val remember: Property<Boolean>
+    val valid: ReadOnlyBooleanProperty
+    val closed: Property<Boolean>
+
+    fun connectPressed()
+    fun cancelPressed()
+}
+
+class ConnectionDetailsViewModel : ItemViewModel<ConnectionDetails>(), ConnectionViewModel {
+
+    private val controller: MainController by inject()
+
     private val keyHostname = "hostname"
     private val keyPort = "port"
     private val keyPassword = "password"
     private val keyRemember = "remember"
     private val keyTLS = "tls"
 
-    val hostname = bind { SimpleStringProperty(item?.hostname, null, config.string(keyHostname)) }
-    val password = bind { SimpleStringProperty(item?.password, null, config.string(keyPassword)) }
-    val port = bind { SimpleIntegerProperty(item?.port, null, config.int(keyPort, 6667)) }
-    val tls = bind { SimpleBooleanProperty(item?.tls, null, config.boolean(keyTLS, false)) }
-    val remember = SimpleBooleanProperty(config.boolean(keyRemember) ?: false)
+    override val hostname = bind { SimpleStringProperty(item?.hostname, null, config.string(keyHostname)) }
+    override val password = bind { SimpleStringProperty(item?.password, null, config.string(keyPassword)) }
+    override val port = bind { SimpleIntegerProperty(item?.port, null, config.int(keyPort, 6667)) }
+    override val tls = bind { SimpleBooleanProperty(item?.tls, null, config.boolean(keyTLS, false)) }
+    override val remember = bind { SimpleBooleanProperty(config.boolean(keyRemember) ?: false) }
+    override val closed = bind { SimpleBooleanProperty(false) }
 
     override fun onCommit() {
         if (remember.value) {
@@ -34,11 +49,25 @@ class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
             }
         }
     }
+
+    override fun connectPressed() {
+        controller.connect(
+            host = hostname.value,
+            port = port.value.toInt(),
+            password = password.value,
+            tls = tls.value
+        )
+        closed.value = true
+    }
+
+    override fun cancelPressed() {
+        rollback()
+        closed.value = true
+    }
+
 }
 
-class ConnectDialog : Fragment() {
-    private val controller: MainController by inject()
-    private val model = ConnectionDetailsModel()
+class ConnectDialog(model: ConnectionViewModel = ConnectionDetailsViewModel()) : Fragment() {
     override val root = form {
         fieldset {
             field("Server Name") {
@@ -61,23 +90,15 @@ class ConnectDialog : Fragment() {
 
             button("Connect", ButtonBar.ButtonData.OK_DONE) {
                 enableWhen(model.valid)
-                action {
-                    model.commit()
-                    controller.connect(
-                        host = model.hostname.value,
-                        port = model.port.value.toInt(),
-                        password = model.password.value,
-                        tls = model.tls.value
-                    )
-                    close()
-                }
+                action(model::connectPressed)
             }
             button("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE) {
-                action {
-                    model.rollback()
-                    close()
-                }
+                action(model::cancelPressed)
             }
         }
+    }
+
+    init {
+        model.closed.addListener { _, _, new -> if (new) { close() } }
     }
 }

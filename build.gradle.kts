@@ -32,17 +32,15 @@ dependencies {
     implementation("no.tornado:tornadofx-controlsfx:0.1")
     implementation("org.fxmisc.richtext:richtextfx:0.9.2")
     implementation("com.dmdirc:ktirc:+")
+
     runtime("org.openjfx:javafx-graphics:$javafx.version:win")
     runtime("org.openjfx:javafx-graphics:$javafx.version:linux")
     runtime("org.openjfx:javafx-graphics:$javafx.version:mac")
-}
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.withType<Wrapper> {
-    gradleVersion = "5.1.1"
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.4.0")
+    testImplementation("io.mockk:mockk:1.9.1")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.0")
 }
 
 configurations.all {
@@ -55,9 +53,26 @@ configurations.all {
     }
 }
 
-tasks.withType<Jar> {
-    manifest.attributes.apply {
-        put("Main-Class", mainClass)
+tasks {
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
     }
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+
+    withType<Wrapper> {
+        gradleVersion = "5.1.1"
+    }
+
+    withType<Test> {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
+
+    withType<Jar> {
+        manifest.attributes.apply {
+            put("Main-Class", mainClass)
+        }
+        from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    }
 }
