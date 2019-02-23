@@ -57,7 +57,7 @@ class ServerlistDialog : Fragment() {
 }
 
 class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
-    private val config1 by kodein.instance<Config>()
+    private val config1 by kodein.instance<ClientConfig>()
 
     val servers = config1[ClientSpec.servers].toMutableList().observable()
     val hostname = bind(ConnectionDetails::hostname)
@@ -68,7 +68,7 @@ class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
 
     override fun onCommit() {
         config1[ClientSpec.servers] = servers
-        config1.save(Paths.get("config.yml"))
+        config1.save()
     }
 }
 

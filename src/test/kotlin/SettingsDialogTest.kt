@@ -1,10 +1,11 @@
 
+import com.dmdirc.ClientConfig
 import com.dmdirc.ClientSpec
 import com.dmdirc.SettingsModel
 import com.dmdirc.kodein
-import com.dmdirc.save
-import com.uchuhimo.konf.Config
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,18 +15,15 @@ import org.kodein.di.generic.provider
 
 private class SettingsModelTest {
 
-    private val mockConfig = mockk<Config>()
+    private val mockConfig = mockk<ClientConfig>()
 
     @BeforeEach
     fun setup() {
         val original = kodein
         kodein = Kodein {
             extend(original, allowOverride = true)
-            bind<Config>(overrides = true) with provider { mockConfig }
+            bind<ClientConfig>(overrides = true) with provider { mockConfig }
         }
-
-        mockkStatic("com.dmdirc.ConfigKt")
-        every { mockConfig.save(any()) } just Runs
     }
 
     @Test
@@ -56,7 +54,7 @@ private class SettingsModelTest {
             mockConfig[ClientSpec.DefaultProfile.nickname] = "crashOverride"
             mockConfig[ClientSpec.DefaultProfile.username] = "crash"
             mockConfig[ClientSpec.DefaultProfile.realname] = "???"
-            mockConfig.save(any())
+            mockConfig.save()
         }
     }
 
