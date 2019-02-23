@@ -115,7 +115,11 @@ class Connection(
         get() = metadata.time.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
 
     private fun WindowUI.addLine(line: String) {
-        textArea.appendText("$line\n")
+        "$line\n".convertControlCodes().forEach {
+            textArea.appendText(it.content)
+            textArea.setStyleClass(textArea.length - it.content.length, textArea.length,
+                it.styles.joinToString(" ", transform = Style::toClasses))
+        }
     }
 
     private fun runLaterWithWindowUi(windowName: String, block: WindowUI.() -> Unit) =
@@ -128,4 +132,13 @@ class Connection(
             it.connection == this && it.name == windowName
         }?.windowUI?.block()
 
+}
+
+private fun Style.toClasses() = when (this) {
+    is Style.BoldStyle -> "irc-bold"
+    is Style.ItalicStyle -> "irc-italic"
+    is Style.UnderlineStyle -> "irc-underline"
+    is Style.StrikethroughStyle -> "irc-strikethrough"
+    is Style.MonospaceStyle -> "irc-monospace"
+    is Style.ColourStyle -> "irc-colour-fg-$foreground" + background?.let { " irc-colour-bg-$background" }
 }
