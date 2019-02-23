@@ -47,7 +47,7 @@ class MainView : View() {
             }
             left = vbox {
                 scrollpane {
-                    listview(SortedList(controller.windows, compareBy { it.path })) {
+                    listview(SortedList(controller.windows, compareBy { it.sortKey })) {
                         isFitToHeight = true
                         bindSelected(controller.selectedWindow)
                         cellFormat {

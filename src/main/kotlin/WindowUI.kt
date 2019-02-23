@@ -6,15 +6,34 @@ import org.fxmisc.flowless.VirtualizedScrollPane
 import org.fxmisc.richtext.StyleClassedTextArea
 import tornadofx.*
 
+enum class WindowType {
+    ROOT,
+    SERVER,
+    CHANNEL
+}
+
+data class Window(
+    val name: String,
+    val type: WindowType,
+    var windowUI: WindowUI,
+    var connection: Connection?,
+    var isConnection: Boolean,
+    val connectionId: String?
+) {
+    val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else name.toLowerCase()}"
+}
+
 class WindowUI(connection: Connection?) : View("Right bit") {
     private val controller: MainController by inject()
     val textArea = StyleClassedTextArea()
     private val inputText = SimpleStringProperty()
     val users = emptyList<String>().toMutableList().observable()
 
-    lateinit var myConnection : Connection
+    lateinit var myConnection: Connection
 
-    init { connection?.let { myConnection = it } }
+    init {
+        connection?.let { myConnection = it }
+    }
 
     override val root = borderpane {
         center = hbox {
