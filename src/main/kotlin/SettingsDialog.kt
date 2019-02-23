@@ -1,27 +1,26 @@
 package com.dmdirc
 
+import com.uchuhimo.konf.Config
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.ButtonBar
+import org.kodein.di.generic.instance
 import tornadofx.*
+import java.nio.file.Paths
 
 data class Settings(val nickname: String, val realname: String, val username: String)
 
 class SettingsModel : ItemViewModel<Settings>() {
-    private val keyNickname = "nickname"
-    private val keyRealname = "realname"
-    private val keyUsername = "username"
+    private val config1 by kodein.instance<Config>()
 
-    val nickname = bind { SimpleStringProperty(item?.nickname, null, app.config.string(keyNickname)) }
-    val realname = bind { SimpleStringProperty(item?.realname, null, app.config.string(keyRealname)) }
-    val username = bind { SimpleStringProperty(item?.username, null, app.config.string(keyUsername)) }
+    val nickname = bind { SimpleStringProperty(item?.nickname, null, config1[ClientSpec.DefaultProfile.nickname]) }
+    val realname = bind { SimpleStringProperty(item?.realname, null, config1[ClientSpec.DefaultProfile.realname]) }
+    val username = bind { SimpleStringProperty(item?.username, null, config1[ClientSpec.DefaultProfile.username]) }
 
     override fun onCommit() {
-        with(app.config) {
-            set(keyNickname to nickname.value)
-            set(keyRealname to realname.value)
-            set(keyUsername to username.value)
-            save()
-        }
+        config1[ClientSpec.DefaultProfile.nickname] = nickname.value
+        config1[ClientSpec.DefaultProfile.realname] = realname.value
+        config1[ClientSpec.DefaultProfile.username] = username.value
+        config1.save(Paths.get("config.yml"))
     }
 }
 

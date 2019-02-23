@@ -15,6 +15,12 @@ data class ConnectionDetails(var hostname: String, var password: String, var por
 
 object ClientSpec : ConfigSpec("") {
     val servers by optional(listOf<ConnectionDetails>())
+
+    object DefaultProfile : ConfigSpec() {
+        val nickname by optional("")
+        val username by optional("")
+        val realname by optional("")
+    }
 }
 
 /**
