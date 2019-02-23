@@ -54,7 +54,7 @@ private class SettingsModelTest {
             mockConfig[ClientSpec.DefaultProfile.nickname] = "crashOverride"
             mockConfig[ClientSpec.DefaultProfile.username] = "crash"
             mockConfig[ClientSpec.DefaultProfile.realname] = "???"
-            mockConfig.save(any())
+            mockConfig.save()
         }
     }
 

@@ -28,10 +28,17 @@ private class ConfigTest {
     }
 
     @Test
-    fun `writes config to disk`() {
+    fun `writes config to specified path`() {
         val config = ClientConfig.loadFrom(fs.getPath("/whatever"))
         config.save(fs.getPath("/out.yml"))
         assertTrue(Files.exists(fs.getPath("/out.yml")))
+    }
+
+    @Test
+    fun `writes config to original path`() {
+        val config = ClientConfig.loadFrom(fs.getPath("/config.yml"))
+        config.save()
+        assertTrue(Files.exists(fs.getPath("/config.yml")))
     }
 
     @Test

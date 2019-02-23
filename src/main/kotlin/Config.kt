@@ -28,7 +28,7 @@ object ClientSpec : ConfigSpec("") {
     }
 }
 
-class ClientConfig private constructor(private val config: Config) {
+class ClientConfig private constructor(private val path: Path, private val config: Config) {
 
     /**
      * Get associated value with specified item.
@@ -47,11 +47,14 @@ class ClientConfig private constructor(private val config: Config) {
     operator fun <T> set(item: Item<T>, value: T) = config.set(item, value)
 
     /**
-     * Attempts to save the config to the given [path].
+     * Attempts to save the config.
+     *
+     * If [newPath] is provided the config is saved to that path; otherwise
+     * the config is saved to the path it was originally loaded from
      */
-    fun save(path: Path) =
+    fun save(newPath: Path? = null) =
         try {
-            Files.newOutputStream(path).use { config.toYaml.toOutputStream(it) }
+            Files.newOutputStream(newPath ?: path).use { config.toYaml.toOutputStream(it) }
         } catch (ex: IOException) {
             logger.log(Level.WARNING, ex) { "Unable to load config file" }
         }
@@ -68,11 +71,11 @@ class ClientConfig private constructor(private val config: Config) {
         fun loadFrom(path: Path): ClientConfig =
             with(Config { addSpec(ClientSpec) }) {
                 try {
-                    return ClientConfig(Files.newInputStream(path).use { from.yaml.inputStream(it) })
+                    return ClientConfig(path, Files.newInputStream(path).use { from.yaml.inputStream(it) })
                 } catch (ex: IOException) {
                     logger.log(Level.WARNING, ex) { "Unable to load config file" }
                 }
-                return ClientConfig(this)
+                return ClientConfig(path, this)
             }
 
     }

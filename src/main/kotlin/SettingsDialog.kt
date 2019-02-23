@@ -4,7 +4,6 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.ButtonBar
 import org.kodein.di.generic.instance
 import tornadofx.*
-import java.nio.file.Paths
 
 data class Settings(val nickname: String, val realname: String, val username: String)
 
@@ -19,7 +18,7 @@ class SettingsModel : ItemViewModel<Settings>() {
         config1[ClientSpec.DefaultProfile.nickname] = nickname.value
         config1[ClientSpec.DefaultProfile.realname] = realname.value
         config1[ClientSpec.DefaultProfile.username] = username.value
-        config1.save(Paths.get("config.yml"))
+        config1.save()
     }
 }
 

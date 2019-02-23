@@ -68,7 +68,7 @@ class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
 
     override fun onCommit() {
         config1[ClientSpec.servers] = servers
-        config1.save(Paths.get("config.yml"))
+        config1.save()
     }
 }
 
