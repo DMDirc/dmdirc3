@@ -60,6 +60,7 @@ class Connection(
             }
             event is ServerReady -> {
                 networkName = client.serverState.features[ServerFeature.Network] ?: ""
+                serverName = client.serverState.serverName
             }
             event is ServerDisconnected -> runLater {
                 window.windowUI.addLine("${event.timestamp} *** Disconnected")
