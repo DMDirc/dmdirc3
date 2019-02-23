@@ -36,6 +36,24 @@ internal class ControlCodesTest {
                 StyledSpan("Crash ", emptySet()),
                 StyledSpan("and ", setOf(Style.MonospaceStyle, Style.StrikethroughStyle)),
                 StyledSpan("burn", emptySet())
+            )),
+
+            arguments("\u00034Crash and burn", listOf(
+                StyledSpan("Crash and burn", setOf(Style.ColourStyle(4, null)))
+            )),
+
+            arguments("\u000304Crash and burn", listOf(
+                StyledSpan("Crash and burn", setOf(Style.ColourStyle(4, null)))
+            )),
+
+            arguments("\u00034,5Crash and \u000fburn", listOf(
+                StyledSpan("Crash and ", setOf(Style.ColourStyle(4, 5))),
+                StyledSpan("burn", emptySet())
+            )),
+
+            arguments("\u00034,Crash and \u0003burn", listOf(
+                StyledSpan(",Crash and ", setOf(Style.ColourStyle(4, null))),
+                StyledSpan("burn", emptySet())
             ))
         )
     }

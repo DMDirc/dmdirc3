@@ -11,7 +11,7 @@ object ControlCode {
     const val Bold = '\u0002'
 
     /**
-     * Sets or resets the colour of the following text. NOT CURRENTLY SUPPORTED.
+     * Sets or resets the colour of the following text.
      *
      * If followed by one or two numbers separated by a comma, sets the foreground and optionally background of the
      * text. Otherwise, clears all colours.
@@ -63,7 +63,7 @@ sealed class Style {
     object MonospaceStyle : Style()
     object UnderlineStyle : Style()
     object StrikethroughStyle : Style()
-    data class ColourStyle(val foreground: Int?, val background: Int?) : Style()
+    data class ColourStyle(val foreground: Int, val background: Int?) : Style()
 }
 
 data class StyledSpan(val content: String, val styles: Set<Style>)
@@ -71,12 +71,34 @@ data class StyledSpan(val content: String, val styles: Set<Style>)
 fun String.convertControlCodes() = sequence {
     val styles = mutableSetOf<Style>()
     val buffer = StringBuilder()
+    var nextColour = -1
+    val colours = arrayOf(StringBuilder(), StringBuilder())
 
     fun emitThen(block: () -> Unit) = sequence {
+        var needComma = false
+        if (nextColour > -1) {
+            if (nextColour == 1 && colours[1].isEmpty()) {
+                // We consumed a comma that wasn't used; re-add it
+                needComma = true
+            }
+
+            if (colours[0].isEmpty()) {
+                styles.removeIf { it is Style.ColourStyle }
+            } else {
+                styles.add(colours.toStyle())
+            }
+
+            nextColour = -1
+            colours.forEach { it.clear() }
+        }
+
         if (buffer.isNotEmpty()) {
             yield(StyledSpan(buffer.toString(), HashSet(styles)))
             buffer.clear()
         }
+
+        if (needComma) buffer.append(',')
+
         block.invoke()
     }
 
@@ -88,7 +110,13 @@ fun String.convertControlCodes() = sequence {
             ControlCode.Underline -> yieldAll(emitThen { styles.toggle(Style.UnderlineStyle) })
             ControlCode.Strikethrough -> yieldAll(emitThen { styles.toggle(Style.StrikethroughStyle) })
             ControlCode.Reset -> yieldAll(emitThen { styles.clear() })
-            else -> buffer.append(it)
+            ControlCode.Colour -> yieldAll(emitThen { nextColour = 0 })
+            else -> when {
+                nextColour == -1 -> buffer.append(it)
+                nextColour == 0 && it == ',' -> nextColour = 1
+                nextColour >= 0 && it.isDigit() && colours[nextColour].length < 2 -> colours[nextColour].append(it)
+                nextColour >= 0 -> yieldAll(emitThen { buffer.append(it) })
+            }
         }
     }
 
@@ -99,3 +127,8 @@ private fun MutableSet<Style>.toggle(style: Style) = when {
     contains(style) -> remove(style)
     else -> add(style)
 }
+
+private fun Array<StringBuilder>.toStyle() = Style.ColourStyle(
+    this[0].toString().toInt(),
+    if (this[1].isEmpty()) null else this[1].toString().toInt()
+)
