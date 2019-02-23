@@ -20,6 +20,11 @@ class MainView : View() {
                     }
                 }
                 menu("IRC") {
+                    item("Server List") {
+                        action {
+                            find<ServerlistDialog>().openModal()
+                        }
+                    }
                     item("Connect") {
                         action {
                             find<ConnectDialog>().openModal()
