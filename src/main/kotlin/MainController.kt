@@ -6,26 +6,6 @@ import org.kodein.di.generic.instance
 import tornadofx.Controller
 import tornadofx.observable
 
-enum class WindowType {
-    ROOT,
-    SERVER,
-    CHANNEL
-}
-
-data class Window(
-    val name: String,
-    val type: WindowType,
-    var windowUI: WindowUI,
-    var connection: Connection?,
-    var isConnection: Boolean
-) {
-    val path = if (isConnection) {
-        connection?.serverName?.toLowerCase() ?: ""
-    } else {
-        "${connection?.serverName?.toLowerCase() ?: ""} ${name.toLowerCase()}"
-    }
-}
-
 class MainController : Controller() {
 
     private val config1 by kodein.instance<ClientConfig>()
