@@ -33,6 +33,7 @@ dependencies {
     implementation("org.fxmisc.richtext:richtextfx:0.9.2")
     implementation("com.dmdirc:ktirc:+")
     implementation("com.uchuhimo:konf:0.13.1")
+    implementation("org.kodein.di:kodein-di-generic-jvm:6.1.0")
 
     runtime("org.openjfx:javafx-graphics:$javafx.version:win")
     runtime("org.openjfx:javafx-graphics:$javafx.version:linux")
