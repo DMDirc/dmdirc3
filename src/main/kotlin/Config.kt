@@ -72,7 +72,7 @@ class ClientConfig private constructor(private val path: Path, private val confi
             with(Config { addSpec(ClientSpec) }) {
                 try {
                     return ClientConfig(path, Files.newInputStream(path).use { from.yaml.inputStream(it) })
-                } catch (ex: IOException) {
+                } catch (ex: Exception) {
                     logger.log(Level.WARNING, ex) { "Unable to load config file" }
                 }
                 return ClientConfig(path, this)

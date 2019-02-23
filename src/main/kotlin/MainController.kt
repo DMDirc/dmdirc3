@@ -22,14 +22,22 @@ class MainController : Controller() {
 
     private val config1 by kodein.instance<ClientConfig>()
     val windows: ObservableList<Window> = emptyList<Window>().toMutableList().observable()
+    val selectedWindow: SimpleObjectProperty<Window> = SimpleObjectProperty()
 
-    fun connect(host: String, port: Int, password: String, tls: Boolean) {
-        Connection(host,  port, password, tls, config1, this).connect()
+    init {
+        autoConnect()
+    }
+
+    private fun autoConnect() {
+        config1[ClientSpec.servers].filter { it.autoconnect }.forEach(this::connect)
+    }
+
+    fun connect(connectionDetails: ConnectionDetails) {
+        Connection(connectionDetails.hostname,  connectionDetails.port, connectionDetails.password, connectionDetails.tls, config1, this).connect()
     }
 
     fun joinChannel(value: String) {
-        selectedChannel.value.connection?.joinChannel(value) ?: return
+        selectedWindow.value.connection?.joinChannel(value) ?: return
     }
 
-    val selectedChannel: SimpleObjectProperty<Window> = SimpleObjectProperty()
 }

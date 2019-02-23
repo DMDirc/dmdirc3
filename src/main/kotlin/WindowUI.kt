@@ -50,7 +50,7 @@ class WindowUI(connection: Connection?) : View("Right bit") {
             action {
                 if (inputText.value.isNotEmpty()) {
                     runAsync {
-                        myConnection.sendMessage(controller.selectedChannel.value.name, inputText.value)
+                        myConnection.sendMessage(controller.selectedWindow.value.name, inputText.value)
                         inputText.value = ""
                     }
                 }
