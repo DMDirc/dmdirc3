@@ -11,7 +11,7 @@ import java.util.logging.Logger
 
 private val logger = Logger.getLogger(ClientSpec::class.simpleName)
 
-data class ConnectionDetails(val hostname: String, val password: String, val port: Int, val tls: Boolean)
+data class ConnectionDetails(val hostname: String, val password: String, val port: Int, val tls: Boolean, val autoconnect: Boolean)
 
 object ClientSpec : ConfigSpec("") {
     val servers by optional(listOf<ConnectionDetails>())
