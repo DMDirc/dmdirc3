@@ -5,8 +5,8 @@ import com.dmdirc.ktirc.events.*
 import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.model.ServerFeature
+import com.uchuhimo.konf.Config
 import javafx.beans.property.SimpleBooleanProperty
-import tornadofx.ConfigProperties
 import tornadofx.runLater
 import java.time.format.DateTimeFormatter
 
@@ -15,7 +15,7 @@ class Connection(
     private val port: Int,
     private val password: String?,
     private val tls: Boolean,
-    private val config: ConfigProperties,
+    private val config: Config,
     private val controller: MainController
 ) {
     private val window: Window = Window(
@@ -29,9 +29,9 @@ class Connection(
     private val client: IrcClient = IrcClient {
         server(host, port, tls, password)
         profile {
-            nickname = config.getProperty("nickname")
-            realName = config.getProperty("realname")
-            username = config.getProperty("username")
+            nickname = config[ClientSpec.DefaultProfile.nickname]
+            realName = config[ClientSpec.DefaultProfile.realname]
+            username = config[ClientSpec.DefaultProfile.username]
         }
     }
 
