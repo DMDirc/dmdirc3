@@ -4,7 +4,6 @@ import javafx.collections.transformation.SortedList
 import javafx.scene.image.Image
 import javafx.scene.layout.Priority
 import tornadofx.*
-import tornadofx.controlsfx.statusbar
 
 class MainView : View() {
     private val controller: MainController by inject()
@@ -74,9 +73,6 @@ class MainView : View() {
                 }
             }
             center = vbox {
-            }
-            bottom = statusbar {
-                text = ""
             }
             addStageIcon(Image(resources.stream("/logo.png")))
         }
