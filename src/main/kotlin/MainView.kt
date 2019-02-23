@@ -52,7 +52,7 @@ class MainView : View() {
                         bindSelected(controller.selectedChannel)
                         cellFormat {
                             text = when (it.type) {
-                                WindowType.SERVER -> it.name
+                                WindowType.SERVER -> "${it.name} [${it.connection?.networkName ?: ""}]"
                                 WindowType.CHANNEL -> "\t${it.name}"
                                 else -> it.name
                             }
