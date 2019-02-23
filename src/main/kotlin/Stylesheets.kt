@@ -20,12 +20,8 @@ private fun Path.checkAndInstall() {
 }
 
 private fun Path.watchFile(file: Path, action: () -> Unit) {
-    val watchPath = if (Files.isDirectory(this)) {
-        this
-    } else {
-        return
-    }
-    watchPath.watch().takeRepeat {
+    if (!Files.isDirectory(this)) return
+    watch().takeRepeat {
         val context = it.context()
         if (context is Path) {
             if (context == file) {
