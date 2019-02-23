@@ -21,10 +21,12 @@ class Connection(
         host,
         WindowType.SERVER,
         WindowUI(this),
-        this
+        this,
+        true
     )
     private val connected = SimpleBooleanProperty(false)
     var networkName = ""
+    var serverName = ""
     private val client: IrcClient = IrcClient {
         server(host, port, tls, password)
         profile {
@@ -36,6 +38,7 @@ class Connection(
 
     fun connect() {
         client.onEvent(this::handleEvent)
+        serverName = client.serverState.serverName
         controller.windows.add(window)
         client.connect()
     }
@@ -71,7 +74,8 @@ class Connection(
                         event.target,
                         WindowType.CHANNEL,
                         WindowUI(this),
-                        this
+                        this,
+                        false
                     )
                 )
             }

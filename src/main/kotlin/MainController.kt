@@ -16,7 +16,15 @@ data class Window(
     val name: String,
     val type: WindowType,
     var windowUI: WindowUI,
-    var connection: Connection?)
+    var connection: Connection?,
+    var isConnection: Boolean
+) {
+    val path = if (isConnection) {
+        connection?.serverName?.toLowerCase() ?: ""
+    } else {
+        "${connection?.serverName?.toLowerCase() ?: ""} ${name.toLowerCase()}"
+    }
+}
 
 class MainController : Controller() {
 

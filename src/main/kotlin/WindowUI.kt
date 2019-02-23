@@ -12,7 +12,7 @@ class WindowUI(connection: Connection?) : View("Right bit") {
     private val inputText = SimpleStringProperty()
     val users = emptyList<String>().toMutableList().observable()
 
-    lateinit var myConnection : Connection;
+    lateinit var myConnection : Connection
 
     init { connection?.let { myConnection = it } }
 
