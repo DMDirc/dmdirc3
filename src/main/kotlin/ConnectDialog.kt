@@ -80,6 +80,9 @@ class ConnectDialog : Fragment() {
             cellFormat {
                 text = "${it.hostname}:${it.port}"
             }
+            if (servers.isNotEmpty()) {
+                selectionModel.select(servers[0])
+            }
         }
         buttonbar {
             button("Connect", ButtonBar.ButtonData.OK_DONE) {
