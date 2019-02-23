@@ -1,7 +1,9 @@
 package com.dmdirc
 
+import com.uchuhimo.konf.Config
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.ButtonBar
+import org.kodein.di.generic.instance
 import tornadofx.*
 import java.nio.file.Paths
 
@@ -55,7 +57,8 @@ class ServerlistDialog : Fragment() {
 }
 
 class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
-    private val config1 = loadConfig(Paths.get("config.yml"))
+    private val config1 by kodein.instance<Config>()
+
     val servers = config1[ClientSpec.servers].toMutableList().observable()
     val hostname = bind(ConnectionDetails::hostname)
     val password = bind(ConnectionDetails::password)
@@ -71,9 +74,11 @@ class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
 
 class ConnectDialog : Fragment() {
     private val controller: MainController by inject()
-    private val config1 = loadConfig(Paths.get("config.yml"))
+    private val config1 by kodein.instance<Config>()
+
     private val servers = config1[ClientSpec.servers].toMutableList().observable()
     private val selected = SimpleObjectProperty<ConnectionDetails>()
+
     override val root = form {
         combobox(selected, servers) {
             bindSelected(selected)
