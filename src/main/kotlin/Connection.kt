@@ -117,8 +117,8 @@ class Connection(
     private fun WindowUI.addLine(line: String) {
         "$line\n".convertControlCodes().forEach {
             textArea.appendText(it.content)
-            textArea.setStyleClass(textArea.length - it.content.length, textArea.length,
-                it.styles.joinToString(" ", transform = Style::toClasses))
+            textArea.setStyle(textArea.length - it.content.length, textArea.length,
+                it.styles.joinToString(" ", transform = Style::toClasses).split(' '))
         }
     }
 
