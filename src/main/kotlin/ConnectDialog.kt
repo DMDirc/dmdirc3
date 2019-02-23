@@ -6,8 +6,6 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.ButtonBar
 import tornadofx.*
 
-data class ConnectionDetails(val hostname: String, val password: String, val port: Int, val tls: Boolean)
-
 class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
     private val keyHostname = "hostname"
     private val keyPort = "port"
