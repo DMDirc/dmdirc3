@@ -5,7 +5,6 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.ButtonBar
 import org.kodein.di.generic.instance
 import tornadofx.*
-import java.nio.file.Paths
 
 class ServerlistDialog : Fragment() {
     private val model = ConnectionDetailsModel()
@@ -92,12 +91,7 @@ class ConnectDialog : Fragment() {
         buttonbar {
             button("Connect", ButtonBar.ButtonData.OK_DONE) {
                 action {
-                    controller.connect(
-                        host = selected.value.hostname,
-                        port = selected.value.port,
-                        password = selected.value.password,
-                        tls = selected.value.tls
-                    )
+                    controller.connect(selected.value)
                     close()
                 }
             }

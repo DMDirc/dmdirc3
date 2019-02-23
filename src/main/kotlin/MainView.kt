@@ -34,7 +34,7 @@ class MainView : View() {
                         action {
                             find<JoinDialog>().openModal()
                         }
-                        enableWhen(controller.selectedChannel.isNotNull)
+                        enableWhen(controller.selectedWindow.isNotNull)
                     }
                 }
                 menu("Settings") {
@@ -49,7 +49,7 @@ class MainView : View() {
                 scrollpane {
                     listview(controller.windows) {
                         isFitToHeight = true
-                        bindSelected(controller.selectedChannel)
+                        bindSelected(controller.selectedWindow)
                         cellFormat {
                             text = when (it.type) {
                                 WindowType.SERVER -> "${it.name} [${it.connection?.networkName ?: ""}]"
@@ -57,7 +57,7 @@ class MainView : View() {
                                 else -> it.name
                             }
                         }
-                        controller.selectedChannel.addListener(ChangeListener { _, _, newValue ->
+                        controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
                                 center = newValue.windowUI.root
                             }
                         )
