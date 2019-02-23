@@ -45,11 +45,11 @@ class MainController : Controller() {
     }
 
     fun joinChannel(value: String) {
-        selectedWindow.value.connection?.joinChannel(value) ?: return
+        selectedWindow.value.connection?.joinChannel(value)
     }
 
     fun leaveChannel(name: String) {
-        selectedWindow.value.connection?.leaveChannel(name) ?: return
+        selectedWindow.value.connection?.leaveChannel(name)
     }
 
 }

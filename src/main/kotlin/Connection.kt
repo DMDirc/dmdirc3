@@ -103,7 +103,7 @@ class Connection(
             is ChannelParted -> {
                 users.remove(event.user.nickname)
                 addLine("${event.timestamp} -- ${event.user.nickname} Left${if (event.reason.isNotEmpty()) " ${event.reason}" else ""}")
-                if (event.user.nickname == client.serverState.localNickname) {
+                if (client.isLocalUser(event.user)) {
                     controller.windows.removeIf { it.connection == this@Connection && it.name == event.target }
                 }
             }

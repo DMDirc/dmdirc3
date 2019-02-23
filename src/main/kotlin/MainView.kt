@@ -65,11 +65,12 @@ class MainView : View() {
                         contextmenu {
                              item("Close") {
                                 action {
-                                    val selected = selectedItem ?: return@action
-                                    if (!selected.isConnection) {
-                                        controller.leaveChannel(selected.name)
-                                    } else {
-                                        selected.connection?.disconnect()
+                                    selectedItem?.let {
+                                        if (!it.isConnection) {
+                                            controller.leaveChannel(it.name)
+                                        } else {
+                                            it.connection?.disconnect()
+                                        }
                                     }
                                 }
                             }
