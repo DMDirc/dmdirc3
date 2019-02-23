@@ -5,7 +5,6 @@ import com.dmdirc.ktirc.events.*
 import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.model.ServerFeature
-import com.uchuhimo.konf.Config
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.runLater
 import java.time.format.DateTimeFormatter
@@ -15,7 +14,7 @@ class Connection(
     private val port: Int,
     private val password: String?,
     private val tls: Boolean,
-    private val config: Config,
+    private val config: ClientConfig,
     private val controller: MainController
 ) {
     private val window: Window = Window(

@@ -1,6 +1,5 @@
 package com.dmdirc
 
-import com.uchuhimo.konf.Config
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ObservableList
 import org.kodein.di.generic.instance
@@ -21,7 +20,7 @@ data class Window(
 
 class MainController : Controller() {
 
-    val config1 by kodein.instance<Config>()
+    private val config1 by kodein.instance<ClientConfig>()
     val windows: ObservableList<Window> = emptyList<Window>().toMutableList().observable()
 
     fun connect(host: String, port: Int, password: String, tls: Boolean) {

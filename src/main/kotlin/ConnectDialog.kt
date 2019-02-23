@@ -57,7 +57,7 @@ class ServerlistDialog : Fragment() {
 }
 
 class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
-    private val config1 by kodein.instance<Config>()
+    private val config1 by kodein.instance<ClientConfig>()
 
     val servers = config1[ClientSpec.servers].toMutableList().observable()
     val hostname = bind(ConnectionDetails::hostname)

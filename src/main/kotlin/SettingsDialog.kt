@@ -1,6 +1,5 @@
 package com.dmdirc
 
-import com.uchuhimo.konf.Config
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.ButtonBar
 import org.kodein.di.generic.instance
@@ -10,7 +9,7 @@ import java.nio.file.Paths
 data class Settings(val nickname: String, val realname: String, val username: String)
 
 class SettingsModel : ItemViewModel<Settings>() {
-    private val config1 by kodein.instance<Config>()
+    private val config1 by kodein.instance<ClientConfig>()
 
     val nickname = bind { SimpleStringProperty(item?.nickname, null, config1[ClientSpec.DefaultProfile.nickname]) }
     val realname = bind { SimpleStringProperty(item?.realname, null, config1[ClientSpec.DefaultProfile.realname]) }
