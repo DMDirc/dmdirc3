@@ -6,9 +6,12 @@ import org.kodein.di.generic.bind
 import org.kodein.di.generic.singleton
 import tornadofx.App
 import tornadofx.launch
+import tornadofx.runAsync
 import java.nio.file.Paths
 import java.util.logging.Level
 import java.util.logging.LogManager
+
+
 
 internal var kodein = Kodein {
     bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
@@ -25,6 +28,12 @@ class MainApp : App(MainView::class) {
             minWidth = 800.0
             minHeight = 600.0
             super.start(this)
+        }
+
+    }
+    init {
+        runAsync {
+            installStyles(Paths.get("stylesheet.css"))
         }
     }
 }
