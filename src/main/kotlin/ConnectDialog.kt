@@ -1,6 +1,5 @@
 package com.dmdirc
 
-import com.uchuhimo.konf.Config
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.ButtonBar
 import org.kodein.di.generic.instance
@@ -73,7 +72,7 @@ class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
 
 class ConnectDialog : Fragment() {
     private val controller: MainController by inject()
-    private val config1 by kodein.instance<Config>()
+    private val config1 by kodein.instance<ClientConfig>()
 
     private val servers = config1[ClientSpec.servers].toMutableList().observable()
     private val selected = SimpleObjectProperty<ConnectionDetails>()
