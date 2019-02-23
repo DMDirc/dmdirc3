@@ -77,6 +77,9 @@ class ConnectDialog : Fragment() {
     override val root = form {
         combobox(selected, servers) {
             bindSelected(selected)
+            cellFormat {
+                text = "${it.hostname}:${it.port}"
+            }
         }
         buttonbar {
             button("Connect", ButtonBar.ButtonData.OK_DONE) {
