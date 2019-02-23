@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import javafx.collections.transformation.SortedList
 import javafx.scene.image.Image
 import javafx.scene.layout.Priority
 import tornadofx.*
@@ -47,7 +48,7 @@ class MainView : View() {
             }
             left = vbox {
                 scrollpane {
-                    listview(controller.windows) {
+                    listview(SortedList(controller.windows, compareBy { it.path })) {
                         isFitToHeight = true
                         bindSelected(controller.selectedWindow)
                         cellFormat {
