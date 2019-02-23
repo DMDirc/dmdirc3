@@ -8,6 +8,9 @@ import com.dmdirc.ktirc.model.ServerFeature
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.runLater
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.atomic.AtomicLong
+
+private val connectionCounter = AtomicLong(0)
 
 class Connection(
     private val host: String,
@@ -22,7 +25,8 @@ class Connection(
         WindowType.SERVER,
         WindowUI(this),
         this,
-        true
+        true,
+        connectionCounter.incrementAndGet().toString(16).padStart(20)
     )
     private val connected = SimpleBooleanProperty(false)
     var networkName = ""
@@ -84,7 +88,8 @@ class Connection(
                         WindowType.CHANNEL,
                         WindowUI(this),
                         this,
-                        false
+                        false,
+                        window.connectionId
                     )
                 )
             }
