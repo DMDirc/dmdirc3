@@ -4,6 +4,7 @@ import com.dmdirc.ktirc.IrcClient
 import com.dmdirc.ktirc.events.*
 import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
+import com.dmdirc.ktirc.model.ServerFeature
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.ConfigProperties
 import tornadofx.runLater
@@ -24,6 +25,7 @@ class Connection(
         this
     )
     private val connected = SimpleBooleanProperty(false)
+    var networkName = ""
     private val client: IrcClient = IrcClient {
         server(host, port, tls, password)
         profile {
@@ -53,6 +55,9 @@ class Connection(
             event is ServerConnected -> runLater {
                 window.windowUI.addLine("${event.timestamp} *** Connected")
                 connected.value = true
+            }
+            event is ServerReady -> {
+                networkName = client.serverState.features[ServerFeature.Network] ?: ""
             }
             event is ServerDisconnected -> runLater {
                 window.windowUI.addLine("${event.timestamp} *** Disconnected")
