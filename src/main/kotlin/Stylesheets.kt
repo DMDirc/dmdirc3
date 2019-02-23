@@ -1,21 +1,21 @@
 package com.dmdirc
 
-import com.sun.javafx.application.PlatformImpl
+import javafx.scene.Scene
 import java.nio.file.*
 
 
-fun installStyles(file: Path) {
-    file.checkAndInstall()
+fun installStyles(root: Scene, file: Path) {
+    file.checkAndInstall(root)
     val directory = file.toAbsolutePath().parent
     directory.watchFile(file) {
-        PlatformImpl.setDefaultPlatformUserAgentStylesheet()
-        file.checkAndInstall()
+        root.stylesheets.clear()
+        file.checkAndInstall(root)
     }
 }
 
-private fun Path.checkAndInstall() {
+private fun Path.checkAndInstall(root: Scene) {
     if (Files.exists(this)) {
-        PlatformImpl.setPlatformUserAgentStylesheet(this.toAbsolutePath().toUri().toURL().toExternalForm())
+        root.stylesheets.add(this.toAbsolutePath().toUri().toURL().toExternalForm())
     }
 }
 

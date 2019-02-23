@@ -1,12 +1,13 @@
 package com.dmdirc
 
 import javafx.stage.Stage
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.singleton
 import tornadofx.App
 import tornadofx.launch
-import tornadofx.runAsync
 import java.nio.file.Paths
 import java.util.logging.Level
 import java.util.logging.LogManager
@@ -29,11 +30,8 @@ class MainApp : App(MainView::class) {
             minHeight = 600.0
             super.start(this)
         }
-
-    }
-    init {
-        runAsync {
-            installStyles(Paths.get("stylesheet.css"))
+        GlobalScope.launch {
+            installStyles(stage.scene, Paths.get("stylesheet.css"))
         }
     }
 }
