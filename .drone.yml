@@ -1,0 +1,8 @@
+kind: pipeline
+name: default
+
+steps:
+  - name: Test
+    image: openjdk:11-jdk
+    commands:
+      - ./gradlew build test
