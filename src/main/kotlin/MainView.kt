@@ -62,6 +62,20 @@ class MainView : View() {
                             }
                         )
                         prefWidth = 148.0
+                        contextmenu {
+                             item("Close") {
+                                action {
+                                    val selected = selectedItem
+                                    if (selected != null) {
+                                        if (!selected.isConnection) {
+                                            controller.leaveChannel(selected.name)
+                                        } else {
+                                            selected.connection?.disconnect()
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     vboxConstraints {
                         vgrow = Priority.ALWAYS

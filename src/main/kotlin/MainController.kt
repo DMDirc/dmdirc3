@@ -48,4 +48,8 @@ class MainController : Controller() {
         selectedWindow.value.connection?.joinChannel(value) ?: return
     }
 
+    fun leaveChannel(name: String) {
+        selectedWindow.value.connection?.leaveChannel(name) ?: return
+    }
+
 }
