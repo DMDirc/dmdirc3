@@ -40,6 +40,9 @@ class Connection(
             realName = config[ClientSpec.DefaultProfile.realname]
             username = config[ClientSpec.DefaultProfile.username]
         }
+        behaviour {
+            alwaysEchoMessages = true
+        }
     }
 
     fun connect() {
