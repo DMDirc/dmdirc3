@@ -2,7 +2,6 @@ package com.dmdirc
 
 import javafx.collections.transformation.SortedList
 import javafx.scene.image.Image
-import javafx.scene.layout.Priority
 import tornadofx.*
 
 class MainView : View() {
@@ -32,7 +31,7 @@ class MainView : View() {
                     }
                     item("Join") {
                         action {
-                            find<JoinDialog>().openModal()
+                            JoinDialogController(controller).create()
                         }
                         enableWhen(controller.selectedWindow.isNotNull)
                     }
