@@ -9,9 +9,7 @@ import org.kodein.di.generic.singleton
 import tornadofx.App
 import tornadofx.launch
 import java.nio.file.Paths
-import java.util.logging.Level
 import java.util.logging.LogManager
-
 
 
 internal var kodein = Kodein {
@@ -20,11 +18,6 @@ internal var kodein = Kodein {
 
 class MainApp : App(MainView::class) {
     override fun start(stage: Stage) {
-        val rootLogger = LogManager.getLogManager().getLogger("")
-        rootLogger.level = Level.OFF
-        for (h in rootLogger.handlers) {
-            h.level = Level.OFF
-        }
         with(stage) {
             minWidth = 800.0
             minHeight = 600.0
@@ -37,5 +30,6 @@ class MainApp : App(MainView::class) {
 }
 
 fun main(args: Array<String>) {
+    LogManager.getLogManager().readConfiguration(MainApp::class.java.getResourceAsStream("/logs.properties"))
     launch<MainApp>(args)
 }
