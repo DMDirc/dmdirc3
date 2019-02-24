@@ -1,29 +1,44 @@
 package com.dmdirc
 
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.control.ButtonBar
 import tornadofx.*
 
 data class JoinDetails(val channel: String)
 
-class JoinDetailsModel : ItemViewModel<JoinDetails>() {
-    private val controller: MainController by inject()
-    val channel = bind(JoinDetails::channel)
-    override fun onCommit() {
-        controller.joinChannel(channel.value)
+class JoinDialogController(private val controller: MainController) {
+    private var model: JoinDetailsModel? = null
+    fun create() {
+        val model = JoinDetailsModel(this)
+        this.model = model
+        JoinDialog(model).openModal()
+    }
+    fun join(channel: String) {
+        controller.joinChannel(channel)
+        model?.closeDialog()
     }
 }
 
-class JoinDialog: Fragment() {
-    private val model = JoinDetailsModel()
+class JoinDetailsModel(private val controller: JoinDialogController) : ItemViewModel<JoinDetails>() {
+    val channel = bind(JoinDetails::channel)
+    val open = SimpleBooleanProperty(true)
+    override fun onCommit() {
+        if (isValid) {
+            controller.join(channel.value)
+        }
+    }
+    fun closeDialog() {
+        open.value = false
+    }
+}
+
+class JoinDialog(private val model: JoinDetailsModel) : Fragment() {
     override val root = form {
         fieldset {
             field("Channel Name") {
                 textfield(model.channel).apply {
                     action {
-                        if (model.isValid) {
-                            model.commit()
-                            close()
-                        }
+                        model.commit()
                     }
                 }.required()
             }
@@ -33,7 +48,6 @@ class JoinDialog: Fragment() {
                 enableWhen(model.valid)
                 action {
                     model.commit()
-                    close()
                 }
             }
             button("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE) {
@@ -42,5 +56,6 @@ class JoinDialog: Fragment() {
                 }
             }
         }
+        model.open.addListener(ChangeListener { _, _, newValue -> if (!newValue) { close() }})
     }
 }
