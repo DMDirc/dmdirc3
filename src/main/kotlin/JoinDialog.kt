@@ -8,7 +8,7 @@ data class JoinDetails(val channel: String)
 class JoinDialogController(private val controller: MainController) : Component() {
     private var dialog: JoinDialog? = null
     fun create() {
-        dialog = JoinDialog(this)
+        dialog = JoinDialog(JoinDetailsModel(this))
         dialog?.openModal()
     }
     fun join(channel: String) {
@@ -26,8 +26,7 @@ class JoinDetailsModel(private val controller: JoinDialogController) : ItemViewM
     }
 }
 
-class JoinDialog(controller: JoinDialogController) : Fragment() {
-    private val model = JoinDetailsModel(controller)
+class JoinDialog(model: JoinDetailsModel) : Fragment() {
     override val root = form {
         fieldset {
             field("Channel Name") {
