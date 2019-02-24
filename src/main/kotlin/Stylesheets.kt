@@ -6,20 +6,18 @@ import java.nio.file.*
 
 
 fun installStyles(root: Scene, file: Path) {
-    runLater {
-        root.stylesheets.add(MainApp::class.java.getResource("/stylesheet.css").toExternalForm())
-    }
     file.checkAndInstall(root)
     val directory = file.toAbsolutePath().parent
     directory.watchFile(file) {
-        root.stylesheets.clear()
         file.checkAndInstall(root)
     }
 }
 
 private fun Path.checkAndInstall(root: Scene) {
-    if (Files.exists(this)) {
-        runLater {
+    runLater {
+        root.stylesheets.clear()
+        root.stylesheets.add(MainApp::class.java.getResource("/stylesheet.css").toExternalForm())
+        if (Files.exists(this)) {
             root.stylesheets.add(this.toAbsolutePath().toUri().toURL().toExternalForm())
         }
     }

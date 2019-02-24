@@ -36,36 +36,20 @@ class WindowUI(connection: Connection?) : View("Right bit") {
     }
 
     override val root = borderpane {
-        center = hbox {
-            vbox {
-                add(VirtualizedScrollPane(textArea.apply {
-                    isEditable = false
-                    isWrapText = true
-                }).apply {
-                    vgrow = Priority.ALWAYS
-                })
-                vboxConstraints {
-                    vgrow = Priority.ALWAYS
-                    hgrow = Priority.ALWAYS
-                }
-            }
+        center = VirtualizedScrollPane(textArea.apply {
+            isEditable = false
+            isWrapText = true
+        }).apply {
+            hgrow = Priority.ALWAYS
+            vgrow = Priority.ALWAYS
         }
-        right = vbox {
-            scrollpane {
-                listview(users) {
-                    isFitToHeight = true
-                    prefWidth = 148.0
-                }
-                vboxConstraints {
-                    vgrow = Priority.ALWAYS
-                    hgrow = Priority.ALWAYS
-                }
-            }
-            borderpaneConstraints {
-                maxWidth = 150.00
-            }
+        right = listview(users) {
+            styleClass.add("nick-list")
+            prefWidth = 148.0
         }
+
         bottom = textfield(inputText) {
+            styleClass.add("input-field")
             action {
                 if (inputText.value.isNotEmpty()) {
                     runAsync {

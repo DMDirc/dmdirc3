@@ -45,44 +45,35 @@ class MainView : View() {
                     }
                 }
             }
-            left = vbox {
-                scrollpane {
-                    listview(SortedList(controller.windows, compareBy { it.sortKey })) {
-                        isFitToHeight = true
-                        bindSelected(controller.selectedWindow)
-                        cellFormat {
-                            text = when (it.type) {
-                                WindowType.SERVER -> "${it.name} [${it.connection?.networkName ?: ""}]"
-                                WindowType.CHANNEL -> "\t${it.name}"
-                                else -> it.name
-                            }
-                        }
-                        controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
-                                center = newValue.windowUI.root
-                            }
-                        )
-                        prefWidth = 148.0
-                        contextmenu {
-                             item("Close") {
-                                action {
-                                    selectedItem?.let {
-                                        if (!it.isConnection) {
-                                            controller.leaveChannel(it.name)
-                                        } else {
-                                            it.connection?.disconnect()
-                                        }
-                                    }
+
+            left = listview(SortedList(controller.windows, compareBy { it.sortKey })) {
+                styleClass.add("tree-view")
+                bindSelected(controller.selectedWindow)
+                cellFormat {
+                    text = when (it.type) {
+                        WindowType.SERVER -> "${it.name} [${it.connection?.networkName ?: ""}]"
+                        WindowType.CHANNEL -> it.name
+                        else -> it.name
+                    }
+                    styleClass.removeIf { it.startsWith("node-") }
+                    styleClass.add("node-${it.type.name.toLowerCase()}")
+                }
+                controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
+                    center = newValue.windowUI.root
+                })
+                prefWidth = 148.0
+                contextmenu {
+                    item("Close") {
+                        action {
+                            selectedItem?.let {
+                                if (!it.isConnection) {
+                                    controller.leaveChannel(it.name)
+                                } else {
+                                    it.connection?.disconnect()
                                 }
                             }
                         }
                     }
-                    vboxConstraints {
-                        vgrow = Priority.ALWAYS
-                        hgrow = Priority.ALWAYS
-                    }
-                }
-                borderpaneConstraints {
-                    maxWidth = 150.00
                 }
             }
             center = vbox {

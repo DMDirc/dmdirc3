@@ -1,3 +1,56 @@
+/* General styling */
+.tree-view {
+    -fx-background-color: transparent;
+    -fx-pref-width: 175px;
+    -fx-padding: 0;
+    -fx-border-width: 0 1px 0 0;
+    -fx-border-style: solid;
+    -fx-border-color: #999999;
+}
+
+.tree-view .node-channel {
+    -fx-label-padding: 5px 5px 5px 20px;
+}
+
+.tree-view .node-server {
+    -fx-label-padding: 5px 5px 5px 5px;
+    -fx-background-color: #dfdfdf;
+}
+
+.tree-view .cell {
+    -fx-padding: 0;
+}
+
+.tree-view .cell:selected {
+    -fx-background-color: #004b7a;
+    -fx-text-fill: #ffffff;
+}
+
+/* Hide the horizontal scrollbar in the tree-view (yuck). */
+.tree-view .scroll-bar:horizontal .increment-arrow,
+.tree-view .scroll-bar:horizontal .decrement-arrow,
+.tree-view .scroll-bar:horizontal .increment-button,
+.tree-view .scroll-bar:horizontal .decrement-button {
+    -fx-padding:0;
+}
+
+.nick-list {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-border-width: 0 0 0 1px;
+    -fx-border-style: solid;
+    -fx-border-color: #999999;
+}
+
+.input-field {
+    -fx-background-color: #ffffff;
+    -fx-padding: 5px;
+    -fx-border-width: 1px 0 0 0;
+    -fx-border-style: solid;
+    -fx-border-color: #999999;
+}
+
+
 /* Supported text styles */
 .irc-bold { -fx-font-weight: bold; }
 .irc-italic { -fx-font-style: italic; }
