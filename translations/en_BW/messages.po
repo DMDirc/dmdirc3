@@ -1,0 +1,143 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: dmdirc\n"
+"Report-Msgid-Bugs-To: #dmdirc on freenode\n"
+"POT-Creation-Date: 2019-02-24 19:04+0000\n"
+"PO-Revision-Date: 2019-02-24 20:19\n"
+"Last-Translator: chameth <crowdin@vacso.co.uk>\n"
+"Language-Team: Backwards\n"
+"Language: en_BW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: dmdirc\n"
+"X-Crowdin-Language: en-bw\n"
+"X-Crowdin-File: messages.pot\n"
+
+#: src/main/kotlin/Connection.kt:68
+msgid "*** Connected"
+msgstr "*** detcennoC"
+
+#: src/main/kotlin/Connection.kt:76
+msgid "*** Disconnected"
+msgstr "*** detcennocsiD"
+
+#: src/main/kotlin/Connection.kt:80
+msgid "*** Error: %s - %s"
+msgstr "*** rorrE: %s - %s"
+
+#: src/main/kotlin/Connection.kt:104
+msgid "-- %s joined"
+msgstr "-- %s denioj"
+
+#: src/main/kotlin/Connection.kt:109
+msgid "-- %s left"
+msgstr "-- %s tfel"
+
+#: src/main/kotlin/Connection.kt:111
+msgid "-- %s left (%s)"
+msgstr "-- %s tfel (%s)"
+
+#: src/main/kotlin/Connection.kt:125
+msgid "-- %s quit"
+msgstr "-- %s tiuq"
+
+#: src/main/kotlin/ConnectDialog.kt:29
+msgid "Add"
+msgstr "Dda"
+
+#: src/main/kotlin/ConnectDialog.kt:131
+msgid "Auto Connect"
+msgstr "Tcennoc otuA"
+
+#: src/main/kotlin/ConnectDialog.kt:46 src/main/kotlin/ConnectDialog.kt:98
+#: src/main/kotlin/JoinDialog.kt:54
+msgid "Cancel"
+msgstr "Lecnac"
+
+#: src/main/kotlin/JoinDialog.kt:39
+msgid "Channel Name"
+msgstr "Eman Lennahc"
+
+#: src/main/kotlin/MainView.kt:66 src/main/kotlin/SettingsDialog.kt:41
+msgid "Close"
+msgstr "Esolc"
+
+#: src/main/kotlin/ConnectDialog.kt:92 src/main/kotlin/MainView.kt:28
+msgid "Connect"
+msgstr "Tcennoc"
+
+#: src/main/kotlin/ConnectDialog.kt:34
+msgid "Delete"
+msgstr "Eteled"
+
+#: src/main/kotlin/MainView.kt:15
+msgid "File"
+msgstr "Elif"
+
+#: src/main/kotlin/MainView.kt:22
+msgid "IRC"
+msgstr "CRI"
+
+#: src/main/kotlin/JoinDialog.kt:48 src/main/kotlin/MainView.kt:33
+msgid "Join"
+msgstr "Nioj"
+
+#: src/main/kotlin/SettingsDialog.kt:30
+msgid "Nickname: "
+msgstr "Emankcin: "
+
+#: src/main/kotlin/ConnectDialog.kt:121
+msgid "Password"
+msgstr "Drowssap"
+
+#: src/main/kotlin/ConnectDialog.kt:116
+msgid "Port"
+msgstr "Trop"
+
+#: src/main/kotlin/SettingsDialog.kt:29
+msgid "Profile"
+msgstr "Eliforp"
+
+#: src/main/kotlin/MainView.kt:16
+msgid "Quit"
+msgstr "Tiuq"
+
+#: src/main/kotlin/SettingsDialog.kt:33
+msgid "Realname: "
+msgstr "Emanlaer: "
+
+#: src/main/kotlin/SettingsDialog.kt:45
+msgid "Reset"
+msgstr "Teser"
+
+#: src/main/kotlin/ConnectDialog.kt:39 src/main/kotlin/SettingsDialog.kt:48
+msgid "Save"
+msgstr "Evas"
+
+#: src/main/kotlin/MainView.kt:23
+msgid "Server List"
+msgstr "Tsil revres"
+
+#: src/main/kotlin/ConnectDialog.kt:110
+msgid "Server Name"
+msgstr "Eman revres"
+
+#: src/main/kotlin/MainView.kt:40 src/main/kotlin/MainView.kt:41
+msgid "Settings"
+msgstr "Sgnittes"
+
+#: src/main/kotlin/ConnectDialog.kt:126
+msgid "TLS"
+msgstr "SLT"
+
+#: src/main/kotlin/SettingsDialog.kt:36
+msgid "Username: "
+msgstr "Emanresu: "
+
+#: src/main/kotlin/ConnectDialog.kt:22
+msgid "[Empty]"
+msgstr "[Ytpme]"
+

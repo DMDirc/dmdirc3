@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import com.jukusoft.i18n.I.tr
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.ButtonBar
 import org.kodein.di.generic.instance
@@ -25,26 +26,26 @@ class SettingsModel : ItemViewModel<Settings>() {
 class SettingsDialog : Fragment() {
     private val model = SettingsModel()
     override val root = form {
-        fieldset("Profile") {
-            field("Nickname: ") {
+        fieldset(tr("Profile")) {
+            field(tr("Nickname: ")) {
                 textfield(model.nickname).required()
             }
-            field("Realname: ") {
+            field(tr("Realname: ")) {
                 textfield(model.realname).required()
             }
-            field("Username: ") {
+            field(tr("Username: ")) {
                 textfield(model.username).required()
             }
         }
         buttonbar {
-            button("Close", ButtonBar.ButtonData.CANCEL_CLOSE).action {
+            button(tr("Close"), ButtonBar.ButtonData.CANCEL_CLOSE).action {
                 model.rollback()
                 close()
             }
-            button("Reset", ButtonBar.ButtonData.OTHER).action {
+            button(tr("Reset"), ButtonBar.ButtonData.OTHER).action {
                 model.rollback()
             }
-            button("Save", ButtonBar.ButtonData.OK_DONE) {
+            button(tr("Save"), ButtonBar.ButtonData.OK_DONE) {
                 enableWhen(model.valid.and(model.dirty))
                 action {
                     model.commit()

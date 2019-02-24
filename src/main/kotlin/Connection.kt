@@ -6,6 +6,7 @@ import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.messages.sendPart
 import com.dmdirc.ktirc.model.ServerFeature
+import com.jukusoft.i18n.I.tr
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.runLater
 import java.time.format.DateTimeFormatter
@@ -64,7 +65,7 @@ class Connection(
         when {
             event is BatchReceived -> event.events.forEach(this::handleEvent)
             event is ServerConnected -> runLater {
-                window.windowUI.addLine(event, "*** Connected")
+                window.windowUI.addLine(event, tr("*** Connected"))
                 connected.value = true
             }
             event is ServerReady -> {
@@ -72,11 +73,11 @@ class Connection(
                 serverName = client.serverState.serverName
             }
             event is ServerDisconnected -> runLater {
-                window.windowUI.addLine(event, "*** Disconnected")
+                window.windowUI.addLine(event, tr("*** Disconnected"))
                 connected.value = false
             }
             event is ServerConnectionError -> runLater {
-                window.windowUI.addLine(event, "*** Error: ${event.error} ${event.details ?: ""}")
+                window.windowUI.addLine(event, tr("*** Error: %s - %s").format(event.error, event.details ?: ""))
             }
             event is ChannelJoined && client.isLocalUser(event.user) -> runLater {
                 controller.windows.add(
@@ -100,11 +101,15 @@ class Connection(
         when (event) {
             is ChannelJoined -> {
                 users.add(event.user.nickname)
-                addLine(event, "-- ${event.user.nickname} Joined")
+                addLine(event, tr("-- %s joined").format(event.user.nickname))
             }
             is ChannelParted -> {
                 users.remove(event.user.nickname)
-                addLine(event, "-- ${event.user.nickname} Left${if (event.reason.isNotEmpty()) " ${event.reason}" else ""}")
+                if (event.reason.isEmpty()) {
+                    addLine(event, tr("-- %s left").format(event.user.nickname))
+                } else {
+                    addLine(event, tr("-- %s left (%s)").format(event.user.nickname, event.reason))
+                }
                 if (client.isLocalUser(event.user)) {
                     controller.windows.removeIf { it.connection == this@Connection && it.name == event.target }
                 }
@@ -117,7 +122,7 @@ class Connection(
             }
             is ChannelQuit -> {
                 users.remove(event.user.nickname)
-                addLine(event, "-- ${event.user.nickname} Quit")
+                addLine(event, tr("-- %s quit").format(event.user.nickname))
             }
             else -> {
             }

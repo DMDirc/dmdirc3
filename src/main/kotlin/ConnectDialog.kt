@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import com.jukusoft.i18n.I.tr
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.ButtonBar
 import org.kodein.di.generic.instance
@@ -18,31 +19,31 @@ class ServerlistDialog : Fragment() {
                 }
                 cellFormat {
                     text = if (it.hostname.isEmpty()) {
-                        "[Empty]"
+                        tr("[Empty]")
                     } else {
                         it.hostname
                     }
                 }
             }
             bottom = buttonbar {
-                button("Add", ButtonBar.ButtonData.LEFT) {
+                button(tr("Add"), ButtonBar.ButtonData.LEFT) {
                     action {
                         model.servers.add(ConnectionDetails("", "", 6667, tls = false, autoconnect = false))
                     }
                 }
-                button("Delete", ButtonBar.ButtonData.LEFT) {
+                button(tr("Delete"), ButtonBar.ButtonData.LEFT) {
                     action {
                         model.servers.remove(model.item)
                     }
                 }
-                button("Save", ButtonBar.ButtonData.OK_DONE) {
+                button(tr("Save"), ButtonBar.ButtonData.OK_DONE) {
                     enableWhen(model.dirty)
                     action {
                         model.commit()
                         close()
                     }
                 }
-                button("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE) {
+                button(tr("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE) {
                     action {
                         model.rollback()
                         close()
@@ -88,13 +89,13 @@ class ConnectDialog : Fragment() {
             }
         }
         buttonbar {
-            button("Connect", ButtonBar.ButtonData.OK_DONE) {
+            button(tr("Connect"), ButtonBar.ButtonData.OK_DONE) {
                 action {
                     controller.connect(selected.value)
                     close()
                 }
             }
-            button("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE) {
+            button(tr("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE) {
                 action {
                     close()
                 }
@@ -106,28 +107,28 @@ class ConnectDialog : Fragment() {
 class ServerInfoPane(private val model: ConnectionDetailsModel) : Fragment() {
     override val root = form {
         fieldset {
-            field("Server Name") {
+            field(tr("Server Name")) {
                 textfield(model.hostname) {
                     enableWhen(!model.empty)
                     required()
                 }
             }
-            field("Port") {
+            field(tr("Port")) {
                 spinner(editable = true, property = model.port, min = 1, max = 65535) {
                     enableWhen(!model.empty)
                 }
             }
-            field("Password") {
+            field(tr("Password")) {
                 textfield(model.password) {
                     enableWhen(!model.empty)
                 }
             }
-            field("TLS") {
+            field(tr("TLS")) {
                 checkbox(property = model.tls) {
                     enableWhen(!model.empty)
                 }
             }
-            field("Auto Connect") {
+            field(tr("Auto Connect")) {
                 checkbox(property = model.autoconnect) {
                     enableWhen(!model.empty)
                 }
