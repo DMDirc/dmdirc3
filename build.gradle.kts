@@ -31,7 +31,7 @@ application {
 dependencies {
     implementation("no.tornado:tornadofx:1.7.18")
     implementation("org.fxmisc.richtext:richtextfx:0.9.2")
-    implementation("com.dmdirc:ktirc:+")
+    implementation("com.dmdirc:ktirc:0.10.1")
     implementation("com.uchuhimo:konf:0.13.1")
     implementation("org.kodein.di:kodein-di-generic-jvm:6.1.0")
 
@@ -51,8 +51,6 @@ configurations.all {
         if (requested.group == "org.jetbrains.kotlin") {
             useVersion("1.3.21")
         }
-        resolutionStrategy.cacheChangingModulesFor(2, TimeUnit.MINUTES)
-        resolutionStrategy.cacheDynamicVersionsFor(2, TimeUnit.MINUTES)
     }
 }
 
