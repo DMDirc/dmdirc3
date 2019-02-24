@@ -9,14 +9,15 @@ object CloseEvent : FXEvent()
 class JoinEvent(val channelName: String) : FXEvent()
 
 class JoinDialogController(private val controller: MainController) : Component() {
-    init {
-        subscribe<JoinEvent> {
+    fun create() {
+        subscribe<JoinEvent>(times=1) {
             controller.joinChannel(it.channelName)
             fire(CloseEvent)
         }
-        subscribe<CancelEvent> {
+        subscribe<CancelEvent>(times=1) {
             fire(CloseEvent)
         }
+        find<JoinDialog>().openModal()
     }
 }
 
@@ -30,8 +31,6 @@ class JoinDetailsModel : ItemViewModel<JoinDetails>() {
 }
 
 class JoinDialog: Fragment() {
-    private val mainController: MainController by inject()
-    private val controller= JoinDialogController(mainController)
     private val model = JoinDetailsModel()
     override val root = form {
         fieldset {
