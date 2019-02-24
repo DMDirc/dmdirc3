@@ -1,12 +1,50 @@
 package com.dmdirc
 
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.geometry.Pos
 import javafx.scene.control.ButtonBar
 import org.kodein.di.generic.instance
 import tornadofx.*
 
-class ServerlistDialog : Fragment() {
-    private val model = ConnectionDetailsModel()
+class ServerListController(private val controller: MainController) {
+    private var model: ServerListModel? = null
+    fun create() {
+        val model = ServerListModel(this)
+        this.model = model
+        ServerlistDialog(model).openModal()
+    }
+
+    fun connect(server: ConnectionDetails) {
+        controller.connect(server)
+    }
+}
+
+class ServerListModel(private val controller: ServerListController) : ItemViewModel<ConnectionDetails>() {
+    val open = SimpleBooleanProperty(true)
+    private val config1 by kodein.instance<ClientConfig>()
+
+    val servers = config1[ClientSpec.servers].toMutableList().observable()
+    val hostname = bind(ConnectionDetails::hostname)
+    val password = bind(ConnectionDetails::password)
+    val port = bind(ConnectionDetails::port)
+    val tls = bind(ConnectionDetails::tls)
+    val autoconnect = bind(ConnectionDetails::autoconnect)
+
+    override fun onCommit() {
+        config1[ClientSpec.servers] = servers
+        config1.save()
+    }
+
+    fun join(server: ConnectionDetails) {
+        controller.connect(server)
+    }
+
+    fun closeDialog() {
+        open.value = false
+    }
+}
+
+class ServerlistDialog(private val model: ServerListModel) : Fragment() {
     override val root = form {
         borderpane {
             minWidth = 600.toDouble()
@@ -21,6 +59,43 @@ class ServerlistDialog : Fragment() {
                         "[Empty]"
                     } else {
                         it.hostname
+                    }
+                }
+            }
+            center = form {
+                fieldset {
+                    field("Server Name") {
+                        textfield(model.hostname) {
+                            enableWhen(!model.empty)
+                            required()
+                        }
+                    }
+                    field("Port") {
+                        spinner(editable = true, property = model.port, min = 1, max = 65535) {
+                            enableWhen(!model.empty)
+                        }
+                    }
+                    field("Password") {
+                        textfield(model.password) {
+                            enableWhen(!model.empty)
+                        }
+                    }
+                    field("TLS") {
+                        checkbox(property = model.tls) {
+                            enableWhen(!model.empty)
+                        }
+                    }
+                    field("Auto Connect") {
+                        checkbox(property = model.autoconnect) {
+                            enableWhen(!model.empty)
+                        }
+                    }
+                }
+                hbox {
+                    buttonbar {
+                        alignment = Pos.BASELINE_RIGHT
+                        button("Connect", ButtonBar.ButtonData.OK_DONE)
+                        button("Reset", ButtonBar.ButtonData.CANCEL_CLOSE)
                     }
                 }
             }
@@ -49,89 +124,7 @@ class ServerlistDialog : Fragment() {
                     }
                 }
             }
-            center = ServerInfoPane(model).root
         }
-    }
-}
-
-class ConnectionDetailsModel : ItemViewModel<ConnectionDetails>() {
-    private val config1 by kodein.instance<ClientConfig>()
-
-    val servers = config1[ClientSpec.servers].toMutableList().observable()
-    val hostname = bind(ConnectionDetails::hostname)
-    val password = bind(ConnectionDetails::password)
-    val port = bind(ConnectionDetails::port)
-    val tls = bind(ConnectionDetails::tls)
-    val autoconnect = bind(ConnectionDetails::autoconnect)
-
-    override fun onCommit() {
-        config1[ClientSpec.servers] = servers
-        config1.save()
-    }
-}
-
-class ConnectDialog : Fragment() {
-    private val controller: MainController by inject()
-    private val config1 by kodein.instance<ClientConfig>()
-
-    private val servers = config1[ClientSpec.servers].toMutableList().observable()
-    private val selected = SimpleObjectProperty<ConnectionDetails>()
-
-    override val root = form {
-        combobox(selected, servers) {
-            bindSelected(selected)
-            cellFormat {
-                text = "${it.hostname}:${it.port}"
-            }
-            if (servers.isNotEmpty()) {
-                selectionModel.select(servers[0])
-            }
-        }
-        buttonbar {
-            button("Connect", ButtonBar.ButtonData.OK_DONE) {
-                action {
-                    controller.connect(selected.value)
-                    close()
-                }
-            }
-            button("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE) {
-                action {
-                    close()
-                }
-            }
-        }
-    }
-}
-
-class ServerInfoPane(private val model: ConnectionDetailsModel) : Fragment() {
-    override val root = form {
-        fieldset {
-            field("Server Name") {
-                textfield(model.hostname) {
-                    enableWhen(!model.empty)
-                    required()
-                }
-            }
-            field("Port") {
-                spinner(editable = true, property = model.port, min = 1, max = 65535) {
-                    enableWhen(!model.empty)
-                }
-            }
-            field("Password") {
-                textfield(model.password) {
-                    enableWhen(!model.empty)
-                }
-            }
-            field("TLS") {
-                checkbox(property = model.tls) {
-                    enableWhen(!model.empty)
-                }
-            }
-            field("Auto Connect") {
-                checkbox(property = model.autoconnect) {
-                    enableWhen(!model.empty)
-                }
-            }
-        }
+        model.open.addListener(ChangeListener { _, _, newValue -> if (!newValue) { close() }})
     }
 }
