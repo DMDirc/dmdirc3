@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import com.jukusoft.i18n.I.tr
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.control.ButtonBar
 import tornadofx.*
@@ -35,7 +36,7 @@ class JoinDetailsModel(private val controller: JoinDialogController) : ItemViewM
 class JoinDialog(private val model: JoinDetailsModel) : Fragment() {
     override val root = form {
         fieldset {
-            field("Channel Name") {
+            field(tr("Channel Name")) {
                 textfield(model.channel).apply {
                     action {
                         model.commit()
@@ -44,13 +45,13 @@ class JoinDialog(private val model: JoinDetailsModel) : Fragment() {
             }
         }
         buttonbar {
-            button("Join", ButtonBar.ButtonData.OK_DONE) {
+            button(tr("Join"), ButtonBar.ButtonData.OK_DONE) {
                 enableWhen(model.valid)
                 action {
                     model.commit()
                 }
             }
-            button("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE) {
+            button(tr("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE) {
                 action {
                     close()
                 }

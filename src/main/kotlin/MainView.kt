@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import com.jukusoft.i18n.I.tr
 import javafx.collections.transformation.SortedList
 import javafx.scene.image.Image
 import tornadofx.*
@@ -11,33 +12,33 @@ class MainView : View() {
             maxHeight = Double.MAX_VALUE
             maxWidth = Double.MAX_VALUE
             top = menubar {
-                menu("File") {
-                    item("Quit") {
+                menu(tr("File")) {
+                    item(tr("Quit")) {
                         action {
                             close()
                         }
                     }
                 }
-                menu("IRC") {
-                    item("Server List") {
+                menu(tr("IRC")) {
+                    item(tr("Server List")) {
                         action {
                             find<ServerlistDialog>().openModal()
                         }
                     }
-                    item("Connect") {
+                    item(tr("Connect")) {
                         action {
                             find<ConnectDialog>().openModal()
                         }
                     }
-                    item("Join") {
+                    item(tr("Join")) {
                         action {
                             JoinDialogController(controller).create()
                         }
                         enableWhen(controller.selectedWindow.isNotNull)
                     }
                 }
-                menu("Settings") {
-                    item("Settings") {
+                menu(tr("Settings")) {
+                    item(tr("Settings")) {
                         action {
                             find<SettingsDialog>().openModal()
                         }
@@ -62,7 +63,7 @@ class MainView : View() {
                 })
                 prefWidth = 148.0
                 contextmenu {
-                    item("Close") {
+                    item(tr("Close")) {
                         action {
                             selectedItem?.let {
                                 if (!it.isConnection) {

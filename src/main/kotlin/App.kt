@@ -1,14 +1,19 @@
 package com.dmdirc
 
+import com.jukusoft.i18n.I
 import javafx.stage.Stage
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.generic.bind
+import org.kodein.di.generic.instance
 import org.kodein.di.generic.singleton
 import tornadofx.App
 import tornadofx.launch
+import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.*
 import java.util.logging.LogManager
 
 
@@ -31,5 +36,16 @@ class MainApp : App(MainView::class) {
 
 fun main(args: Array<String>) {
     LogManager.getLogManager().readConfiguration(MainApp::class.java.getResourceAsStream("/logs.properties"))
+    initInternationalisation(Path.of("translations"))
     launch<MainApp>(args)
+}
+
+fun initInternationalisation(path: Path) {
+    if (!Files.exists(path)) {
+        Files.createDirectory(path)
+    }
+
+    val config by kodein.instance<ClientConfig>()
+    I.init(path.toFile(), Locale.ENGLISH, "messages")
+    I.setLanguage(Locale.forLanguageTag(config[ClientSpec.language]))
 }
