@@ -4,16 +4,34 @@ import javafx.scene.control.ButtonBar
 import tornadofx.*
 
 data class JoinDetails(val channel: String)
+object CancelEvent : FXEvent()
+object CloseEvent : FXEvent()
+class JoinEvent(val channelName: String) : FXEvent()
+
+class JoinDialogController(private val controller: MainController) : Component() {
+    init {
+        subscribe<JoinEvent> {
+            controller.joinChannel(it.channelName)
+            fire(CloseEvent)
+        }
+        subscribe<CancelEvent> {
+            fire(CloseEvent)
+        }
+    }
+}
 
 class JoinDetailsModel : ItemViewModel<JoinDetails>() {
-    private val controller: MainController by inject()
     val channel = bind(JoinDetails::channel)
     override fun onCommit() {
-        controller.joinChannel(channel.value)
+        if (isValid) {
+            fire(JoinEvent(channel.value))
+        }
     }
 }
 
 class JoinDialog: Fragment() {
+    private val mainController: MainController by inject()
+    private val controller= JoinDialogController(mainController)
     private val model = JoinDetailsModel()
     override val root = form {
         fieldset {
@@ -22,7 +40,6 @@ class JoinDialog: Fragment() {
                     action {
                         if (model.isValid) {
                             model.commit()
-                            close()
                         }
                     }
                 }.required()
@@ -32,15 +49,21 @@ class JoinDialog: Fragment() {
             button("Join", ButtonBar.ButtonData.OK_DONE) {
                 enableWhen(model.valid)
                 action {
-                    model.commit()
-                    close()
+                    if (model.isValid) {
+                        model.commit()
+                    }
                 }
             }
             button("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE) {
                 action {
-                    close()
+                    fire(CancelEvent)
                 }
             }
+        }
+    }
+    init {
+        subscribe<CloseEvent>(times=1) {
+            close()
         }
     }
 }
