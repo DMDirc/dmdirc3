@@ -62,6 +62,19 @@ class MainView : View() {
                             }
                         )
                         prefWidth = 148.0
+                        contextmenu {
+                             item("Close") {
+                                action {
+                                    selectedItem?.let {
+                                        if (!it.isConnection) {
+                                            controller.leaveChannel(it.name)
+                                        } else {
+                                            it.connection?.disconnect()
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     vboxConstraints {
                         vgrow = Priority.ALWAYS

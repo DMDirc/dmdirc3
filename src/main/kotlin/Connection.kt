@@ -55,6 +55,14 @@ class Connection(
         client.sendJoin(channel)
     }
 
+    fun leaveChannel(channel: String) {
+        client.sendPart(channel)
+    }
+
+    private fun IrcClient.sendPart(channel: String) {
+        this.send("PART", channel)
+    }
+
     private fun handleEvent(event: IrcEvent) {
         when {
             event is BatchReceived -> event.events.forEach(this::handleEvent)
@@ -100,6 +108,9 @@ class Connection(
             is ChannelParted -> {
                 users.remove(event.user.nickname)
                 addLine("${event.timestamp} -- ${event.user.nickname} Left${if (event.reason.isNotEmpty()) " ${event.reason}" else ""}")
+                if (client.isLocalUser(event.user)) {
+                    controller.windows.removeIf { it.connection == this@Connection && it.name == event.target }
+                }
             }
             is MessageReceived -> addLine("${event.timestamp} <${event.user.nickname}> ${event.message}")
             is ActionReceived -> addLine("${event.timestamp} * ${event.user.nickname} ${event.action}")
@@ -136,6 +147,11 @@ class Connection(
         controller.windows.find {
             it.connection == this && it.name == windowName
         }?.windowUI?.block()
+
+    fun disconnect() {
+        client.disconnect()
+        controller.windows.removeIf { it.connection == this@Connection }
+    }
 
 }
 
