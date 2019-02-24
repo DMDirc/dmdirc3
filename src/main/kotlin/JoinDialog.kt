@@ -5,7 +5,7 @@ import tornadofx.*
 
 data class JoinDetails(val channel: String)
 
-class JoinDialogController(private val controller: MainController) : Component() {
+class JoinDialogController(private val controller: MainController) {
     private var dialog: JoinDialog? = null
     fun create() {
         dialog = JoinDialog(JoinDetailsModel(this))
