@@ -1,32 +1,38 @@
 package com.dmdirc
 
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.control.ButtonBar
 import tornadofx.*
 
 data class JoinDetails(val channel: String)
 
 class JoinDialogController(private val controller: MainController) {
-    private var dialog: JoinDialog? = null
+    private var model: JoinDetailsModel? = null
     fun create() {
-        dialog = JoinDialog(JoinDetailsModel(this))
-        dialog?.openModal()
+        val model = JoinDetailsModel(this)
+        this.model = model
+        JoinDialog(model).openModal()
     }
     fun join(channel: String) {
         controller.joinChannel(channel)
-        dialog?.close()
+        model?.closeDialog()
     }
 }
 
 class JoinDetailsModel(private val controller: JoinDialogController) : ItemViewModel<JoinDetails>() {
     val channel = bind(JoinDetails::channel)
+    val open = SimpleBooleanProperty(true)
     override fun onCommit() {
         if (isValid) {
             controller.join(channel.value)
         }
     }
+    fun closeDialog() {
+        open.value = false
+    }
 }
 
-class JoinDialog(model: JoinDetailsModel) : Fragment() {
+class JoinDialog(private val model: JoinDetailsModel) : Fragment() {
     override val root = form {
         fieldset {
             field("Channel Name") {
@@ -50,5 +56,6 @@ class JoinDialog(model: JoinDetailsModel) : Fragment() {
                 }
             }
         }
+        model.open.addListener(ChangeListener { _, _, newValue -> if (!newValue) { close() }})
     }
 }
