@@ -62,7 +62,7 @@ class ServerListModel(private val controller: ServerListController) : ItemViewMo
     val servers = emptyList<ConnectionDetailsEditable>().toMutableList().observable()
     val hostname = bind(autocommit = true, defaultValue = "") { item?.hostname }
     val password = bind(autocommit = true, defaultValue = "") { item?.password }
-    val port = bind(autocommit = true, defaultValue = 6667) { item?.port }
+    val port = bind(autocommit = true, defaultValue = 6697) { item?.port }
     val tls = bind(autocommit = true, defaultValue = true) { item?.tls }
     val autoconnect = bind(autocommit = true, defaultValue = false) { item?.autoconnect }
 
