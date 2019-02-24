@@ -20,11 +20,16 @@ data class ConnectionDetails(
 
 object ClientSpec : ConfigSpec("") {
     val servers by optional(listOf<ConnectionDetails>())
+    val language by optional("en-GB")
 
     object DefaultProfile : ConfigSpec() {
         val nickname by optional("")
         val username by optional("")
         val realname by optional("")
+    }
+
+    object Formatting : ConfigSpec() {
+        val timestamp by optional("HH:mm:ss")
     }
 }
 

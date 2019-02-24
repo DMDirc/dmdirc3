@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import com.jukusoft.i18n.I.tr
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
@@ -88,7 +89,7 @@ class ServerlistDialog(private val model: ServerListModel) : Fragment() {
                 bindSelected(model)
                 cellFormat {
                     text = if (it.hostname.value.isEmpty()) {
-                        "[Empty]"
+                        tr("[Empty]")
                     } else {
                         it.hostname.value
                     }
@@ -96,28 +97,28 @@ class ServerlistDialog(private val model: ServerListModel) : Fragment() {
             }
             center = form {
                 fieldset {
-                    field("Server Name") {
+                    field(tr("Server Name")) {
                         textfield(model.hostname) {
                             enableWhen(!model.empty)
                             required()
                         }
                     }
-                    field("Port") {
+                    field(tr("Port")) {
                         spinner(editable = true, property = model.port, min = 1, max = 65535) {
                             enableWhen(!model.empty)
                         }
                     }
-                    field("Password") {
+                    field(tr("Password")) {
                         textfield(model.password) {
                             enableWhen(!model.empty)
                         }
                     }
-                    field("TLS") {
+                    field(tr("TLS")) {
                         checkbox(property = model.tls) {
                             enableWhen(!model.empty)
                         }
                     }
-                    field("Auto Connect") {
+                    field(tr("Auto Connect")) {
                         checkbox(property = model.autoconnect) {
                             enableWhen(!model.empty)
                         }
@@ -126,7 +127,7 @@ class ServerlistDialog(private val model: ServerListModel) : Fragment() {
                 hbox {
                     buttonbar {
                         alignment = Pos.BASELINE_RIGHT
-                        button("Connect", ButtonBar.ButtonData.OK_DONE) {
+                        button(tr("Connect"), ButtonBar.ButtonData.OK_DONE) {
                             action {
                                 model.join(model.item)
                             }
@@ -134,7 +135,7 @@ class ServerlistDialog(private val model: ServerListModel) : Fragment() {
                     }
                 }
                 bottom = buttonbar {
-                    button("Add", ButtonBar.ButtonData.LEFT) {
+                    button(tr("Add"), ButtonBar.ButtonData.LEFT) {
                         action {
                             model.servers.add(
                                 ConnectionDetailsEditable(
@@ -147,18 +148,18 @@ class ServerlistDialog(private val model: ServerListModel) : Fragment() {
                             )
                         }
                     }
-                    button("Delete", ButtonBar.ButtonData.LEFT) {
+                    button(tr("Delete"), ButtonBar.ButtonData.LEFT) {
                         action {
                             model.servers.remove(model.item)
                         }
                     }
-                    button("Save", ButtonBar.ButtonData.OK_DONE) {
+                    button(tr("Save"), ButtonBar.ButtonData.OK_DONE) {
                         enableWhen(model.valid)
                         action {
                             model.commit()
                         }
                     }
-                    button("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE) {
+                    button(tr("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE) {
                         action {
                             close()
                         }

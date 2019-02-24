@@ -52,11 +52,11 @@
 
 
 /* Supported text styles */
-.irc-bold { -fx-font-weight: bold; }
-.irc-italic { -fx-font-style: italic; }
-.irc-underline { -fx-underline: true; }
-.irc-strikethrough { -fx-strikethrough: true; }
-.irc-monospace { -fx-font-family: monospace; }
+.irc-bold { -fx-font-weight: bold !important; }
+.irc-italic { -fx-font-style: italic !important; }
+.irc-underline { -fx-underline: true !important; }
+.irc-strikethrough { -fx-strikethrough: true !important; }
+.irc-monospace { -fx-font-family: monospace !important; }
 
 /* User-customisable colours */
 .irc-colour-fg-0 { -fx-fill: white; }
