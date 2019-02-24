@@ -4,6 +4,7 @@ import com.dmdirc.ktirc.IrcClient
 import com.dmdirc.ktirc.events.*
 import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
+import com.dmdirc.ktirc.messages.sendPart
 import com.dmdirc.ktirc.model.ServerFeature
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.runLater
@@ -57,10 +58,6 @@ class Connection(
 
     fun leaveChannel(channel: String) {
         client.sendPart(channel)
-    }
-
-    private fun IrcClient.sendPart(channel: String) {
-        this.send("PART", channel)
     }
 
     private fun handleEvent(event: IrcEvent) {
