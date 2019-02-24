@@ -6,8 +6,9 @@ val mainClass = "com.dmdirc.AppKt"
 
 plugins {
     application
-    kotlin("jvm").version("1.3.20")
+    kotlin("jvm").version("1.3.21")
     id("org.openjfx.javafxplugin").version("0.0.7")
+    id("name.remal.check-updates") version "1.0.113"
 }
 
 repositories {
@@ -48,7 +49,7 @@ dependencies {
 configurations.all {
     resolutionStrategy.eachDependency {
         if (requested.group == "org.jetbrains.kotlin") {
-            useVersion("1.3.20")
+            useVersion("1.3.21")
         }
         resolutionStrategy.cacheChangingModulesFor(2, TimeUnit.MINUTES)
         resolutionStrategy.cacheDynamicVersionsFor(2, TimeUnit.MINUTES)
