@@ -15,13 +15,13 @@ class ConnectionDetailsEditable(
 ) {
     var hostname: String by property(hostname)
     fun hostnameProperty() = getProperty(ConnectionDetailsEditable::hostname)
-    var password by property(password)
+    var password: String by property(password)
     fun passwordProperty() = getProperty(ConnectionDetailsEditable::password)
-    var port by property(port)
+    var port: Int by property(port)
     fun portProperty() = getProperty(ConnectionDetailsEditable::port)
-    var tls by property(tls)
+    var tls: Boolean by property(tls)
     fun tlsProperty() = getProperty(ConnectionDetailsEditable::tls)
-    var autoconnect by property(autoconnect)
+    var autoconnect: Boolean by property(autoconnect)
     fun autoconnectProperty() = getProperty(ConnectionDetailsEditable::autoconnect)
 }
 
@@ -33,7 +33,7 @@ class ServerListController(private val controller: MainController) {
         this.model = model
         ServerlistDialog(model).openModal()
         model.servers.addAll(config1[ClientSpec.servers]
-            .map { ConnectionDetailsEditable(it.hostname, it.password, it.port, it.tls, it.autoconnect)}
+            .map { ConnectionDetailsEditable(it.hostname, it.password, it.port, it.tls, it.autoconnect) }
             .toMutableList().observable())
     }
 
@@ -49,7 +49,8 @@ class ServerListController(private val controller: MainController) {
         model?.closeDialog()
     }
 
-    private fun getConnectionDetails(server: ConnectionDetailsEditable) = ConnectionDetails(server.hostname, server.password, server.port, server.tls, server.autoconnect)
+    private fun getConnectionDetails(server: ConnectionDetailsEditable) =
+        ConnectionDetails(server.hostname, server.password, server.port, server.tls, server.autoconnect)
 }
 
 class ServerListModel(private val controller: ServerListController) : ItemViewModel<ConnectionDetailsEditable>() {
@@ -132,7 +133,15 @@ class ServerlistDialog(private val model: ServerListModel) : Fragment() {
                 bottom = buttonbar {
                     button("Add", ButtonBar.ButtonData.LEFT) {
                         action {
-                            model.servers.add(ConnectionDetailsEditable("", "", 6667, tls = false, autoconnect = false))
+                            model.servers.add(
+                                ConnectionDetailsEditable(
+                                    hostname = "",
+                                    password = "",
+                                    port = 6667,
+                                    tls = false,
+                                    autoconnect = false
+                                )
+                            )
                         }
                     }
                     button("Delete", ButtonBar.ButtonData.LEFT) {
