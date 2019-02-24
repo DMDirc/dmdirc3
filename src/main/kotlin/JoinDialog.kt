@@ -4,34 +4,30 @@ import javafx.scene.control.ButtonBar
 import tornadofx.*
 
 data class JoinDetails(val channel: String)
-object CancelEvent : FXEvent()
-object CloseEvent : FXEvent()
-class JoinEvent(val channelName: String) : FXEvent()
 
 class JoinDialogController(private val controller: MainController) : Component() {
+    private var dialog: JoinDialog? = null
     fun create() {
-        subscribe<JoinEvent>(times = 1) {
-            controller.joinChannel(it.channelName)
-            fire(CloseEvent)
-        }
-        subscribe<CancelEvent>(times = 1) {
-            fire(CloseEvent)
-        }
-        find<JoinDialog>().openModal()
+        dialog = JoinDialog(this)
+        dialog?.openModal()
+    }
+    fun join(channel: String) {
+        controller.joinChannel(channel)
+        dialog?.close()
     }
 }
 
-class JoinDetailsModel : ItemViewModel<JoinDetails>() {
+class JoinDetailsModel(private val controller: JoinDialogController) : ItemViewModel<JoinDetails>() {
     val channel = bind(JoinDetails::channel)
     override fun onCommit() {
         if (isValid) {
-            fire(JoinEvent(channel.value))
+            controller.join(channel.value)
         }
     }
 }
 
-class JoinDialog : Fragment() {
-    private val model = JoinDetailsModel()
+class JoinDialog(controller: JoinDialogController) : Fragment() {
+    private val model = JoinDetailsModel(controller)
     override val root = form {
         fieldset {
             field("Channel Name") {
@@ -51,15 +47,9 @@ class JoinDialog : Fragment() {
             }
             button("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE) {
                 action {
-                    fire(CancelEvent)
+                    close()
                 }
             }
-        }
-    }
-
-    init {
-        subscribe<CloseEvent>(times = 1) {
-            close()
         }
     }
 }
