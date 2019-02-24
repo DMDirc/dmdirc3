@@ -3,7 +3,6 @@ package com.dmdirc
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.layout.Priority
 import org.fxmisc.flowless.VirtualizedScrollPane
-import org.fxmisc.richtext.StyleClassedTextArea
 import tornadofx.*
 
 enum class WindowType {
@@ -25,7 +24,7 @@ data class Window(
 
 class WindowUI(connection: Connection?) : View("Right bit") {
     private val controller: MainController by inject()
-    val textArea = StyleClassedTextArea()
+    val textArea = IrcTextArea()
     private val inputText = SimpleStringProperty()
     val users = emptyList<String>().toMutableList().observable()
 

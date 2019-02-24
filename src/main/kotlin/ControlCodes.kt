@@ -57,16 +57,6 @@ object ControlCode {
 
 }
 
-sealed class Style {
-    object BoldStyle : Style()
-    object ItalicStyle : Style()
-    object MonospaceStyle : Style()
-    object UnderlineStyle : Style()
-    object StrikethroughStyle : Style()
-    data class CustomStyle(val style: String) : Style()
-    data class ColourStyle(val foreground: Int, val background: Int?) : Style()
-}
-
 data class StyledSpan(val content: String, val styles: Set<Style>)
 
 fun String.convertControlCodes() = sequence {

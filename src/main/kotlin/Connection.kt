@@ -138,8 +138,7 @@ class Connection(
     private fun WindowUI.addLine(spans: Sequence<StyledSpan>) {
         spans.forEach {
             textArea.appendText(it.content)
-            textArea.setStyle(textArea.length - it.content.length, textArea.length,
-                it.styles.joinToString(" ", transform = Style::toClasses).split(' '))
+            textArea.setStyle(textArea.length - it.content.length, textArea.length, it.styles)
         }
     }
 
@@ -158,14 +157,4 @@ class Connection(
         controller.windows.removeIf { it.connection == this@Connection }
     }
 
-}
-
-private fun Style.toClasses() = when (this) {
-    is Style.BoldStyle -> "irc-bold"
-    is Style.ItalicStyle -> "irc-italic"
-    is Style.UnderlineStyle -> "irc-underline"
-    is Style.StrikethroughStyle -> "irc-strikethrough"
-    is Style.MonospaceStyle -> "irc-monospace"
-    is Style.ColourStyle -> "irc-colour-fg-$foreground" + background?.let { " irc-colour-bg-$background" }
-    is Style.CustomStyle -> style
 }
