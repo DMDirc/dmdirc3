@@ -26,6 +26,10 @@ object ClientSpec : ConfigSpec("") {
         val username by optional("")
         val realname by optional("")
     }
+
+    object Formatting : ConfigSpec() {
+        val timestamp by optional("HH:mm:ss")
+    }
 }
 
 class ClientConfig private constructor(private val path: Path, private val config: Config) {
