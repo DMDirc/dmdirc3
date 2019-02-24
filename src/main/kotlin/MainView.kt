@@ -22,12 +22,7 @@ class MainView : View() {
                 menu(tr("IRC")) {
                     item(tr("Server List")) {
                         action {
-                            find<ServerlistDialog>().openModal()
-                        }
-                    }
-                    item(tr("Connect")) {
-                        action {
-                            find<ConnectDialog>().openModal()
+                            ServerListController(controller).create()
                         }
                     }
                     item(tr("Join")) {

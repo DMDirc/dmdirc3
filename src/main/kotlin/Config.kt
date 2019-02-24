@@ -11,11 +11,11 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 data class ConnectionDetails(
-    var hostname: String,
-    var password: String,
-    var port: Int,
-    var tls: Boolean = true,
-    var autoconnect: Boolean = false
+    val hostname: String,
+    val password: String,
+    val port: Int,
+    val tls: Boolean = true,
+    val autoconnect: Boolean = false
 )
 
 object ClientSpec : ConfigSpec("") {
