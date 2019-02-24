@@ -1,6 +1,8 @@
 package com.dmdirc
 
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
 import javafx.scene.control.ButtonBar
 import org.kodein.di.generic.instance
@@ -13,16 +15,11 @@ class ConnectionDetailsEditable(
     tls: Boolean = true,
     autoconnect: Boolean = false
 ) {
-    var hostname: String by property(hostname)
-    fun hostnameProperty() = getProperty(ConnectionDetailsEditable::hostname)
-    var password: String by property(password)
-    fun passwordProperty() = getProperty(ConnectionDetailsEditable::password)
-    var port: Int by property(port)
-    fun portProperty() = getProperty(ConnectionDetailsEditable::port)
-    var tls: Boolean by property(tls)
-    fun tlsProperty() = getProperty(ConnectionDetailsEditable::tls)
-    var autoconnect: Boolean by property(autoconnect)
-    fun autoconnectProperty() = getProperty(ConnectionDetailsEditable::autoconnect)
+    val hostname = SimpleStringProperty(hostname)
+    val password = SimpleStringProperty(password)
+    val port = SimpleIntegerProperty(port)
+    val tls = SimpleBooleanProperty(tls)
+    val autoconnect = SimpleBooleanProperty(autoconnect)
 }
 
 class ServerListController(private val controller: MainController) {
@@ -50,17 +47,23 @@ class ServerListController(private val controller: MainController) {
     }
 
     private fun getConnectionDetails(server: ConnectionDetailsEditable) =
-        ConnectionDetails(server.hostname, server.password, server.port, server.tls, server.autoconnect)
+        ConnectionDetails(
+            server.hostname.value,
+            server.password.value,
+            server.port.value,
+            server.tls.value,
+            server.autoconnect.value
+        )
 }
 
 class ServerListModel(private val controller: ServerListController) : ItemViewModel<ConnectionDetailsEditable>() {
     val open = SimpleBooleanProperty(true)
     val servers = emptyList<ConnectionDetailsEditable>().toMutableList().observable()
-    val hostname = bind(autocommit = true) { item?.hostnameProperty() }
-    val password = bind(autocommit = true) { item?.passwordProperty() }
-    val port = bind(autocommit = true) { item?.portProperty() }
-    val tls = bind(autocommit = true) { item?.tlsProperty() }
-    val autoconnect = bind(autocommit = true) { item?.autoconnectProperty() }
+    val hostname = bind(autocommit = true, defaultValue = "") { item?.hostname }
+    val password = bind(autocommit = true, defaultValue = "") { item?.password }
+    val port = bind(autocommit = true, defaultValue = 6667) { item?.port }
+    val tls = bind(autocommit = true, defaultValue = true) { item?.tls }
+    val autoconnect = bind(autocommit = true, defaultValue = false) { item?.autoconnect }
 
     override fun onCommit() {
         controller.save(servers)
@@ -84,10 +87,10 @@ class ServerlistDialog(private val model: ServerListModel) : Fragment() {
             left = listview(model.servers) {
                 bindSelected(model)
                 cellFormat {
-                    text = if (it.hostname.isEmpty()) {
+                    text = if (it.hostname.value.isEmpty()) {
                         "[Empty]"
                     } else {
-                        it.hostname
+                        it.hostname.value
                     }
                 }
             }
