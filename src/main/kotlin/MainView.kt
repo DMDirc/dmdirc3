@@ -1,12 +1,16 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
+import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.transformation.SortedList
+import javafx.scene.Node
 import javafx.scene.image.Image
+import javafx.util.StringConverter
 import tornadofx.*
 
 class MainView : View() {
     private val controller: MainController by inject()
+    private val windowProperty = SimpleObjectProperty<Node>()
     override val root =
         borderpane {
             maxHeight = Double.MAX_VALUE
@@ -53,21 +57,6 @@ class MainView : View() {
                     styleClass.removeIf { it.startsWith("node-") }
                     styleClass.add("node-${it.type.name.toLowerCase()}")
                 }
-                controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
-                    if (newValue == null) {
-                        center = vbox{}
-                        title = tr("DMDirc")
-                    } else {
-                        center = newValue.windowUI.root
-                        title = if (newValue.isConnection) {
-                            tr("DMDirc: %s").format(newValue.connection?.networkName ?: "")
-                        } else {
-                            tr("DMDirc: %s | %s").format(newValue.name, newValue.connection?.networkName ?: "")
-                        }
-
-                    }
-
-                })
                 prefWidth = 148.0
                 contextmenu {
                     item(tr("Close")) {
@@ -83,9 +72,38 @@ class MainView : View() {
                     }
                 }
             }
-            center = vbox {
-            }
+            centerProperty().bindBidirectional(windowProperty)
             addStageIcon(Image(resources.stream("/logo.png")))
-            title = tr("DMDirc")
+            titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
         }
+
+    init {
+        controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
+            run {
+                if (newValue == null) {
+                    windowProperty.value = vbox {}
+                } else {
+                    windowProperty.value = newValue.windowUI.root
+                }
+            }
+        })
+    }
+}
+
+class TitleStringConverter : StringConverter<Window>() {
+    override fun fromString(string: String?): Window {
+        TODO("not implemented")
+    }
+
+    override fun toString(window: Window?): String {
+        return if (window == null) {
+            tr("DMDirc")
+        } else {
+            if (window.isConnection) {
+                tr("DMDirc: %s").format(window.connection?.networkName ?: "")
+            } else {
+                tr("DMDirc: %s | %s").format(window.name, window.connection?.networkName ?: "")
+            }
+        }
+    }
 }
