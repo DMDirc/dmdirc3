@@ -11,28 +11,28 @@ enum class WindowType {
     CHANNEL
 }
 
-data class Window(
+class WindowModel(
     val name: String,
     val type: WindowType,
-    var windowUI: WindowUI,
     var connection: Connection?,
     var isConnection: Boolean,
     val connectionId: String?
 ) {
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else name.toLowerCase()}"
+    val users = emptyList<String>().toMutableList().observable()
+    val inputField = SimpleStringProperty("")
+
+    fun handleInput() {
+        if (inputField.value.isNotEmpty()) {
+            connection?.sendMessage(name, inputField.value)
+            inputField.value = ""
+        }
+    }
 }
 
-class WindowUI(connection: Connection?) : View("Right bit") {
-    private val controller: MainController by inject()
+class WindowUI(model: WindowModel) : View("Right bit") {
+
     val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
-    private val inputText = SimpleStringProperty()
-    val users = emptyList<String>().toMutableList().observable()
-
-    lateinit var myConnection: Connection
-
-    init {
-        connection?.let { myConnection = it }
-    }
 
     override val root = borderpane {
         center = VirtualizedScrollPane(textArea.apply {
@@ -42,19 +42,16 @@ class WindowUI(connection: Connection?) : View("Right bit") {
             hgrow = Priority.ALWAYS
             vgrow = Priority.ALWAYS
         }
-        right = listview(users) {
+        right = listview(model.users) {
             styleClass.add("nick-list")
             prefWidth = 148.0
         }
 
-        bottom = textfield(inputText) {
+        bottom = textfield(model.inputField) {
             styleClass.add("input-field")
             action {
-                if (inputText.value.isNotEmpty()) {
-                    runAsync {
-                        myConnection.sendMessage(controller.selectedWindow.value.name, inputText.value)
-                        inputText.value = ""
-                    }
+                runAsync {
+                    model.handleInput()
                 }
             }
         }

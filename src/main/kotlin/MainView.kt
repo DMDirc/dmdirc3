@@ -58,7 +58,7 @@ class MainView : View() {
                         center = vbox{}
                         title = tr("DMDirc")
                     } else {
-                        center = newValue.windowUI.root
+                        center = controller.hackyWindowMap[newValue]?.root
                         title = if (newValue.isConnection) {
                             tr("DMDirc: %s").format(newValue.connection?.networkName ?: "")
                         } else {

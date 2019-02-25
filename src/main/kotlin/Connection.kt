@@ -22,10 +22,9 @@ class Connection(
     private val config: ClientConfig,
     private val controller: MainController
 ) {
-    private val window: Window = Window(
+    private val window = WindowModel(
         host,
         WindowType.SERVER,
-        WindowUI(this),
         this,
         true,
         connectionCounter.incrementAndGet().toString(16).padStart(20)
@@ -33,6 +32,7 @@ class Connection(
     private val connected = SimpleBooleanProperty(false)
     var networkName = ""
     var serverName = ""
+
     private val client: IrcClient = IrcClient {
         server(host, port, tls, password)
         profile {
@@ -43,6 +43,10 @@ class Connection(
         behaviour {
             alwaysEchoMessages = true
         }
+    }
+
+    init {
+        controller.hackyWindowMap[window] = WindowUI(window)
     }
 
     fun connect() {
@@ -68,7 +72,7 @@ class Connection(
         when {
             event is BatchReceived -> event.events.forEach(this::handleEvent)
             event is ServerConnected -> runLater {
-                window.windowUI.addLine(event, tr("*** Connected"))
+                window.addLine(event, tr("*** Connected"))
                 connected.value = true
             }
             event is ServerReady -> {
@@ -76,23 +80,22 @@ class Connection(
                 serverName = client.serverState.serverName
             }
             event is ServerDisconnected -> runLater {
-                window.windowUI.addLine(event, tr("*** Disconnected"))
+                window.addLine(event, tr("*** Disconnected"))
                 connected.value = false
             }
             event is ServerConnectionError -> runLater {
-                window.windowUI.addLine(event, tr("*** Error: %s - %s").format(event.error, event.details ?: ""))
+                window.addLine(event, tr("*** Error: %s - %s").format(event.error, event.details ?: ""))
             }
             event is ChannelJoined && client.isLocalUser(event.user) -> runLater {
-                controller.windows.add(
-                    Window(
-                        event.target,
-                        WindowType.CHANNEL,
-                        WindowUI(this),
-                        this,
-                        false,
-                        window.connectionId
-                    )
+                val model = WindowModel(
+                    event.target,
+                    WindowType.CHANNEL,
+                    this,
+                    false,
+                    window.connectionId
                 )
+                controller.windows.add(model)
+                controller.hackyWindowMap[model] = WindowUI(model)
             }
             event is TargetedEvent -> runLaterWithWindowUi(event.target) { handleTargetedEvent(event) }
             else -> {
@@ -100,7 +103,7 @@ class Connection(
         }
     }
 
-    private fun WindowUI.handleTargetedEvent(event: TargetedEvent) {
+    private fun WindowModel.handleTargetedEvent(event: TargetedEvent) {
         when (event) {
             is ChannelJoined -> {
                 users.add(event.user.nickname)
@@ -135,7 +138,7 @@ class Connection(
     private val IrcEvent.timestamp: String
         get() = metadata.time.format(DateTimeFormatter.ofPattern(config[ClientSpec.Formatting.timestamp]))
 
-    private fun WindowUI.addLine(event: IrcEvent, line: String) =
+    private fun WindowModel.addLine(event: IrcEvent, line: String) =
         addLine(
             sequenceOf(
                 StyledSpan(
@@ -145,34 +148,39 @@ class Connection(
             ) + " $line\n".detectLinks().convertControlCodes()
         )
 
-    private fun WindowUI.addLine(spans: Sequence<StyledSpan>) {
-        val images = mutableListOf<Style.Link>()
-        spans.forEach {
-            textArea.appendText(it.content)
-            textArea.setStyle(textArea.length - it.content.length, textArea.length, it.styles)
-            it.styles
-                .filterIsInstance(Style.Link::class.java)
-                .filter { s -> s.url.matches(Regex(".*\\.(png|jpg|jpeg)$", RegexOption.IGNORE_CASE)) }
-                .let(images::addAll)
-        }
-
-        if (this@Connection.config[ClientSpec.Display.embedImages]) {
-            images.forEach {
-                textArea.appendText("${ControlCode.InternalImages}${it.url}")
+    private fun WindowModel.addLine(spans: Sequence<StyledSpan>) {
+        controller.hackyWindowMap[this]?.let { window ->
+            // TODO: The model should handle all this, not the view directly.
+            val images = mutableListOf<Style.Link>()
+            spans.forEach {
+                window.textArea.appendText(it.content)
+                window.textArea.setStyle(window.textArea.length - it.content.length, window.textArea.length, it.styles)
+                it.styles
+                    .filterIsInstance(Style.Link::class.java)
+                    .filter { s -> s.url.matches(Regex(".*\\.(png|jpg|jpeg)$", RegexOption.IGNORE_CASE)) }
+                    .let(images::addAll)
             }
-            textArea.appendText("\n")
+
+            if (this@Connection.config[ClientSpec.Display.embedImages]) {
+                images.forEach {
+                    window.textArea.appendText("${ControlCode.InternalImages}${it.url}")
+                }
+                if (images.isNotEmpty()) {
+                    window.textArea.appendText("\n")
+                }
+            }
         }
     }
 
-    private fun runLaterWithWindowUi(windowName: String, block: WindowUI.() -> Unit) =
+    private fun runLaterWithWindowUi(windowName: String, block: WindowModel.() -> Unit) =
         runLater {
-            withWindowUi(windowName, block)
+            withWindowModel(windowName, block)
         }
 
-    private fun withWindowUi(windowName: String, block: WindowUI.() -> Unit) =
+    private fun withWindowModel(windowName: String, block: WindowModel.() -> Unit) =
         controller.windows.find {
             it.connection == this && it.name == windowName
-        }?.windowUI?.block()
+        }?.block()
 
     fun disconnect() {
         client.disconnect()
