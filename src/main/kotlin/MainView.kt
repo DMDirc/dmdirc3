@@ -1,12 +1,16 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
+import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.transformation.SortedList
+import javafx.scene.Node
 import javafx.scene.image.Image
+import javafx.util.StringConverter
 import tornadofx.*
 
 class MainView : View() {
     private val controller: MainController by inject()
+    private val windowProperty = SimpleObjectProperty<Node>()
     override val root =
         borderpane {
             maxHeight = Double.MAX_VALUE
@@ -50,42 +54,54 @@ class MainView : View() {
                         WindowType.CHANNEL -> it.name
                         else -> it.name
                     }
-                    styleClass.removeIf { it.startsWith("node-") }
+                    styleClass.removeIf { s -> s.startsWith("node-") }
                     styleClass.add("node-${it.type.name.toLowerCase()}")
                 }
-                controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
-                    if (newValue == null) {
-                        center = vbox{}
-                        title = tr("DMDirc")
-                    } else {
-                        center = controller.hackyWindowMap[newValue]?.root
-                        title = if (newValue.isConnection) {
-                            tr("DMDirc: %s").format(newValue.connection?.networkName ?: "")
-                        } else {
-                            tr("DMDirc: %s | %s").format(newValue.name, newValue.connection?.networkName ?: "")
-                        }
 
-                    }
-
-                })
                 prefWidth = 148.0
                 contextmenu {
                     item(tr("Close")) {
                         action {
                             selectedItem?.let {
-                                if (!it.isConnection) {
-                                    controller.leaveChannel(it.name)
-                                } else {
+                                if (it.isConnection) {
                                     it.connection?.disconnect()
+                                } else {
+                                    controller.leaveChannel(it.name)
                                 }
                             }
                         }
                     }
                 }
             }
-            center = vbox {
-            }
+            centerProperty().bindBidirectional(windowProperty)
             addStageIcon(Image(resources.stream("/logo.png")))
-            title = tr("DMDirc")
+            titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
         }
+
+    init {
+        controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
+            if (newValue == null) {
+                windowProperty.value = vbox {}
+            } else {
+                windowProperty.value = controller.hackyWindowMap[newValue]?.root
+            }
+        })
+    }
+}
+
+class TitleStringConverter : StringConverter<WindowModel>() {
+
+    override fun fromString(string: String?) = TODO("not implemented")
+
+    override fun toString(window: WindowModel?): String {
+        return if (window == null) {
+            tr("DMDirc")
+        } else {
+            if (window.isConnection) {
+                tr("DMDirc: %s").format(window.connection?.networkName ?: "")
+            } else {
+                tr("DMDirc: %s | %s").format(window.name, window.connection?.networkName ?: "")
+            }
+        }
+    }
 }
