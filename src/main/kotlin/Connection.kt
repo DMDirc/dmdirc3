@@ -145,29 +145,22 @@ class Connection(
                     event.timestamp,
                     setOf(Style.CustomStyle("timestamp"))
                 )
-            ) + " $line\n".detectLinks().convertControlCodes()
+            ) + " $line".detectLinks().convertControlCodes()
         )
 
     private fun WindowModel.addLine(spans: Sequence<StyledSpan>) {
-        controller.hackyWindowMap[this]?.let { window ->
-            // TODO: The model should handle all this, not the view directly.
-            val images = mutableListOf<Style.Link>()
-            spans.forEach {
-                window.textArea.appendText(it.content)
-                window.textArea.setStyle(window.textArea.length - it.content.length, window.textArea.length, it.styles)
-                it.styles
-                    .filterIsInstance(Style.Link::class.java)
-                    .filter { s -> s.url.matches(Regex(".*\\.(png|jpg|jpeg)$", RegexOption.IGNORE_CASE)) }
-                    .let(images::addAll)
-            }
-
-            if (this@Connection.config[ClientSpec.Display.embedImages]) {
-                images.forEach {
-                    window.textArea.appendText("${ControlCode.InternalImages}${it.url}")
-                }
-                if (images.isNotEmpty()) {
-                    window.textArea.appendText("\n")
-                }
+        lines.add(spans.toList().toTypedArray())
+        if (this@Connection.config[ClientSpec.Display.embedImages]) {
+            val images = spans
+                .toList()
+                .flatMap { it.styles }
+                .filterIsInstance(Style.Link::class.java)
+                .map { it.url }
+                .filter { it.matches(Regex(".*\\.(png|jpg|jpeg)$", RegexOption.IGNORE_CASE)) }
+                .map { StyledSpan("${ControlCode.InternalImages}$it", emptySet()) }
+                .toTypedArray()
+            if (images.isNotEmpty()) {
+                lines.add(images)
             }
         }
     }

@@ -19,7 +19,8 @@ class WindowModel(
     val connectionId: String?
 ) {
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else name.toLowerCase()}"
-    val users = emptyList<String>().toMutableList().observable()
+    val users = mutableListOf<String>().observable()
+    val lines = mutableListOf<Array<StyledSpan>>().observable()
     val inputField = SimpleStringProperty("")
 
     fun handleInput() {
@@ -32,7 +33,7 @@ class WindowModel(
 
 class WindowUI(model: WindowModel) : View("Right bit") {
 
-    val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
+    private val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
 
     override val root = borderpane {
         center = VirtualizedScrollPane(textArea.apply {
@@ -56,4 +57,23 @@ class WindowUI(model: WindowModel) : View("Right bit") {
             }
         }
     }
+
+    init {
+        model.lines.onChange { change ->
+            // TODO: Support ops other than just appending lines (editing, deleting, inserting earlier, etc).
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.addedSubList.forEach { line ->
+                        line.forEach { segment ->
+                            val position = textArea.length
+                            textArea.appendText(segment.content)
+                            textArea.setStyle(position, textArea.length, segment.styles)
+                        }
+                        textArea.appendText("\n")
+                    }
+                }
+            }
+        }
+    }
+
 }
