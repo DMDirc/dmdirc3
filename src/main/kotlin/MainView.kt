@@ -56,7 +56,7 @@ class MainView : View() {
                 controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
                     if (newValue == null) {
                         center = vbox{}
-                        title = "DMDirc"
+                        title = tr("DMDirc")
                     } else {
                         center = newValue.windowUI.root
                         title = if (newValue.isConnection) {
