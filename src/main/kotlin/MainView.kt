@@ -79,12 +79,10 @@ class MainView : View() {
 
     init {
         controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
-            run {
-                if (newValue == null) {
-                    windowProperty.value = vbox {}
-                } else {
-                    windowProperty.value = newValue.windowUI.root
-                }
+            if (newValue == null) {
+                windowProperty.value = vbox {}
+            } else {
+                windowProperty.value = newValue.windowUI.root
             }
         })
     }
