@@ -46,6 +46,11 @@ object ControlCode {
     const val InternalLinks = '\u0017'
 
     /**
+     * Identifies embedded images for special processing within the client.
+     */
+    const val InternalImages = '\u0018'
+
+    /**
      * Toggles the italic property of text.
      */
     const val Italic = '\u001d'

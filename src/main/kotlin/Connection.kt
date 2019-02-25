@@ -136,12 +136,28 @@ class Connection(
         get() = metadata.time.format(DateTimeFormatter.ofPattern(config[ClientSpec.Formatting.timestamp]))
 
     private fun WindowUI.addLine(event: IrcEvent, line: String) =
-        addLine(sequenceOf(StyledSpan(event.timestamp, setOf(Style.CustomStyle("timestamp")))) + " $line\n".detectLinks().convertControlCodes())
+        addLine(
+            sequenceOf(
+                StyledSpan(
+                    event.timestamp,
+                    setOf(Style.CustomStyle("timestamp"))
+                )
+            ) + " $line\n".detectLinks().convertControlCodes()
+        )
 
     private fun WindowUI.addLine(spans: Sequence<StyledSpan>) {
+        val images = mutableListOf<Style.Link>()
         spans.forEach {
             textArea.appendText(it.content)
             textArea.setStyle(textArea.length - it.content.length, textArea.length, it.styles)
+            it.styles
+                .filterIsInstance(Style.Link::class.java)
+                .filter { s -> s.url.matches(Regex(".*\\.(png|jpg|jpeg)$", RegexOption.IGNORE_CASE)) }
+                .let(images::addAll)
+        }
+
+        images.forEach {
+            textArea.appendText("${ControlCode.InternalImages}${it.url}\n")
         }
     }
 
