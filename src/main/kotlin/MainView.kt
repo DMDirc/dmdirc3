@@ -54,18 +54,19 @@ class MainView : View() {
                         WindowType.CHANNEL -> it.name
                         else -> it.name
                     }
-                    styleClass.removeIf { it.startsWith("node-") }
+                    styleClass.removeIf { s -> s.startsWith("node-") }
                     styleClass.add("node-${it.type.name.toLowerCase()}")
                 }
+
                 prefWidth = 148.0
                 contextmenu {
                     item(tr("Close")) {
                         action {
                             selectedItem?.let {
-                                if (!it.isConnection) {
-                                    controller.leaveChannel(it.name)
-                                } else {
+                                if (it.isConnection) {
                                     it.connection?.disconnect()
+                                } else {
+                                    controller.leaveChannel(it.name)
                                 }
                             }
                         }
@@ -79,29 +80,19 @@ class MainView : View() {
 
     init {
         controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
-            if (newValue == null) {
-                windowProperty.value = vbox {}
-            } else {
-                windowProperty.value = newValue.windowUI.root
-            }
+            windowProperty.value = controller.windowUis[newValue]?.root ?: vbox {}
         })
     }
 }
 
-class TitleStringConverter : StringConverter<Window>() {
-    override fun fromString(string: String?): Window {
-        TODO("not implemented")
+class TitleStringConverter : StringConverter<WindowModel>() {
+
+    override fun fromString(string: String?) = TODO("not implemented")
+
+    override fun toString(window: WindowModel?) = when {
+        window == null -> tr("DMDirc")
+        window.isConnection -> tr("DMDirc: %s").format(window.connection?.networkName ?: "")
+        else -> tr("DMDirc: %s | %s").format(window.name, window.connection?.networkName ?: "")
     }
 
-    override fun toString(window: Window?): String {
-        return if (window == null) {
-            tr("DMDirc")
-        } else {
-            if (window.isConnection) {
-                tr("DMDirc: %s").format(window.connection?.networkName ?: "")
-            } else {
-                tr("DMDirc: %s | %s").format(window.name, window.connection?.networkName ?: "")
-            }
-        }
-    }
 }
