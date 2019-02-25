@@ -11,7 +11,7 @@ class MainController : Controller() {
     private val config1 by kodein.instance<ClientConfig>()
     val windows: ObservableList<WindowModel> = emptyList<WindowModel>().toMutableList().observable()
     val selectedWindow: SimpleObjectProperty<WindowModel> = SimpleObjectProperty()
-    val hackyWindowMap = mutableMapOf<WindowModel, WindowUI>()
+    val windowUis = mutableMapOf<WindowModel, WindowUI>()
 
     init {
         autoConnect()

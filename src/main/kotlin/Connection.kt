@@ -46,7 +46,7 @@ class Connection(
     }
 
     init {
-        controller.hackyWindowMap[window] = WindowUI(window)
+        controller.windowUis[window] = WindowUI(window)
     }
 
     fun connect() {
@@ -95,7 +95,7 @@ class Connection(
                     window.connectionId
                 )
                 controller.windows.add(model)
-                controller.hackyWindowMap[model] = WindowUI(model)
+                controller.windowUis[model] = WindowUI(model)
             }
             event is TargetedEvent -> runLaterWithWindowUi(event.target) { handleTargetedEvent(event) }
             else -> {
@@ -118,6 +118,7 @@ class Connection(
                 }
                 if (client.isLocalUser(event.user)) {
                     controller.windows.removeIf { it.connection == this@Connection && it.name == event.target }
+                    controller.windowUis.remove(this)
                 }
             }
             is MessageReceived -> addLine(event, "<${event.user.nickname}> ${event.message}")
@@ -178,6 +179,7 @@ class Connection(
     fun disconnect() {
         client.disconnect()
         controller.windows.removeIf { it.connection == this@Connection }
+        controller.windowUis.remove(window)
     }
 
 }

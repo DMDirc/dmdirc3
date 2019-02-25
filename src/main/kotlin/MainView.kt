@@ -80,11 +80,7 @@ class MainView : View() {
 
     init {
         controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
-            if (newValue == null) {
-                windowProperty.value = vbox {}
-            } else {
-                windowProperty.value = controller.hackyWindowMap[newValue]?.root
-            }
+            windowProperty.value = controller.windowUis[newValue]?.root ?: vbox {}
         })
     }
 }
@@ -93,15 +89,10 @@ class TitleStringConverter : StringConverter<WindowModel>() {
 
     override fun fromString(string: String?) = TODO("not implemented")
 
-    override fun toString(window: WindowModel?): String {
-        return if (window == null) {
-            tr("DMDirc")
-        } else {
-            if (window.isConnection) {
-                tr("DMDirc: %s").format(window.connection?.networkName ?: "")
-            } else {
-                tr("DMDirc: %s | %s").format(window.name, window.connection?.networkName ?: "")
-            }
-        }
+    override fun toString(window: WindowModel?) = when {
+        window == null -> tr("DMDirc")
+        window.isConnection -> tr("DMDirc: %s").format(window.connection?.networkName ?: "")
+        else -> tr("DMDirc: %s | %s").format(window.name, window.connection?.networkName ?: "")
     }
+
 }
