@@ -24,7 +24,7 @@ data class Window(
 
 class WindowUI(connection: Connection?) : View("Right bit") {
     private val controller: MainController by inject()
-    val textArea = IrcTextArea()
+    val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
     private val inputText = SimpleStringProperty()
     val users = emptyList<String>().toMutableList().observable()
 

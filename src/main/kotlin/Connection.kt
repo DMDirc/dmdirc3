@@ -136,7 +136,7 @@ class Connection(
         get() = metadata.time.format(DateTimeFormatter.ofPattern(config[ClientSpec.Formatting.timestamp]))
 
     private fun WindowUI.addLine(event: IrcEvent, line: String) =
-        addLine(sequenceOf(StyledSpan(event.timestamp, setOf(Style.CustomStyle("timestamp")))) + " $line\n".convertControlCodes())
+        addLine(sequenceOf(StyledSpan(event.timestamp, setOf(Style.CustomStyle("timestamp")))) + " $line\n".detectLinks().convertControlCodes())
 
     private fun WindowUI.addLine(spans: Sequence<StyledSpan>) {
         spans.forEach {
