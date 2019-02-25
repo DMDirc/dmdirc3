@@ -1,6 +1,8 @@
 package com.dmdirc
 
 import javafx.scene.Node
+import javafx.scene.image.ImageView
+import javafx.scene.layout.Pane
 import org.fxmisc.richtext.GenericStyledArea
 import org.fxmisc.richtext.TextExt
 import org.fxmisc.richtext.model.SegmentOpsBase
@@ -57,7 +59,11 @@ class IrcSegmentOps : SegmentOpsBase<Segment, Collection<Style>>(Segment.Empty),
         }
 
     override fun create(text: String?) = text?.let {
-        Segment.Text(it)
+        if (it.startsWith(ControlCode.InternalImages)) {
+            Segment.Image(it.substring(1))
+        } else {
+            Segment.Text(it)
+        }
     } ?: Segment.Empty
 
 }
@@ -76,7 +82,19 @@ class IrcTextArea(linkClickHandler: (String) -> Unit) :
                         te.styleClass.add("text")
                         applyStyles(te, ss.style, linkClickHandler)
                     }
-                    is Segment.Image -> javafx.scene.image.ImageView(seg.url)
+                    is Segment.Image -> with (ImageView(seg.url)) {
+                        // We can't seem to set the width/height in CSS :(
+                        fitWidth = 250.0
+                        fitHeight = 250.0
+                        isPreserveRatio = true
+                        isSmooth = true
+
+                        Pane(this).also { te ->
+                            te.styleClass.add("inline-image")
+                            te.styleClass.add("irc-link")
+                            te.setOnMouseClicked { linkClickHandler(seg.url) }
+                        }
+                    }
                     is Segment.Empty -> TextExt("There's nothing here :(").also { te -> te.styleClass.add("text") }
                 }
             }

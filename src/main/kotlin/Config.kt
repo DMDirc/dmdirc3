@@ -31,6 +31,10 @@ object ClientSpec : ConfigSpec("") {
     object Formatting : ConfigSpec() {
         val timestamp by optional("HH:mm:ss")
     }
+
+    object Display : ConfigSpec() {
+        val embedImages by optional(true)
+    }
 }
 
 class ClientConfig private constructor(private val path: Path, private val config: Config) {

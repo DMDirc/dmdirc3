@@ -54,6 +54,11 @@ internal class ControlCodesTest {
             arguments("\u00034,Crash and \u0003burn", listOf(
                 StyledSpan(",Crash and ", setOf(Style.ColourStyle(4, null))),
                 StyledSpan("burn", emptySet())
+            )),
+
+            arguments("\u0017Crash and \u0017burn", listOf(
+                StyledSpan("Crash and ", setOf(Style.Link("Crash and "))),
+                StyledSpan("burn", emptySet())
             ))
         )
     }
