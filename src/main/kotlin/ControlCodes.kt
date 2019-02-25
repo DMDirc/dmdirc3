@@ -41,6 +41,16 @@ object ControlCode {
     const val Reverse = '\u0016'
 
     /**
+     * Identifies links for special processing within the client.
+     */
+    const val InternalLinks = '\u0017'
+
+    /**
+     * Identifies embedded images for special processing within the client.
+     */
+    const val InternalImages = '\u0018'
+
+    /**
      * Toggles the italic property of text.
      */
     const val Italic = '\u001d'
@@ -57,17 +67,11 @@ object ControlCode {
 
 }
 
-sealed class Style {
-    object BoldStyle : Style()
-    object ItalicStyle : Style()
-    object MonospaceStyle : Style()
-    object UnderlineStyle : Style()
-    object StrikethroughStyle : Style()
-    data class CustomStyle(val style: String) : Style()
-    data class ColourStyle(val foreground: Int, val background: Int?) : Style()
-}
-
 data class StyledSpan(val content: String, val styles: Set<Style>)
+
+private val linkRegex = Regex("(?i)(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", RegexOption.IGNORE_CASE)
+
+fun String.detectLinks() = linkRegex.replace(this, "${ControlCode.InternalLinks}$0${ControlCode.InternalLinks}")
 
 fun String.convertControlCodes() = sequence {
     val styles = mutableSetOf<Style>()
@@ -112,6 +116,12 @@ fun String.convertControlCodes() = sequence {
             ControlCode.Strikethrough -> yieldAll(emitThen { styles.toggle(Style.StrikethroughStyle) })
             ControlCode.Reset -> yieldAll(emitThen { styles.clear() })
             ControlCode.Colour -> yieldAll(emitThen { nextColour = 0 })
+            ControlCode.InternalLinks -> {
+                styles.firstOrNull { s -> s is Style.Link }?.let { link ->
+                    (link as Style.Link).url = buffer.toString()
+                    yieldAll(emitThen { styles.removeAll { l -> l is Style.Link } })
+                } ?: yieldAll(emitThen { styles.add(Style.Link("")) })
+            }
             else -> when {
                 nextColour == -1 -> buffer.append(it)
                 nextColour == 0 && it == ',' -> nextColour = 1

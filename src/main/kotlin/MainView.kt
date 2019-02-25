@@ -22,12 +22,7 @@ class MainView : View() {
                 menu(tr("IRC")) {
                     item(tr("Server List")) {
                         action {
-                            find<ServerlistDialog>().openModal()
-                        }
-                    }
-                    item(tr("Connect")) {
-                        action {
-                            find<ConnectDialog>().openModal()
+                            ServerListController(controller).create()
                         }
                     }
                     item(tr("Join")) {
@@ -59,7 +54,19 @@ class MainView : View() {
                     styleClass.add("node-${it.type.name.toLowerCase()}")
                 }
                 controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
-                    center = newValue.windowUI.root
+                    if (newValue == null) {
+                        center = vbox{}
+                        title = tr("DMDirc")
+                    } else {
+                        center = newValue.windowUI.root
+                        title = if (newValue.isConnection) {
+                            tr("DMDirc: %s").format(newValue.connection?.networkName ?: "")
+                        } else {
+                            tr("DMDirc: %s | %s").format(newValue.name, newValue.connection?.networkName ?: "")
+                        }
+
+                    }
+
                 })
                 prefWidth = 148.0
                 contextmenu {
@@ -79,5 +86,6 @@ class MainView : View() {
             center = vbox {
             }
             addStageIcon(Image(resources.stream("/logo.png")))
+            title = tr("DMDirc")
         }
 }
