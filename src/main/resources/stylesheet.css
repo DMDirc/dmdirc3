@@ -58,6 +58,12 @@
 .irc-strikethrough { -fx-strikethrough: true !important; }
 .irc-monospace { -fx-font-family: monospace !important; }
 
+.irc-link {
+    -fx-underline: true !important;
+    -fx-fill: blue !important;
+    -fx-cursor: hand;
+}
+
 /* User-customisable colours */
 .irc-colour-fg-0 { -fx-fill: white; }
 .irc-colour-fg-1 { -fx-fill: black; }
