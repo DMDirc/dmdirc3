@@ -60,10 +60,11 @@ class MainView : View() {
                     } else {
                         center = newValue.windowUI.root
                         title = if (newValue.isConnection) {
-                            "DMDirc: ${newValue.connection?.networkName ?: ""}"
+                            tr("DMDirc: %s").format(newValue.connection?.networkName ?: "")
                         } else {
-                            "DMDirc: ${newValue.name} | ${newValue.connection?.networkName}"
+                            tr("DMDirc: %s | %s").format(newValue.name, newValue.connection?.networkName ?: "")
                         }
+
                     }
 
                 })
@@ -85,6 +86,6 @@ class MainView : View() {
             center = vbox {
             }
             addStageIcon(Image(resources.stream("/logo.png")))
-            title = "DMDirc"
+            title = tr("DMDirc")
         }
 }
