@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: dmdirc\n"
 "Report-Msgid-Bugs-To: #dmdirc on freenode\n"
 "POT-Creation-Date: 2019-02-24 19:04+0000\n"
-"PO-Revision-Date: 2019-02-24 21:55\n"
+"PO-Revision-Date: 2019-02-25 20:35\n"
 "Last-Translator: chameth <crowdin@vacso.co.uk>\n"
 "Language-Team: English, United States\n"
 "Language: en_US\n"
@@ -16,44 +16,44 @@ msgstr ""
 "X-Crowdin-Language: en-US\n"
 "X-Crowdin-File: /master/translations/messages.pot\n"
 
-#: src/main/kotlin/Connection.kt:68
+#: src/main/kotlin/Connection.kt:68 src/main/kotlin/Connection.kt:71
 msgid "*** Connected"
 msgstr ""
 
-#: src/main/kotlin/Connection.kt:76
+#: src/main/kotlin/Connection.kt:76 src/main/kotlin/Connection.kt:79
 msgid "*** Disconnected"
 msgstr ""
 
-#: src/main/kotlin/Connection.kt:80
+#: src/main/kotlin/Connection.kt:80 src/main/kotlin/Connection.kt:83
 msgid "*** Error: %s - %s"
 msgstr ""
 
-#: src/main/kotlin/Connection.kt:104
+#: src/main/kotlin/Connection.kt:104 src/main/kotlin/Connection.kt:107
 msgid "-- %s joined"
 msgstr ""
 
-#: src/main/kotlin/Connection.kt:109
+#: src/main/kotlin/Connection.kt:109 src/main/kotlin/Connection.kt:112
 msgid "-- %s left"
 msgstr ""
 
-#: src/main/kotlin/Connection.kt:111
+#: src/main/kotlin/Connection.kt:111 src/main/kotlin/Connection.kt:114
 msgid "-- %s left (%s)"
 msgstr ""
 
-#: src/main/kotlin/Connection.kt:125
+#: src/main/kotlin/Connection.kt:125 src/main/kotlin/Connection.kt:128
 msgid "-- %s quit"
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:29
+#: src/main/kotlin/ConnectDialog.kt:29 src/main/kotlin/ConnectDialog.kt:138
 msgid "Add"
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:131
+#: src/main/kotlin/ConnectDialog.kt:131 src/main/kotlin/ConnectDialog.kt:121
 msgid "Auto Connect"
 msgstr ""
 
 #: src/main/kotlin/ConnectDialog.kt:46 src/main/kotlin/ConnectDialog.kt:98
-#: src/main/kotlin/JoinDialog.kt:54
+#: src/main/kotlin/JoinDialog.kt:54 src/main/kotlin/ConnectDialog.kt:162
 msgid "Cancel"
 msgstr ""
 
@@ -62,14 +62,28 @@ msgid "Channel Name"
 msgstr ""
 
 #: src/main/kotlin/MainView.kt:66 src/main/kotlin/SettingsDialog.kt:41
+#: src/main/kotlin/MainView.kt:73
 msgid "Close"
 msgstr ""
 
 #: src/main/kotlin/ConnectDialog.kt:92 src/main/kotlin/MainView.kt:28
+#: src/main/kotlin/ConnectDialog.kt:130
 msgid "Connect"
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:34
+#: src/main/kotlin/MainView.kt:59 src/main/kotlin/MainView.kt:89
+msgid "DMDirc"
+msgstr ""
+
+#: src/main/kotlin/MainView.kt:63
+msgid "DMDirc: %s"
+msgstr ""
+
+#: src/main/kotlin/MainView.kt:65
+msgid "DMDirc: %s | %s"
+msgstr ""
+
+#: src/main/kotlin/ConnectDialog.kt:34 src/main/kotlin/ConnectDialog.kt:151
 msgid "Delete"
 msgstr ""
 
@@ -82,6 +96,7 @@ msgid "IRC"
 msgstr ""
 
 #: src/main/kotlin/JoinDialog.kt:48 src/main/kotlin/MainView.kt:33
+#: src/main/kotlin/MainView.kt:28
 msgid "Join"
 msgstr ""
 
@@ -89,11 +104,11 @@ msgstr ""
 msgid "Nickname: "
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:121
+#: src/main/kotlin/ConnectDialog.kt:121 src/main/kotlin/ConnectDialog.kt:111
 msgid "Password"
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:116
+#: src/main/kotlin/ConnectDialog.kt:116 src/main/kotlin/ConnectDialog.kt:106
 msgid "Port"
 msgstr ""
 
@@ -114,6 +129,7 @@ msgid "Reset"
 msgstr ""
 
 #: src/main/kotlin/ConnectDialog.kt:39 src/main/kotlin/SettingsDialog.kt:48
+#: src/main/kotlin/ConnectDialog.kt:156
 msgid "Save"
 msgstr ""
 
@@ -121,15 +137,16 @@ msgstr ""
 msgid "Server List"
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:110
+#: src/main/kotlin/ConnectDialog.kt:110 src/main/kotlin/ConnectDialog.kt:100
 msgid "Server Name"
 msgstr ""
 
 #: src/main/kotlin/MainView.kt:40 src/main/kotlin/MainView.kt:41
+#: src/main/kotlin/MainView.kt:35 src/main/kotlin/MainView.kt:36
 msgid "Settings"
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:126
+#: src/main/kotlin/ConnectDialog.kt:126 src/main/kotlin/ConnectDialog.kt:116
 msgid "TLS"
 msgstr ""
 
@@ -137,7 +154,7 @@ msgstr ""
 msgid "Username: "
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:22
+#: src/main/kotlin/ConnectDialog.kt:22 src/main/kotlin/ConnectDialog.kt:92
 msgid "[Empty]"
 msgstr ""
 
