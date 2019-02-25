@@ -156,8 +156,11 @@ class Connection(
                 .let(images::addAll)
         }
 
-        images.forEach {
-            textArea.appendText("${ControlCode.InternalImages}${it.url}\n")
+        if (this@Connection.config[ClientSpec.Display.embedImages]) {
+            images.forEach {
+                textArea.appendText("${ControlCode.InternalImages}${it.url}")
+            }
+            textArea.appendText("\n")
         }
     }
 
