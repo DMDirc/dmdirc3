@@ -9,8 +9,9 @@ import tornadofx.observable
 class MainController : Controller() {
 
     private val config1 by kodein.instance<ClientConfig>()
-    val windows: ObservableList<Window> = emptyList<Window>().toMutableList().observable()
-    val selectedWindow: SimpleObjectProperty<Window> = SimpleObjectProperty()
+    val windows: ObservableList<WindowModel> = emptyList<WindowModel>().toMutableList().observable()
+    val selectedWindow: SimpleObjectProperty<WindowModel> = SimpleObjectProperty()
+    val windowUis = mutableMapOf<WindowModel, WindowUI>()
 
     init {
         autoConnect()

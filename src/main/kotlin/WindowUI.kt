@@ -11,28 +11,29 @@ enum class WindowType {
     CHANNEL
 }
 
-data class Window(
+class WindowModel(
     val name: String,
     val type: WindowType,
-    var windowUI: WindowUI,
     var connection: Connection?,
     var isConnection: Boolean,
     val connectionId: String?
 ) {
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else name.toLowerCase()}"
+    val users = mutableListOf<String>().observable()
+    val lines = mutableListOf<Array<StyledSpan>>().observable()
+    val inputField = SimpleStringProperty("")
+
+    fun handleInput() {
+        if (inputField.value.isNotEmpty()) {
+            connection?.sendMessage(name, inputField.value)
+            inputField.value = ""
+        }
+    }
 }
 
-class WindowUI(connection: Connection?) : View("Right bit") {
-    private val controller: MainController by inject()
-    val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
-    private val inputText = SimpleStringProperty()
-    val users = emptyList<String>().toMutableList().observable()
+class WindowUI(model: WindowModel) : View("Right bit") {
 
-    lateinit var myConnection: Connection
-
-    init {
-        connection?.let { myConnection = it }
-    }
+    private val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
 
     override val root = borderpane {
         center = VirtualizedScrollPane(textArea.apply {
@@ -42,21 +43,37 @@ class WindowUI(connection: Connection?) : View("Right bit") {
             hgrow = Priority.ALWAYS
             vgrow = Priority.ALWAYS
         }
-        right = listview(users) {
+        right = listview(model.users) {
             styleClass.add("nick-list")
             prefWidth = 148.0
         }
 
-        bottom = textfield(inputText) {
+        bottom = textfield(model.inputField) {
             styleClass.add("input-field")
             action {
-                if (inputText.value.isNotEmpty()) {
-                    runAsync {
-                        myConnection.sendMessage(controller.selectedWindow.value.name, inputText.value)
-                        inputText.value = ""
+                runAsync {
+                    model.handleInput()
+                }
+            }
+        }
+    }
+
+    init {
+        model.lines.onChange { change ->
+            // TODO: Support ops other than just appending lines (editing, deleting, inserting earlier, etc).
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.addedSubList.forEach { line ->
+                        line.forEach { segment ->
+                            val position = textArea.length
+                            textArea.appendText(segment.content)
+                            textArea.setStyle(position, textArea.length, segment.styles)
+                        }
+                        textArea.appendText("\n")
                     }
                 }
             }
         }
     }
+
 }
