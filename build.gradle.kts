@@ -31,7 +31,7 @@ application {
 dependencies {
     implementation("no.tornado:tornadofx:1.7.18")
     implementation("org.fxmisc.richtext:richtextfx:0.9.2")
-    implementation("com.dmdirc:ktirc:0.10.1")
+    implementation("com.dmdirc:ktirc:0.10.3")
     implementation("com.uchuhimo:konf:0.13.1")
     implementation("org.kodein.di:kodein-di-generic-jvm:6.1.0")
     implementation("com.jukusoft:easy-i18n-gettext:1.2.0")
