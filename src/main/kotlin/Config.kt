@@ -30,6 +30,10 @@ object ClientSpec : ConfigSpec("") {
 
     object Formatting : ConfigSpec() {
         val timestamp by optional("HH:mm:ss")
+        val channelEvent by optional("-- %s")
+        val serverEvent by optional("** %s")
+        val message by optional("<%s> %s")
+        val action by optional("* %s %s")
     }
 
     object Display : ConfigSpec() {
