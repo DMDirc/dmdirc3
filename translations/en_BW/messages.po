@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: dmdirc\n"
 "Report-Msgid-Bugs-To: #dmdirc on freenode\n"
 "POT-Creation-Date: 2019-02-24 19:04+0000\n"
-"PO-Revision-Date: 2019-02-25 20:35\n"
+"PO-Revision-Date: 2019-02-26 01:59\n"
 "Last-Translator: chameth <crowdin@vacso.co.uk>\n"
 "Language-Team: Backwards\n"
 "Language: en_BW\n"
@@ -73,15 +73,15 @@ msgstr "Tcennoc"
 
 #: src/main/kotlin/MainView.kt:59 src/main/kotlin/MainView.kt:89
 msgid "DMDirc"
-msgstr ""
+msgstr "CRIdmd"
 
 #: src/main/kotlin/MainView.kt:63
 msgid "DMDirc: %s"
-msgstr ""
+msgstr "CRIdmd: %s"
 
 #: src/main/kotlin/MainView.kt:65
 msgid "DMDirc: %s | %s"
-msgstr ""
+msgstr "CRIdmd: %s | %s"
 
 #: src/main/kotlin/ConnectDialog.kt:34 src/main/kotlin/ConnectDialog.kt:151
 msgid "Delete"
