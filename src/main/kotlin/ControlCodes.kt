@@ -19,9 +19,9 @@ object ControlCode {
     const val Colour = '\u0003'
 
     /**
-     * Sets or resets the colour of the following text, using hexadecimal. NOT CURRENTLY SUPPORTED.
+     * Sets or resets the colour of the following text, using hexadecimal.
      *
-     * Takes colours in the same manner as [Colour].
+     * Takes 6-character hexadecimal colours in the same manner as [Colour].
      */
     const val HexColour = '\u0004'
 
@@ -77,18 +77,26 @@ fun String.convertControlCodes() = sequence {
     val styles = mutableSetOf<Style>()
     val buffer = StringBuilder()
     var nextColour = -1
+    var nextColourLength = 0 to 0
+    var nextColourFilter: (Char) -> Boolean =  Char::isDigit
     val colours = arrayOf(StringBuilder(), StringBuilder())
 
     fun emitThen(block: () -> Unit) = sequence {
-        var needComma = false
+        var extraContent = ""
         if (nextColour > -1) {
+            if (colours[nextColour].length < nextColourLength.first) {
+                // We got a bit of a colour, but not enough.
+                extraContent = String(colours[nextColour])
+                colours[nextColour].clear()
+            }
+
             if (nextColour == 1 && colours[1].isEmpty()) {
                 // We consumed a comma that wasn't used; re-add it
-                needComma = true
+                extraContent = ",$extraContent"
             }
 
             if (colours[0].isEmpty()) {
-                styles.removeIf { it is Style.ColourStyle }
+                styles.removeIf { it is Style.ColourStyle || it is Style.HexColourStyle }
             } else {
                 styles.add(colours.toStyle())
             }
@@ -102,7 +110,7 @@ fun String.convertControlCodes() = sequence {
             buffer.clear()
         }
 
-        if (needComma) buffer.append(',')
+        buffer.append(extraContent)
 
         block.invoke()
     }
@@ -115,7 +123,16 @@ fun String.convertControlCodes() = sequence {
             ControlCode.Underline -> yieldAll(emitThen { styles.toggle(Style.UnderlineStyle) })
             ControlCode.Strikethrough -> yieldAll(emitThen { styles.toggle(Style.StrikethroughStyle) })
             ControlCode.Reset -> yieldAll(emitThen { styles.clear() })
-            ControlCode.Colour -> yieldAll(emitThen { nextColour = 0 })
+            ControlCode.Colour -> yieldAll(emitThen {
+                nextColour = 0
+                nextColourLength = 1 to 2
+                nextColourFilter = Char::isDigit
+            })
+            ControlCode.HexColour -> yieldAll(emitThen {
+                nextColour = 0
+                nextColourLength = 6 to 6
+                nextColourFilter = { c: Char -> c.isDigit() || c.toLowerCase() in 'a'..'f' }
+            })
             ControlCode.InternalLinks -> {
                 styles.firstOrNull { s -> s is Style.Link }?.let { link ->
                     (link as Style.Link).url = buffer.toString()
@@ -123,9 +140,13 @@ fun String.convertControlCodes() = sequence {
                 } ?: yieldAll(emitThen { styles.add(Style.Link("")) })
             }
             else -> when {
+                // We're not expecting a colour argument:
                 nextColour == -1 -> buffer.append(it)
-                nextColour == 0 && it == ',' -> nextColour = 1
-                nextColour >= 0 && it.isDigit() && colours[nextColour].length < 2 -> colours[nextColour].append(it)
+                // We've expecting the first colour, have got enough chars, and hit a comma:
+                nextColour == 0 && colours[nextColour].length >= nextColourLength.first && it == ',' -> nextColour = 1
+                // We're expecting a colour, hit a valid char for our colour, and don't yet have enough chars:
+                nextColour >= 0 && nextColourFilter(it) && colours[nextColour].length < nextColourLength.second -> colours[nextColour].append(it)
+                // We're expecting a colour but got something else:
                 nextColour >= 0 -> yieldAll(emitThen { buffer.append(it) })
             }
         }
@@ -139,7 +160,12 @@ private fun MutableSet<Style>.toggle(style: Style) = when {
     else -> add(style)
 }
 
-private fun Array<StringBuilder>.toStyle() = Style.ColourStyle(
-    this[0].toString().toInt(),
-    if (this[1].isEmpty()) null else this[1].toString().toInt()
-)
+private fun Array<StringBuilder>.toStyle(): Style {
+    val foreground = this[0].toString()
+    val background = if (this[1].isEmpty()) null else this[1].toString()
+    return if (foreground.length <= 2) {
+        Style.ColourStyle(foreground.toInt(), background?.toInt())
+    } else {
+        Style.HexColourStyle(foreground, background)
+    }
+}
