@@ -61,209 +61,209 @@
 .irc-link {
     -fx-underline: true !important;
     -fx-fill: blue !important;
-    -fx-cursor: hand;
+    -fx-cursor: hand  !important;
 }
 
 /* User-customisable colours */
-.irc-colour-fg-0 { -fx-fill: white; }
-.irc-colour-fg-1 { -fx-fill: black; }
-.irc-colour-fg-2 { -fx-fill: blue; }
-.irc-colour-fg-3 { -fx-fill: green; }
-.irc-colour-fg-4 { -fx-fill: red; }
-.irc-colour-fg-5 { -fx-fill: brown; }
-.irc-colour-fg-6 { -fx-fill: magenta; }
-.irc-colour-fg-7 { -fx-fill: orange; }
-.irc-colour-fg-8 { -fx-fill: yellow; }
-.irc-colour-fg-9 { -fx-fill: lightgreen; }
-.irc-colour-fg-10 { -fx-fill: cyan; }
-.irc-colour-fg-11 { -fx-fill: lightcyan; }
-.irc-colour-fg-12 { -fx-fill: lightblue; }
-.irc-colour-fg-13 { -fx-fill: pink; }
-.irc-colour-fg-14 { -fx-fill: grey; }
-.irc-colour-fg-15 { -fx-fill: lightgrey; }
+.irc-colour-fg-0 { -fx-fill: white !important; }
+.irc-colour-fg-1 { -fx-fill: black !important; }
+.irc-colour-fg-2 { -fx-fill: blue !important; }
+.irc-colour-fg-3 { -fx-fill: green !important; }
+.irc-colour-fg-4 { -fx-fill: red !important; }
+.irc-colour-fg-5 { -fx-fill: brown !important; }
+.irc-colour-fg-6 { -fx-fill: magenta !important; }
+.irc-colour-fg-7 { -fx-fill: orange !important; }
+.irc-colour-fg-8 { -fx-fill: yellow !important; }
+.irc-colour-fg-9 { -fx-fill: lightgreen !important; }
+.irc-colour-fg-10 { -fx-fill: cyan !important; }
+.irc-colour-fg-11 { -fx-fill: lightcyan !important; }
+.irc-colour-fg-12 { -fx-fill: lightblue !important; }
+.irc-colour-fg-13 { -fx-fill: pink !important; }
+.irc-colour-fg-14 { -fx-fill: grey !important; }
+.irc-colour-fg-15 { -fx-fill: lightgrey !important; }
 
-.irc-colour-bg-0 { -rtfx-background-color: white; }
-.irc-colour-bg-1 { -rtfx-background-color: black; }
-.irc-colour-bg-2 { -rtfx-background-color: blue; }
-.irc-colour-bg-3 { -rtfx-background-color: green; }
-.irc-colour-bg-4 { -rtfx-background-color: red; }
-.irc-colour-bg-5 { -rtfx-background-color: brown; }
-.irc-colour-bg-6 { -rtfx-background-color: magenta; }
-.irc-colour-bg-7 { -rtfx-background-color: orange; }
-.irc-colour-bg-8 { -rtfx-background-color: yellow; }
-.irc-colour-bg-9 { -rtfx-background-color: lightgreen; }
-.irc-colour-bg-10 { -rtfx-background-color: cyan; }
-.irc-colour-bg-11 { -rtfx-background-color: lightcyan; }
-.irc-colour-bg-12 { -rtfx-background-color: lightblue; }
-.irc-colour-bg-13 { -rtfx-background-color: pink; }
-.irc-colour-bg-14 { -rtfx-background-color: grey; }
-.irc-colour-bg-15 { -rtfx-background-color: lightgrey; }
+.irc-colour-bg-0 { -rtfx-background-color: white !important; }
+.irc-colour-bg-1 { -rtfx-background-color: black !important; }
+.irc-colour-bg-2 { -rtfx-background-color: blue !important; }
+.irc-colour-bg-3 { -rtfx-background-color: green !important; }
+.irc-colour-bg-4 { -rtfx-background-color: red !important; }
+.irc-colour-bg-5 { -rtfx-background-color: brown !important; }
+.irc-colour-bg-6 { -rtfx-background-color: magenta !important; }
+.irc-colour-bg-7 { -rtfx-background-color: orange !important; }
+.irc-colour-bg-8 { -rtfx-background-color: yellow !important; }
+.irc-colour-bg-9 { -rtfx-background-color: lightgreen !important; }
+.irc-colour-bg-10 { -rtfx-background-color: cyan !important; }
+.irc-colour-bg-11 { -rtfx-background-color: lightcyan !important; }
+.irc-colour-bg-12 { -rtfx-background-color: lightblue !important; }
+.irc-colour-bg-13 { -rtfx-background-color: pink !important; }
+.irc-colour-bg-14 { -rtfx-background-color: grey !important; }
+.irc-colour-bg-15 { -rtfx-background-color: lightgrey !important; }
 
 /* Extended colours */
-.irc-colour-fg-16 { -fx-fill: #470000; }
-.irc-colour-fg-17 { -fx-fill: #472100; }
-.irc-colour-fg-18 { -fx-fill: #474700; }
-.irc-colour-fg-19 { -fx-fill: #324700; }
-.irc-colour-fg-20 { -fx-fill: #004700; }
-.irc-colour-fg-21 { -fx-fill: #00472c; }
-.irc-colour-fg-22 { -fx-fill: #004747; }
-.irc-colour-fg-23 { -fx-fill: #002747; }
-.irc-colour-fg-24 { -fx-fill: #000047; }
-.irc-colour-fg-25 { -fx-fill: #2e0047; }
-.irc-colour-fg-26 { -fx-fill: #470047; }
-.irc-colour-fg-27 { -fx-fill: #47002a; }
-.irc-colour-fg-28 { -fx-fill: #740000; }
-.irc-colour-fg-29 { -fx-fill: #743a00; }
-.irc-colour-fg-30 { -fx-fill: #747400; }
-.irc-colour-fg-31 { -fx-fill: #517400; }
-.irc-colour-fg-32 { -fx-fill: #007400; }
-.irc-colour-fg-33 { -fx-fill: #007449; }
-.irc-colour-fg-34 { -fx-fill: #007474; }
-.irc-colour-fg-35 { -fx-fill: #004074; }
-.irc-colour-fg-36 { -fx-fill: #000074; }
-.irc-colour-fg-37 { -fx-fill: #4b0074; }
-.irc-colour-fg-38 { -fx-fill: #740074; }
-.irc-colour-fg-39 { -fx-fill: #740045; }
-.irc-colour-fg-40 { -fx-fill: #b50000; }
-.irc-colour-fg-41 { -fx-fill: #b56300; }
-.irc-colour-fg-42 { -fx-fill: #b5b500; }
-.irc-colour-fg-43 { -fx-fill: #7db500; }
-.irc-colour-fg-44 { -fx-fill: #00b500; }
-.irc-colour-fg-45 { -fx-fill: #00b571; }
-.irc-colour-fg-46 { -fx-fill: #00b5b5; }
-.irc-colour-fg-47 { -fx-fill: #0063b5; }
-.irc-colour-fg-48 { -fx-fill: #0000b5; }
-.irc-colour-fg-49 { -fx-fill: #7500b5; }
-.irc-colour-fg-50 { -fx-fill: #b500b5; }
-.irc-colour-fg-51 { -fx-fill: #b5006b; }
-.irc-colour-fg-52 { -fx-fill: #ff0000; }
-.irc-colour-fg-53 { -fx-fill: #ff8c00; }
-.irc-colour-fg-54 { -fx-fill: #ffff00; }
-.irc-colour-fg-55 { -fx-fill: #b2ff00; }
-.irc-colour-fg-56 { -fx-fill: #00ff00; }
-.irc-colour-fg-57 { -fx-fill: #00ffa0; }
-.irc-colour-fg-58 { -fx-fill: #00ffff; }
-.irc-colour-fg-59 { -fx-fill: #008cff; }
-.irc-colour-fg-60 { -fx-fill: #0000ff; }
-.irc-colour-fg-61 { -fx-fill: #a500ff; }
-.irc-colour-fg-62 { -fx-fill: #ff00ff; }
-.irc-colour-fg-63 { -fx-fill: #ff0098; }
-.irc-colour-fg-64 { -fx-fill: #ff5959; }
-.irc-colour-fg-65 { -fx-fill: #ffb459; }
-.irc-colour-fg-66 { -fx-fill: #ffff71; }
-.irc-colour-fg-67 { -fx-fill: #cfff60; }
-.irc-colour-fg-68 { -fx-fill: #6fff6f; }
-.irc-colour-fg-69 { -fx-fill: #65ffc9; }
-.irc-colour-fg-70 { -fx-fill: #6dffff; }
-.irc-colour-fg-71 { -fx-fill: #59b4ff; }
-.irc-colour-fg-72 { -fx-fill: #5959ff; }
-.irc-colour-fg-73 { -fx-fill: #c459ff; }
-.irc-colour-fg-74 { -fx-fill: #ff66ff; }
-.irc-colour-fg-75 { -fx-fill: #ff59bc; }
-.irc-colour-fg-76 { -fx-fill: #ff9c9c; }
-.irc-colour-fg-77 { -fx-fill: #ffd39c; }
-.irc-colour-fg-78 { -fx-fill: #ffff9c; }
-.irc-colour-fg-79 { -fx-fill: #e2ff9c; }
-.irc-colour-fg-80 { -fx-fill: #9cff9c; }
-.irc-colour-fg-81 { -fx-fill: #9cffdb; }
-.irc-colour-fg-82 { -fx-fill: #9cffff; }
-.irc-colour-fg-83 { -fx-fill: #9cd3ff; }
-.irc-colour-fg-84 { -fx-fill: #9c9cff; }
-.irc-colour-fg-85 { -fx-fill: #dc9cff; }
-.irc-colour-fg-86 { -fx-fill: #ff9cff; }
-.irc-colour-fg-87 { -fx-fill: #ff94d3; }
-.irc-colour-fg-88 { -fx-fill: #000000; }
-.irc-colour-fg-89 { -fx-fill: #131313; }
-.irc-colour-fg-90 { -fx-fill: #282828; }
-.irc-colour-fg-91 { -fx-fill: #363636; }
-.irc-colour-fg-92 { -fx-fill: #4d4d4d; }
-.irc-colour-fg-93 { -fx-fill: #656565; }
-.irc-colour-fg-94 { -fx-fill: #818181; }
-.irc-colour-fg-95 { -fx-fill: #9f9f9f; }
-.irc-colour-fg-96 { -fx-fill: #bcbcbc; }
-.irc-colour-fg-97 { -fx-fill: #e2e2e2; }
-.irc-colour-fg-98 { -fx-fill: #ffffff; }
+.irc-colour-fg-16 { -fx-fill: #470000 !important; }
+.irc-colour-fg-17 { -fx-fill: #472100 !important; }
+.irc-colour-fg-18 { -fx-fill: #474700 !important; }
+.irc-colour-fg-19 { -fx-fill: #324700 !important; }
+.irc-colour-fg-20 { -fx-fill: #004700 !important; }
+.irc-colour-fg-21 { -fx-fill: #00472c !important; }
+.irc-colour-fg-22 { -fx-fill: #004747 !important; }
+.irc-colour-fg-23 { -fx-fill: #002747 !important; }
+.irc-colour-fg-24 { -fx-fill: #000047 !important; }
+.irc-colour-fg-25 { -fx-fill: #2e0047 !important; }
+.irc-colour-fg-26 { -fx-fill: #470047 !important; }
+.irc-colour-fg-27 { -fx-fill: #47002a !important; }
+.irc-colour-fg-28 { -fx-fill: #740000 !important; }
+.irc-colour-fg-29 { -fx-fill: #743a00 !important; }
+.irc-colour-fg-30 { -fx-fill: #747400 !important; }
+.irc-colour-fg-31 { -fx-fill: #517400 !important; }
+.irc-colour-fg-32 { -fx-fill: #007400 !important; }
+.irc-colour-fg-33 { -fx-fill: #007449 !important; }
+.irc-colour-fg-34 { -fx-fill: #007474 !important; }
+.irc-colour-fg-35 { -fx-fill: #004074 !important; }
+.irc-colour-fg-36 { -fx-fill: #000074 !important; }
+.irc-colour-fg-37 { -fx-fill: #4b0074 !important; }
+.irc-colour-fg-38 { -fx-fill: #740074 !important; }
+.irc-colour-fg-39 { -fx-fill: #740045 !important; }
+.irc-colour-fg-40 { -fx-fill: #b50000 !important; }
+.irc-colour-fg-41 { -fx-fill: #b56300 !important; }
+.irc-colour-fg-42 { -fx-fill: #b5b500 !important; }
+.irc-colour-fg-43 { -fx-fill: #7db500 !important; }
+.irc-colour-fg-44 { -fx-fill: #00b500 !important; }
+.irc-colour-fg-45 { -fx-fill: #00b571 !important; }
+.irc-colour-fg-46 { -fx-fill: #00b5b5 !important; }
+.irc-colour-fg-47 { -fx-fill: #0063b5 !important; }
+.irc-colour-fg-48 { -fx-fill: #0000b5 !important; }
+.irc-colour-fg-49 { -fx-fill: #7500b5 !important; }
+.irc-colour-fg-50 { -fx-fill: #b500b5 !important; }
+.irc-colour-fg-51 { -fx-fill: #b5006b !important; }
+.irc-colour-fg-52 { -fx-fill: #ff0000 !important; }
+.irc-colour-fg-53 { -fx-fill: #ff8c00 !important; }
+.irc-colour-fg-54 { -fx-fill: #ffff00 !important; }
+.irc-colour-fg-55 { -fx-fill: #b2ff00 !important; }
+.irc-colour-fg-56 { -fx-fill: #00ff00 !important; }
+.irc-colour-fg-57 { -fx-fill: #00ffa0 !important; }
+.irc-colour-fg-58 { -fx-fill: #00ffff !important; }
+.irc-colour-fg-59 { -fx-fill: #008cff !important; }
+.irc-colour-fg-60 { -fx-fill: #0000ff !important; }
+.irc-colour-fg-61 { -fx-fill: #a500ff !important; }
+.irc-colour-fg-62 { -fx-fill: #ff00ff !important; }
+.irc-colour-fg-63 { -fx-fill: #ff0098 !important; }
+.irc-colour-fg-64 { -fx-fill: #ff5959 !important; }
+.irc-colour-fg-65 { -fx-fill: #ffb459 !important; }
+.irc-colour-fg-66 { -fx-fill: #ffff71 !important; }
+.irc-colour-fg-67 { -fx-fill: #cfff60 !important; }
+.irc-colour-fg-68 { -fx-fill: #6fff6f !important; }
+.irc-colour-fg-69 { -fx-fill: #65ffc9 !important; }
+.irc-colour-fg-70 { -fx-fill: #6dffff !important; }
+.irc-colour-fg-71 { -fx-fill: #59b4ff !important; }
+.irc-colour-fg-72 { -fx-fill: #5959ff !important; }
+.irc-colour-fg-73 { -fx-fill: #c459ff !important; }
+.irc-colour-fg-74 { -fx-fill: #ff66ff !important; }
+.irc-colour-fg-75 { -fx-fill: #ff59bc !important; }
+.irc-colour-fg-76 { -fx-fill: #ff9c9c !important; }
+.irc-colour-fg-77 { -fx-fill: #ffd39c !important; }
+.irc-colour-fg-78 { -fx-fill: #ffff9c !important; }
+.irc-colour-fg-79 { -fx-fill: #e2ff9c !important; }
+.irc-colour-fg-80 { -fx-fill: #9cff9c !important; }
+.irc-colour-fg-81 { -fx-fill: #9cffdb !important; }
+.irc-colour-fg-82 { -fx-fill: #9cffff !important; }
+.irc-colour-fg-83 { -fx-fill: #9cd3ff !important; }
+.irc-colour-fg-84 { -fx-fill: #9c9cff !important; }
+.irc-colour-fg-85 { -fx-fill: #dc9cff !important; }
+.irc-colour-fg-86 { -fx-fill: #ff9cff !important; }
+.irc-colour-fg-87 { -fx-fill: #ff94d3 !important; }
+.irc-colour-fg-88 { -fx-fill: #000000 !important; }
+.irc-colour-fg-89 { -fx-fill: #131313 !important; }
+.irc-colour-fg-90 { -fx-fill: #282828 !important; }
+.irc-colour-fg-91 { -fx-fill: #363636 !important; }
+.irc-colour-fg-92 { -fx-fill: #4d4d4d !important; }
+.irc-colour-fg-93 { -fx-fill: #656565 !important; }
+.irc-colour-fg-94 { -fx-fill: #818181 !important; }
+.irc-colour-fg-95 { -fx-fill: #9f9f9f !important; }
+.irc-colour-fg-96 { -fx-fill: #bcbcbc !important; }
+.irc-colour-fg-97 { -fx-fill: #e2e2e2 !important; }
+.irc-colour-fg-98 { -fx-fill: #ffffff !important; }
 
-.irc-colour-bg-16 { -rtfx-background-color: #470000; }
-.irc-colour-bg-17 { -rtfx-background-color: #472100; }
-.irc-colour-bg-18 { -rtfx-background-color: #474700; }
-.irc-colour-bg-19 { -rtfx-background-color: #324700; }
-.irc-colour-bg-20 { -rtfx-background-color: #004700; }
-.irc-colour-bg-21 { -rtfx-background-color: #00472c; }
-.irc-colour-bg-22 { -rtfx-background-color: #004747; }
-.irc-colour-bg-23 { -rtfx-background-color: #002747; }
-.irc-colour-bg-24 { -rtfx-background-color: #000047; }
-.irc-colour-bg-25 { -rtfx-background-color: #2e0047; }
-.irc-colour-bg-26 { -rtfx-background-color: #470047; }
-.irc-colour-bg-27 { -rtfx-background-color: #47002a; }
-.irc-colour-bg-28 { -rtfx-background-color: #740000; }
-.irc-colour-bg-29 { -rtfx-background-color: #743a00; }
-.irc-colour-bg-30 { -rtfx-background-color: #747400; }
-.irc-colour-bg-31 { -rtfx-background-color: #517400; }
-.irc-colour-bg-32 { -rtfx-background-color: #007400; }
-.irc-colour-bg-33 { -rtfx-background-color: #007449; }
-.irc-colour-bg-34 { -rtfx-background-color: #007474; }
-.irc-colour-bg-35 { -rtfx-background-color: #004074; }
-.irc-colour-bg-36 { -rtfx-background-color: #000074; }
-.irc-colour-bg-37 { -rtfx-background-color: #4b0074; }
-.irc-colour-bg-38 { -rtfx-background-color: #740074; }
-.irc-colour-bg-39 { -rtfx-background-color: #740045; }
-.irc-colour-bg-40 { -rtfx-background-color: #b50000; }
-.irc-colour-bg-41 { -rtfx-background-color: #b56300; }
-.irc-colour-bg-42 { -rtfx-background-color: #b5b500; }
-.irc-colour-bg-43 { -rtfx-background-color: #7db500; }
-.irc-colour-bg-44 { -rtfx-background-color: #00b500; }
-.irc-colour-bg-45 { -rtfx-background-color: #00b571; }
-.irc-colour-bg-46 { -rtfx-background-color: #00b5b5; }
-.irc-colour-bg-47 { -rtfx-background-color: #0063b5; }
-.irc-colour-bg-48 { -rtfx-background-color: #0000b5; }
-.irc-colour-bg-49 { -rtfx-background-color: #7500b5; }
-.irc-colour-bg-50 { -rtfx-background-color: #b500b5; }
-.irc-colour-bg-51 { -rtfx-background-color: #b5006b; }
-.irc-colour-bg-52 { -rtfx-background-color: #ff0000; }
-.irc-colour-bg-53 { -rtfx-background-color: #ff8c00; }
-.irc-colour-bg-54 { -rtfx-background-color: #ffff00; }
-.irc-colour-bg-55 { -rtfx-background-color: #b2ff00; }
-.irc-colour-bg-56 { -rtfx-background-color: #00ff00; }
-.irc-colour-bg-57 { -rtfx-background-color: #00ffa0; }
-.irc-colour-bg-58 { -rtfx-background-color: #00ffff; }
-.irc-colour-bg-59 { -rtfx-background-color: #008cff; }
-.irc-colour-bg-60 { -rtfx-background-color: #0000ff; }
-.irc-colour-bg-61 { -rtfx-background-color: #a500ff; }
-.irc-colour-bg-62 { -rtfx-background-color: #ff00ff; }
-.irc-colour-bg-63 { -rtfx-background-color: #ff0098; }
-.irc-colour-bg-64 { -rtfx-background-color: #ff5959; }
-.irc-colour-bg-65 { -rtfx-background-color: #ffb459; }
-.irc-colour-bg-66 { -rtfx-background-color: #ffff71; }
-.irc-colour-bg-67 { -rtfx-background-color: #cfff60; }
-.irc-colour-bg-68 { -rtfx-background-color: #6fff6f; }
-.irc-colour-bg-69 { -rtfx-background-color: #65ffc9; }
-.irc-colour-bg-70 { -rtfx-background-color: #6dffff; }
-.irc-colour-bg-71 { -rtfx-background-color: #59b4ff; }
-.irc-colour-bg-72 { -rtfx-background-color: #5959ff; }
-.irc-colour-bg-73 { -rtfx-background-color: #c459ff; }
-.irc-colour-bg-74 { -rtfx-background-color: #ff66ff; }
-.irc-colour-bg-75 { -rtfx-background-color: #ff59bc; }
-.irc-colour-bg-76 { -rtfx-background-color: #ff9c9c; }
-.irc-colour-bg-77 { -rtfx-background-color: #ffd39c; }
-.irc-colour-bg-78 { -rtfx-background-color: #ffff9c; }
-.irc-colour-bg-79 { -rtfx-background-color: #e2ff9c; }
-.irc-colour-bg-80 { -rtfx-background-color: #9cff9c; }
-.irc-colour-bg-81 { -rtfx-background-color: #9cffdb; }
-.irc-colour-bg-82 { -rtfx-background-color: #9cffff; }
-.irc-colour-bg-83 { -rtfx-background-color: #9cd3ff; }
-.irc-colour-bg-84 { -rtfx-background-color: #9c9cff; }
-.irc-colour-bg-85 { -rtfx-background-color: #dc9cff; }
-.irc-colour-bg-86 { -rtfx-background-color: #ff9cff; }
-.irc-colour-bg-87 { -rtfx-background-color: #ff94d3; }
-.irc-colour-bg-88 { -rtfx-background-color: #000000; }
-.irc-colour-bg-89 { -rtfx-background-color: #131313; }
-.irc-colour-bg-90 { -rtfx-background-color: #282828; }
-.irc-colour-bg-91 { -rtfx-background-color: #363636; }
-.irc-colour-bg-92 { -rtfx-background-color: #4d4d4d; }
-.irc-colour-bg-93 { -rtfx-background-color: #656565; }
-.irc-colour-bg-94 { -rtfx-background-color: #818181; }
-.irc-colour-bg-95 { -rtfx-background-color: #9f9f9f; }
-.irc-colour-bg-96 { -rtfx-background-color: #bcbcbc; }
-.irc-colour-bg-97 { -rtfx-background-color: #e2e2e2; }
-.irc-colour-bg-98 { -rtfx-background-color: #ffffff; }
+.irc-colour-bg-16 { -rtfx-background-color: #470000 !important; }
+.irc-colour-bg-17 { -rtfx-background-color: #472100 !important; }
+.irc-colour-bg-18 { -rtfx-background-color: #474700 !important; }
+.irc-colour-bg-19 { -rtfx-background-color: #324700 !important; }
+.irc-colour-bg-20 { -rtfx-background-color: #004700 !important; }
+.irc-colour-bg-21 { -rtfx-background-color: #00472c !important; }
+.irc-colour-bg-22 { -rtfx-background-color: #004747 !important; }
+.irc-colour-bg-23 { -rtfx-background-color: #002747 !important; }
+.irc-colour-bg-24 { -rtfx-background-color: #000047 !important; }
+.irc-colour-bg-25 { -rtfx-background-color: #2e0047 !important; }
+.irc-colour-bg-26 { -rtfx-background-color: #470047 !important; }
+.irc-colour-bg-27 { -rtfx-background-color: #47002a !important; }
+.irc-colour-bg-28 { -rtfx-background-color: #740000 !important; }
+.irc-colour-bg-29 { -rtfx-background-color: #743a00 !important; }
+.irc-colour-bg-30 { -rtfx-background-color: #747400 !important; }
+.irc-colour-bg-31 { -rtfx-background-color: #517400 !important; }
+.irc-colour-bg-32 { -rtfx-background-color: #007400 !important; }
+.irc-colour-bg-33 { -rtfx-background-color: #007449 !important; }
+.irc-colour-bg-34 { -rtfx-background-color: #007474 !important; }
+.irc-colour-bg-35 { -rtfx-background-color: #004074 !important; }
+.irc-colour-bg-36 { -rtfx-background-color: #000074 !important; }
+.irc-colour-bg-37 { -rtfx-background-color: #4b0074 !important; }
+.irc-colour-bg-38 { -rtfx-background-color: #740074 !important; }
+.irc-colour-bg-39 { -rtfx-background-color: #740045 !important; }
+.irc-colour-bg-40 { -rtfx-background-color: #b50000 !important; }
+.irc-colour-bg-41 { -rtfx-background-color: #b56300 !important; }
+.irc-colour-bg-42 { -rtfx-background-color: #b5b500 !important; }
+.irc-colour-bg-43 { -rtfx-background-color: #7db500 !important; }
+.irc-colour-bg-44 { -rtfx-background-color: #00b500 !important; }
+.irc-colour-bg-45 { -rtfx-background-color: #00b571 !important; }
+.irc-colour-bg-46 { -rtfx-background-color: #00b5b5 !important; }
+.irc-colour-bg-47 { -rtfx-background-color: #0063b5 !important; }
+.irc-colour-bg-48 { -rtfx-background-color: #0000b5 !important; }
+.irc-colour-bg-49 { -rtfx-background-color: #7500b5 !important; }
+.irc-colour-bg-50 { -rtfx-background-color: #b500b5 !important; }
+.irc-colour-bg-51 { -rtfx-background-color: #b5006b !important; }
+.irc-colour-bg-52 { -rtfx-background-color: #ff0000 !important; }
+.irc-colour-bg-53 { -rtfx-background-color: #ff8c00 !important; }
+.irc-colour-bg-54 { -rtfx-background-color: #ffff00 !important; }
+.irc-colour-bg-55 { -rtfx-background-color: #b2ff00 !important; }
+.irc-colour-bg-56 { -rtfx-background-color: #00ff00 !important; }
+.irc-colour-bg-57 { -rtfx-background-color: #00ffa0 !important; }
+.irc-colour-bg-58 { -rtfx-background-color: #00ffff !important; }
+.irc-colour-bg-59 { -rtfx-background-color: #008cff !important; }
+.irc-colour-bg-60 { -rtfx-background-color: #0000ff !important; }
+.irc-colour-bg-61 { -rtfx-background-color: #a500ff !important; }
+.irc-colour-bg-62 { -rtfx-background-color: #ff00ff !important; }
+.irc-colour-bg-63 { -rtfx-background-color: #ff0098 !important; }
+.irc-colour-bg-64 { -rtfx-background-color: #ff5959 !important; }
+.irc-colour-bg-65 { -rtfx-background-color: #ffb459 !important; }
+.irc-colour-bg-66 { -rtfx-background-color: #ffff71 !important; }
+.irc-colour-bg-67 { -rtfx-background-color: #cfff60 !important; }
+.irc-colour-bg-68 { -rtfx-background-color: #6fff6f !important; }
+.irc-colour-bg-69 { -rtfx-background-color: #65ffc9 !important; }
+.irc-colour-bg-70 { -rtfx-background-color: #6dffff !important; }
+.irc-colour-bg-71 { -rtfx-background-color: #59b4ff !important; }
+.irc-colour-bg-72 { -rtfx-background-color: #5959ff !important; }
+.irc-colour-bg-73 { -rtfx-background-color: #c459ff !important; }
+.irc-colour-bg-74 { -rtfx-background-color: #ff66ff !important; }
+.irc-colour-bg-75 { -rtfx-background-color: #ff59bc !important; }
+.irc-colour-bg-76 { -rtfx-background-color: #ff9c9c !important; }
+.irc-colour-bg-77 { -rtfx-background-color: #ffd39c !important; }
+.irc-colour-bg-78 { -rtfx-background-color: #ffff9c !important; }
+.irc-colour-bg-79 { -rtfx-background-color: #e2ff9c !important; }
+.irc-colour-bg-80 { -rtfx-background-color: #9cff9c !important; }
+.irc-colour-bg-81 { -rtfx-background-color: #9cffdb !important; }
+.irc-colour-bg-82 { -rtfx-background-color: #9cffff !important; }
+.irc-colour-bg-83 { -rtfx-background-color: #9cd3ff !important; }
+.irc-colour-bg-84 { -rtfx-background-color: #9c9cff !important; }
+.irc-colour-bg-85 { -rtfx-background-color: #dc9cff !important; }
+.irc-colour-bg-86 { -rtfx-background-color: #ff9cff !important; }
+.irc-colour-bg-87 { -rtfx-background-color: #ff94d3 !important; }
+.irc-colour-bg-88 { -rtfx-background-color: #000000 !important; }
+.irc-colour-bg-89 { -rtfx-background-color: #131313 !important; }
+.irc-colour-bg-90 { -rtfx-background-color: #282828 !important; }
+.irc-colour-bg-91 { -rtfx-background-color: #363636 !important; }
+.irc-colour-bg-92 { -rtfx-background-color: #4d4d4d !important; }
+.irc-colour-bg-93 { -rtfx-background-color: #656565 !important; }
+.irc-colour-bg-94 { -rtfx-background-color: #818181 !important; }
+.irc-colour-bg-95 { -rtfx-background-color: #9f9f9f !important; }
+.irc-colour-bg-96 { -rtfx-background-color: #bcbcbc !important; }
+.irc-colour-bg-97 { -rtfx-background-color: #e2e2e2 !important; }
+.irc-colour-bg-98 { -rtfx-background-color: #ffffff !important; }
