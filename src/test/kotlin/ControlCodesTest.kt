@@ -86,6 +86,11 @@ internal class ControlCodesTest {
             arguments("\u0017Crash and \u0017burn", listOf(
                 StyledSpan("Crash and ", setOf(Style.Link("Crash and "))),
                 StyledSpan("burn", emptySet())
+            )),
+
+            arguments("\u0019Crash\u0019 and burn", listOf(
+                StyledSpan("Crash", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan(" and burn", emptySet())
             ))
         )
     }
