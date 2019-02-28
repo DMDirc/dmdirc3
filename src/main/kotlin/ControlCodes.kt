@@ -51,6 +51,11 @@ object ControlCode {
     const val InternalImages = '\u0018'
 
     /**
+     * Identifies nicknames for special processing within the client.
+     */
+    const val InternalNicknames = '\u0019'
+
+    /**
      * Toggles the italic property of text.
      */
     const val Italic = '\u001d'
@@ -122,6 +127,7 @@ fun String.convertControlCodes() = sequence {
             ControlCode.Monospace -> yieldAll(emitThen { styles.toggle(Style.MonospaceStyle) })
             ControlCode.Underline -> yieldAll(emitThen { styles.toggle(Style.UnderlineStyle) })
             ControlCode.Strikethrough -> yieldAll(emitThen { styles.toggle(Style.StrikethroughStyle) })
+            ControlCode.InternalNicknames -> yieldAll(emitThen { styles.toggle(Style.CustomStyle("irc-nickname")) })
             ControlCode.Reset -> yieldAll(emitThen { styles.clear() })
             ControlCode.Colour -> yieldAll(emitThen {
                 nextColour = 0
