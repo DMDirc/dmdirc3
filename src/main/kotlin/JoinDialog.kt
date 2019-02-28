@@ -2,6 +2,7 @@ package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
 import javafx.application.Platform.runLater
+import javafx.beans.binding.BooleanExpression
 import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
@@ -16,7 +17,6 @@ import javafx.stage.Stage
 import javafx.stage.StageStyle
 import org.controlsfx.validation.ValidationSupport
 import org.controlsfx.validation.Validator
-import tornadofx.enableWhen
 
 class JoinDialogController(private val controller: MainController) {
     fun create() {
@@ -33,15 +33,9 @@ class JoinDialogController(private val controller: MainController) {
 class JoinDetailsModel(private val controller: JoinDialogController) {
     val channel = SimpleStringProperty()
     val open = SimpleBooleanProperty(true)
-    val channelValidator = Validator.createEmptyValidator<TextField>("Required")
+    val channelValidator: Validator<TextField> = Validator.createEmptyValidator<TextField>("Required")
     val validated = emptyList<ReadOnlyBooleanProperty>().toMutableList()
-    val validated1 = SimpleBooleanProperty(false)
-
-    init {
-        validated1.addListener { observable, oldValue, newValue ->
-            println("New Value: $newValue")
-        }
-    }
+    var validated1: BooleanExpression = SimpleBooleanProperty(false)
 
     fun commit() {
         if (validated.any {
@@ -72,7 +66,7 @@ class JoinDialog(model: JoinDetailsModel): Stage() {
                     validationSupport.registerValidator(this, model.channelValidator)
                     model.validated.add((validationSupport.invalidProperty()))
                     validationSupport.invalidProperty()
-                    model.validated1.or(validationSupport.invalidProperty().not())
+                    model.validated1 = model.validated1.or(validationSupport.invalidProperty().not())
                     model.channel.bindBidirectional(textProperty())
                     setOnAction {
                         model.commit()
@@ -83,7 +77,7 @@ class JoinDialog(model: JoinDetailsModel): Stage() {
                     buttons.addAll(
                         Button(tr("Join")).apply {
                             setButtonData(this, ButtonBar.ButtonData.OK_DONE)
-                            enableWhen { model.isValid() }
+                            disableProperty().bind(model.isValid().not())
                             setOnAction {
                                 model.commit()
                             }
