@@ -1,62 +1,103 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
+import javafx.application.Platform.runLater
+import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleStringProperty
+import javafx.scene.Scene
+import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
-import tornadofx.*
-
-data class JoinDetails(val channel: String)
+import javafx.scene.control.ButtonBar.setButtonData
+import javafx.scene.control.TextField
+import javafx.scene.layout.VBox
+import javafx.stage.Modality
+import javafx.stage.Stage
+import javafx.stage.StageStyle
+import org.controlsfx.validation.ValidationSupport
+import org.controlsfx.validation.Validator
+import tornadofx.enableWhen
 
 class JoinDialogController(private val controller: MainController) {
-    private var model: JoinDetailsModel? = null
     fun create() {
-        val model = JoinDetailsModel(this)
-        this.model = model
-        JoinDialog(model).openModal()
+        runLater {
+            JoinDialog(JoinDetailsModel(this)).show()
+        }
     }
-    fun join(channel: String) {
-        controller.joinChannel(channel)
-        model?.closeDialog()
+
+    fun join(value: String) {
+        controller.joinChannel(value)
     }
 }
 
-class JoinDetailsModel(private val controller: JoinDialogController) : ItemViewModel<JoinDetails>() {
-    val channel = bind(JoinDetails::channel)
+class JoinDetailsModel(private val controller: JoinDialogController) {
+    val channel = SimpleStringProperty()
     val open = SimpleBooleanProperty(true)
-    override fun onCommit() {
-        if (isValid) {
-            controller.join(channel.value)
+    val channelValidator = Validator.createEmptyValidator<TextField>("Required")
+    val validated = emptyList<ReadOnlyBooleanProperty>().toMutableList()
+    val validated1 = SimpleBooleanProperty(false)
+
+    init {
+        validated1.addListener { observable, oldValue, newValue ->
+            println("New Value: $newValue")
         }
     }
+
+    fun commit() {
+        if (validated.any {
+                it.value == true
+            }) {
+            return
+        }
+        controller.join(channel.value)
+        closeDialog()
+    }
+
     fun closeDialog() {
         open.value = false
     }
+
+    fun isValid() = validated1
 }
 
-class JoinDialog(private val model: JoinDetailsModel) : Fragment() {
-    override val root = form {
-        fieldset {
-            field(tr("Channel Name")) {
-                textfield(model.channel).apply {
-                    action {
+class JoinDialog(model: JoinDetailsModel): Stage() {
+    init {
+        model.open.addListener { _, _, newValue -> if (newValue == false) { close() } }
+        initStyle(StageStyle.DECORATED)
+        initModality(Modality.APPLICATION_MODAL)
+        scene = Scene(VBox().apply {
+            children.addAll(
+                TextField().apply {
+                    val validationSupport = ValidationSupport()
+                    validationSupport.registerValidator(this, model.channelValidator)
+                    model.validated.add((validationSupport.invalidProperty()))
+                    validationSupport.invalidProperty()
+                    model.validated1.or(validationSupport.invalidProperty().not())
+                    model.channel.bindBidirectional(textProperty())
+                    setOnAction {
                         model.commit()
                     }
-                }.required()
-            }
-        }
-        buttonbar {
-            button(tr("Join"), ButtonBar.ButtonData.OK_DONE) {
-                enableWhen(model.valid)
-                action {
-                    model.commit()
                 }
-            }
-            button(tr("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE) {
-                action {
-                    close()
+                ,
+                ButtonBar().apply {
+                    buttons.addAll(
+                        Button(tr("Join")).apply {
+                            setButtonData(this, ButtonBar.ButtonData.OK_DONE)
+                            enableWhen { model.isValid() }
+                            setOnAction {
+                                model.commit()
+                            }
+                        }
+                        ,
+                        Button(tr("Cancel")).apply {
+                            setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
+                            setOnAction {
+                                model.closeDialog()
+                            }
+                        }
+                    )
                 }
-            }
-        }
-        model.open.addListener(ChangeListener { _, _, newValue -> if (!newValue) { close() }})
+            )
+        })
     }
 }

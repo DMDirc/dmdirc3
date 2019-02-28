@@ -31,6 +31,7 @@ application {
 
 dependencies {
     implementation("no.tornado:tornadofx:1.7.18")
+    implementation("org.controlsfx:controlsfx:9.0.0")
     implementation("org.fxmisc.richtext:richtextfx:0.9.2")
     implementation("com.dmdirc:ktirc:0.10.3")
     implementation("com.uchuhimo:konf:0.13.1")
