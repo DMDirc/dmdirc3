@@ -45,7 +45,7 @@ class JoinDetailsModel(private val controller: JoinDialogController): Validating
     }
 
     override fun addValidator(validator: BooleanExpression) {
-        validated = validated.or(validator).not()
+        validated = validated.or(validator.not())
     }
 
     fun isValid() = validated
