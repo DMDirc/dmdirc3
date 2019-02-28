@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
+import org.kodein.di.generic.instance
 
 class JoinDialogController(private val controller: MainController) {
     fun create() {
@@ -53,7 +54,9 @@ class JoinDetailsModel(private val controller: JoinDialogController): Validating
 
 class JoinDialog(model: JoinDetailsModel): Stage() {
     init {
+        val primaryStage by kodein.instance<Stage>()
         model.open.addListener { _, _, newValue -> if (newValue == false) { close() } }
+        initOwner(primaryStage)
         initStyle(StageStyle.DECORATED)
         initModality(Modality.APPLICATION_MODAL)
         scene = Scene(VBox().apply {
