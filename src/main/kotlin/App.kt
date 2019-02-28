@@ -21,10 +21,7 @@ internal lateinit var kodein: Kodein
 
 class MainApp : App(MainView::class) {
     override fun start(stage: Stage) {
-        kodein = Kodein {
-            bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
-            bind<Stage>() with singleton { stage }
-        }
+        kodein = initKodein(stage)
         initInternationalisation(Path.of("translations"))
         with(stage) {
             minWidth = 800.0
@@ -34,6 +31,13 @@ class MainApp : App(MainView::class) {
         GlobalScope.launch {
             installStyles(stage.scene, Paths.get("stylesheet.css"))
         }
+    }
+}
+
+fun initKodein(stage: Stage): Kodein {
+    return Kodein {
+        bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
+        bind<Stage>() with singleton { stage }
     }
 }
 
