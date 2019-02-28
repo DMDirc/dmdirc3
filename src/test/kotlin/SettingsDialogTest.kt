@@ -1,11 +1,9 @@
 
-import com.dmdirc.ClientConfig
-import com.dmdirc.ClientSpec
-import com.dmdirc.SettingsModel
-import com.dmdirc.kodein
+import com.dmdirc.*
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import javafx.stage.Stage
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,9 +14,11 @@ import org.kodein.di.generic.provider
 private class SettingsModelTest {
 
     private val mockConfig = mockk<ClientConfig>()
+    private val stage = mockk<Stage>()
 
     @BeforeEach
     fun setup() {
+        kodein = initKodein(stage)
         val original = kodein
         kodein = Kodein {
             extend(original, allowOverride = true)

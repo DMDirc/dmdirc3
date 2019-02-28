@@ -17,12 +17,12 @@ import java.util.*
 import java.util.logging.LogManager
 
 
-internal var kodein = Kodein {
-    bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
-}
+internal lateinit var kodein: Kodein
 
 class MainApp : App(MainView::class) {
     override fun start(stage: Stage) {
+        kodein = initKodein(stage)
+        initInternationalisation(Path.of("translations"))
         with(stage) {
             minWidth = 800.0
             minHeight = 600.0
@@ -34,9 +34,15 @@ class MainApp : App(MainView::class) {
     }
 }
 
+fun initKodein(stage: Stage): Kodein {
+    return Kodein {
+        bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
+        bind<Stage>() with singleton { stage }
+    }
+}
+
 fun main(args: Array<String>) {
     LogManager.getLogManager().readConfiguration(MainApp::class.java.getResourceAsStream("/logs.properties"))
-    initInternationalisation(Path.of("translations"))
     launch<MainApp>(args)
 }
 
