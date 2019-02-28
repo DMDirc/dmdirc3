@@ -3,7 +3,6 @@ package com.dmdirc
 import com.jukusoft.i18n.I.tr
 import javafx.application.Platform.runLater
 import javafx.beans.binding.BooleanExpression
-import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.Scene
@@ -34,13 +33,10 @@ class JoinDetailsModel(private val controller: JoinDialogController) {
     val channel = SimpleStringProperty()
     val open = SimpleBooleanProperty(true)
     val channelValidator: Validator<TextField> = Validator.createEmptyValidator<TextField>("Required")
-    val validated = emptyList<ReadOnlyBooleanProperty>().toMutableList()
-    var validated1: BooleanExpression = SimpleBooleanProperty(false)
+    var validated: BooleanExpression = SimpleBooleanProperty(false)
 
     fun commit() {
-        if (validated.any {
-                it.value == true
-            }) {
+        if (isValid().value.not()) {
             return
         }
         controller.join(channel.value)
@@ -51,7 +47,7 @@ class JoinDetailsModel(private val controller: JoinDialogController) {
         open.value = false
     }
 
-    fun isValid() = validated1
+    fun isValid() = validated
 }
 
 class JoinDialog(model: JoinDetailsModel): Stage() {
@@ -64,9 +60,8 @@ class JoinDialog(model: JoinDetailsModel): Stage() {
                 TextField().apply {
                     val validationSupport = ValidationSupport()
                     validationSupport.registerValidator(this, model.channelValidator)
-                    model.validated.add((validationSupport.invalidProperty()))
                     validationSupport.invalidProperty()
-                    model.validated1 = model.validated1.or(validationSupport.invalidProperty().not())
+                    model.validated = model.validated.or(validationSupport.invalidProperty().not())
                     model.channel.bindBidirectional(textProperty())
                     setOnAction {
                         model.commit()
