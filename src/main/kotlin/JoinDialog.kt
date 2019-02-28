@@ -14,8 +14,6 @@ import javafx.scene.layout.VBox
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
-import org.controlsfx.validation.ValidationSupport
-import org.controlsfx.validation.Validator
 
 class JoinDialogController(private val controller: MainController) {
     fun create() {
@@ -29,11 +27,10 @@ class JoinDialogController(private val controller: MainController) {
     }
 }
 
-class JoinDetailsModel(private val controller: JoinDialogController) {
-    val channel = SimpleStringProperty()
+class JoinDetailsModel(private val controller: JoinDialogController): ValidatingModel {
     val open = SimpleBooleanProperty(true)
-    val channelValidator: Validator<TextField> = Validator.createEmptyValidator<TextField>("Required")
-    var validated: BooleanExpression = SimpleBooleanProperty(false)
+    val channel = SimpleStringProperty()
+    private var validated: BooleanExpression = SimpleBooleanProperty(false)
 
     fun commit() {
         if (isValid().value.not()) {
@@ -47,6 +44,10 @@ class JoinDetailsModel(private val controller: JoinDialogController) {
         open.value = false
     }
 
+    override fun addValidator(validator: BooleanExpression) {
+        validated = validated.or(validator).not()
+    }
+
     fun isValid() = validated
 }
 
@@ -58,11 +59,7 @@ class JoinDialog(model: JoinDetailsModel): Stage() {
         scene = Scene(VBox().apply {
             children.addAll(
                 TextField().apply {
-                    val validationSupport = ValidationSupport()
-                    validationSupport.registerValidator(this, model.channelValidator)
-                    validationSupport.invalidProperty()
-                    model.validated = model.validated.or(validationSupport.invalidProperty().not())
-                    model.channel.bindBidirectional(textProperty())
+                    bindRequiredTextControl(this, model.channel, model)
                     setOnAction {
                         model.commit()
                     }
