@@ -10,9 +10,12 @@ import org.controlsfx.validation.Validator
 val requiredValidator: Validator<TextField> = Validator.createEmptyValidator<TextField>("Required")
 
 fun bindRequiredTextControl(c: TextInputControl, p: StringProperty, m: ValidatingModel) {
+    bindTextControl(c, p, requiredValidator, m)
+}
+
+fun bindTextControl(c: TextInputControl, p: StringProperty, v: Validator<TextField>, m: ValidatingModel) {
     val validationSupport = ValidationSupport()
-    validationSupport.registerValidator(c, requiredValidator)
-    validationSupport.invalidProperty()
+    validationSupport.registerValidator(c, v)
     m.addValidator(validationSupport.invalidProperty())
     p.bindBidirectional(c.textProperty())
 }
