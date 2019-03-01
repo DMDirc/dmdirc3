@@ -2,9 +2,10 @@ package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
 import javafx.application.Platform.runLater
-import javafx.beans.binding.BooleanExpression
+import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.StringProperty
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
@@ -16,46 +17,62 @@ import javafx.stage.Stage
 import javafx.stage.StageStyle
 import org.kodein.di.generic.instance
 
-class JoinDialogController(private val controller: MainController) {
+object JoinDialogContract {
+    interface Controller {
+        fun join(channel: String)
+    }
+
+    interface ViewModel : ValidatingModel {
+        val open: BooleanProperty
+        val channel: StringProperty
+        fun onTextAction()
+        fun onJoinPressed()
+        fun onCancelPressed()
+    }
+}
+
+class JoinDialogController(private val controller: MainController) : JoinDialogContract.Controller {
     fun create() {
         runLater {
             JoinDialog(JoinDetailsModel(this)).show()
         }
     }
 
-    fun join(value: String) {
-        controller.joinChannel(value)
+    override fun join(channel: String) {
+        controller.joinChannel(channel)
     }
 }
 
-class JoinDetailsModel(private val controller: JoinDialogController): ValidatingModel {
-    val open = SimpleBooleanProperty(true)
-    val channel = SimpleStringProperty()
-    private var validated: BooleanExpression = SimpleBooleanProperty(false)
+class JoinDetailsModel(private val controller: JoinDialogContract.Controller) : JoinDialogContract.ViewModel {
 
-    fun commit() {
-        if (isValid().value.not()) {
+    override val open = SimpleBooleanProperty(true)
+    override val channel = SimpleStringProperty()
+    override val valid = ValidatorChain()
+
+    private fun commit() {
+        if (!valid.value) {
             return
         }
         controller.join(channel.value)
-        closeDialog()
+        close()
     }
 
-    fun closeDialog() {
-        open.value = false
-    }
+    private fun close() = open.set(false)
 
-    override fun addValidator(validator: BooleanExpression) {
-        validated = validated.or(validator.not())
-    }
+    override fun onTextAction() = commit()
+    override fun onJoinPressed() = commit()
+    override fun onCancelPressed() = close()
 
-    fun isValid() = validated
 }
 
-class JoinDialog(model: JoinDetailsModel): Stage() {
+class JoinDialog(model: JoinDialogContract.ViewModel) : Stage() {
     init {
         val primaryStage by kodein.instance<Stage>()
-        model.open.addListener { _, _, newValue -> if (newValue == false) { close() } }
+        model.open.addListener { _, _, newValue ->
+            if (newValue == false) {
+                close()
+            }
+        }
         initOwner(primaryStage)
         initStyle(StageStyle.DECORATED)
         initModality(Modality.APPLICATION_MODAL)
@@ -63,26 +80,18 @@ class JoinDialog(model: JoinDetailsModel): Stage() {
             children.addAll(
                 TextField().apply {
                     bindRequiredTextControl(this, model.channel, model)
-                    setOnAction {
-                        model.commit()
-                    }
-                }
-                ,
+                    setOnAction { model.onTextAction() }
+                },
                 ButtonBar().apply {
                     buttons.addAll(
                         Button(tr("Join")).apply {
                             setButtonData(this, ButtonBar.ButtonData.OK_DONE)
-                            disableProperty().bind(model.isValid().not())
-                            setOnAction {
-                                model.commit()
-                            }
-                        }
-                        ,
+                            disableProperty().bind(model.valid.not())
+                            setOnAction { model.onJoinPressed() }
+                        },
                         Button(tr("Cancel")).apply {
                             setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
-                            setOnAction {
-                                model.closeDialog()
-                            }
+                            setOnAction { model.onCancelPressed() }
                         }
                     )
                 }
