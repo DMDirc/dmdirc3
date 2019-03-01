@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
+import org.kodein.di.generic.provider
 import org.kodein.di.generic.singleton
 import tornadofx.App
 import tornadofx.launch
@@ -37,7 +38,12 @@ class MainApp : App(MainView::class) {
 fun initKodein(stage: Stage): Kodein {
     return Kodein {
         bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
-        bind<Stage>() with singleton { stage }
+        bind<Stage>() with instance(stage)
+        bind<MainController>() with singleton { MainController(instance()) }
+
+        bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
+        bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
+        bind<JoinDialog>() with provider { JoinDialog(instance()) }
     }
 }
 

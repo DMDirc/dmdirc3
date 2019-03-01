@@ -6,11 +6,16 @@ import javafx.collections.transformation.SortedList
 import javafx.scene.Node
 import javafx.scene.image.Image
 import javafx.util.StringConverter
+import org.kodein.di.generic.instance
+import org.kodein.di.generic.provider
 import tornadofx.*
 
 class MainView : View() {
-    private val controller: MainController by inject()
+
+    private val controller: MainController by kodein.instance()
+    private val joinDialogProvider: () -> JoinDialog by kodein.provider()
     private val windowProperty = SimpleObjectProperty<Node>()
+
     override val root =
         borderpane {
             maxHeight = Double.MAX_VALUE
@@ -31,7 +36,7 @@ class MainView : View() {
                     }
                     item(tr("Join")) {
                         action {
-                            JoinDialogController(controller).create()
+                            joinDialogProvider().show()
                         }
                         enableWhen(controller.selectedWindow.isNotNull)
                     }
@@ -89,7 +94,7 @@ class TitleStringConverter : StringConverter<WindowModel>() {
 
     override fun fromString(string: String?) = TODO("not implemented")
 
-    override fun toString(window: WindowModel?) = when {
+    override fun toString(window: WindowModel?): String = when {
         window == null -> tr("DMDirc")
         window.isConnection -> tr("DMDirc: %s").format(window.connection?.networkName ?: "")
         else -> tr("DMDirc: %s | %s").format(window.name, window.connection?.networkName ?: "")
