@@ -3,12 +3,12 @@ package com.dmdirc
 import javafx.beans.binding.BooleanExpression
 import javafx.beans.property.ReadOnlyBooleanPropertyBase
 import javafx.beans.property.StringProperty
+import javafx.beans.value.ChangeListener
 import javafx.scene.control.TextField
 import javafx.scene.control.TextInputControl
 import kotlinx.atomicfu.atomic
 import org.controlsfx.validation.ValidationSupport
 import org.controlsfx.validation.Validator
-import tornadofx.ChangeListener
 
 val requiredValidator: Validator<TextField> = Validator.createEmptyValidator<TextField>("Required")
 
