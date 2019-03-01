@@ -1,7 +1,6 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
-import javafx.application.Platform.runLater
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
@@ -32,18 +31,12 @@ object JoinDialogContract {
 }
 
 class JoinDialogController(private val controller: MainController) : JoinDialogContract.Controller {
-    fun create() {
-        runLater {
-            JoinDialog(JoinDetailsModel(this)).show()
-        }
-    }
-
     override fun join(channel: String) {
         controller.joinChannel(channel)
     }
 }
 
-class JoinDetailsModel(private val controller: JoinDialogContract.Controller) : JoinDialogContract.ViewModel {
+class JoinDialogModel(private val controller: JoinDialogContract.Controller) : JoinDialogContract.ViewModel {
 
     override val open = SimpleBooleanProperty(true)
     override val channel = SimpleStringProperty()

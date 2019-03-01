@@ -2,13 +2,11 @@ package com.dmdirc
 
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ObservableList
-import org.kodein.di.generic.instance
 import tornadofx.Controller
 import tornadofx.observable
 
-class MainController : Controller() {
+class MainController(private val config1: ClientConfig) : Controller() {
 
-    private val config1 by kodein.instance<ClientConfig>()
     val windows: ObservableList<WindowModel> = emptyList<WindowModel>().toMutableList().observable()
     val selectedWindow: SimpleObjectProperty<WindowModel> = SimpleObjectProperty()
     val windowUis = mutableMapOf<WindowModel, WindowUI>()
