@@ -1,9 +1,12 @@
 package com.dmdirc
 
 import javafx.beans.binding.BooleanExpression
+import javafx.beans.property.ReadOnlyBooleanPropertyBase
 import javafx.beans.property.StringProperty
+import javafx.beans.value.ChangeListener
 import javafx.scene.control.TextField
 import javafx.scene.control.TextInputControl
+import kotlinx.atomicfu.atomic
 import org.controlsfx.validation.ValidationSupport
 import org.controlsfx.validation.Validator
 
@@ -16,10 +19,43 @@ fun bindRequiredTextControl(c: TextInputControl, p: StringProperty, m: Validatin
 fun bindTextControl(c: TextInputControl, p: StringProperty, v: Validator<TextField>, m: ValidatingModel) {
     val validationSupport = ValidationSupport()
     validationSupport.registerValidator(c, v)
-    m.addValidator(validationSupport.invalidProperty())
+    m.valid.addValidator(validationSupport.invalidProperty())
     p.bindBidirectional(c.textProperty())
 }
 
 interface ValidatingModel {
-    fun addValidator(validator: BooleanExpression)
+    val valid: ValidatorChain
+}
+
+/**
+ * Manages a chain of validators that must all pass in order for the overall validation state to be true.
+ *
+ * If no validators are supplied, validation fails. Listeners are only notified when the overall validation
+ * state changes.
+ */
+class ValidatorChain : ReadOnlyBooleanPropertyBase() {
+
+    private val validators = mutableListOf<BooleanExpression>()
+    private var valid = atomic(false)
+
+    private val listener = ChangeListener<Boolean> { _, _, _ -> recompute() }
+
+    override fun getName() = ""
+    override fun getBean() = null
+
+    override fun get() = validators.isNotEmpty() && validators.all { it.get() }
+
+    fun addValidator(validator: BooleanExpression) {
+        validators.add(validator)
+        validator.addListener(listener)
+        recompute()
+    }
+
+    private fun recompute() {
+        val newValue = get()
+        if (valid.compareAndSet(!newValue, newValue)) {
+            fireValueChangedEvent()
+        }
+    }
+
 }
