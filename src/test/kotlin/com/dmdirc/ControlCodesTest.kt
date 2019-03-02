@@ -1,7 +1,4 @@
-
-import com.dmdirc.Style
-import com.dmdirc.StyledSpan
-import com.dmdirc.convertControlCodes
+package com.dmdirc
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments

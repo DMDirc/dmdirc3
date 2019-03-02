@@ -23,7 +23,7 @@ class ConnectionDetailsEditable(
     val autoconnect = SimpleBooleanProperty(autoconnect)
 }
 
-class ServerListController(private val controller: MainController) {
+class ServerListController(private val controller: MainContract.Controller) {
     private val config1 by kodein.instance<ClientConfig>()
     private var model: ServerListModel? = null
     fun create() {

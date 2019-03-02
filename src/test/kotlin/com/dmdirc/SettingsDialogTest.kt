@@ -1,4 +1,4 @@
-
+package com.dmdirc
 import com.dmdirc.*
 import io.mockk.every
 import io.mockk.mockk
