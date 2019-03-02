@@ -19,7 +19,8 @@ fun bindRequiredTextControl(c: TextInputControl, p: StringProperty, m: Validatin
 fun bindTextControl(c: TextInputControl, p: StringProperty, v: Validator<TextField>, m: ValidatingModel) {
     val validationSupport = ValidationSupport()
     validationSupport.registerValidator(c, v)
-    m.valid.addValidator(validationSupport.invalidProperty())
+    m.valid.addValidator(validationSupport.invalidProperty().not())
+    c.textProperty().set(p.value)
     p.bindBidirectional(c.textProperty())
 }
 
