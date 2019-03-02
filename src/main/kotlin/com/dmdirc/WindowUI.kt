@@ -1,9 +1,15 @@
 package com.dmdirc
 
+import javafx.application.HostServices
 import javafx.beans.property.SimpleStringProperty
-import javafx.scene.layout.Priority
+import javafx.collections.ListChangeListener
+import javafx.scene.control.ListView
+import javafx.scene.control.TextField
+import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.BorderPane
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.fxmisc.flowless.VirtualizedScrollPane
-import tornadofx.*
 
 enum class WindowType {
     ROOT,
@@ -17,7 +23,8 @@ class WindowModel(
     var connection: Connection?,
     var isConnection: Boolean,
     val connectionId: String?
-) {
+): ValidatingModel {
+    override val valid = ValidatorChain()
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else name.toLowerCase()}"
     val users = mutableListOf<String>().observable()
     val lines = mutableListOf<Array<StyledSpan>>().observable()
@@ -31,35 +38,36 @@ class WindowModel(
     }
 }
 
-class WindowUI(model: WindowModel) : View("Right bit") {
+class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
 
     private val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
 
-    override val root = borderpane {
-        center = VirtualizedScrollPane(textArea.apply {
-            isEditable = false
-            isWrapText = true
-        }).apply {
-            hgrow = Priority.ALWAYS
-            vgrow = Priority.ALWAYS
-        }
-        right = listview(model.users) {
-            styleClass.add("nick-list")
-            prefWidth = 148.0
-        }
-
-        bottom = textfield(model.inputField) {
-            styleClass.add("input-field")
-            action {
-                runAsync {
-                    model.handleInput()
+    init {
+        val borderPane = BorderPane().apply {
+            center = VirtualizedScrollPane(textArea.apply {
+                isEditable = false
+                isWrapText = true
+            })
+            right = ListView<String>(model.users).apply {
+                styleClass.add("nick-list")
+                prefWidth = 148.0
+            }
+            bottom = TextField().apply {
+                model.inputField.bindBidirectional(this.textProperty())
+                styleClass.add("input-field")
+                setOnAction {
+                    GlobalScope.launch {
+                        model.handleInput()
+                    }
                 }
             }
+            AnchorPane.setTopAnchor(this, 0.0);
+            AnchorPane.setLeftAnchor(this, 0.0);
+            AnchorPane.setRightAnchor(this, 0.0);
+            AnchorPane.setBottomAnchor(this, 0.0)
         }
-    }
-
-    init {
-        model.lines.onChange { change ->
+        children.add(borderPane)
+        model.lines.addListener(ListChangeListener { change ->
             // TODO: Support ops other than just appending lines (editing, deleting, inserting earlier, etc).
             while (change.next()) {
                 if (change.wasAdded()) {
@@ -72,8 +80,8 @@ class WindowUI(model: WindowModel) : View("Right bit") {
                         textArea.appendText("\n")
                     }
                 }
-            }
-        }
-    }
 
+            }
+        })
+    }
 }

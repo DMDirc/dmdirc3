@@ -50,7 +50,7 @@ class Connection(
     }
 
     init {
-        controller.windowUis[window] = WindowUI(window)
+        controller.windowUis[window] = WindowUI(window, hostServices)
     }
 
     fun connect() {
@@ -99,7 +99,7 @@ class Connection(
                     window.connectionId
                 )
                 controller.windows.add(model)
-                controller.windowUis[model] = WindowUI(model)
+                controller.windowUis[model] = WindowUI(model, hostServices)
             }
             event is TargetedEvent -> runLaterWithWindowUi(event.target) { handleTargetedEvent(event) }
             else -> {
