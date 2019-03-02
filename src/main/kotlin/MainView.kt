@@ -14,6 +14,7 @@ class MainView : View() {
 
     private val controller: MainController by kodein.instance()
     private val joinDialogProvider: () -> JoinDialog by kodein.provider()
+    private val settingsDialogProvider: () -> SettingsDialog by kodein.provider()
     private val windowProperty = SimpleObjectProperty<Node>()
 
     override val root =
@@ -44,7 +45,7 @@ class MainView : View() {
                 menu(tr("Settings")) {
                     item(tr("Settings")) {
                         action {
-                            find<SettingsDialog>().openModal()
+                            settingsDialogProvider().show()
                         }
                     }
                 }

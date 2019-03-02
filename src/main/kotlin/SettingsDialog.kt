@@ -1,58 +1,114 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.StringProperty
+import javafx.scene.Scene
+import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
+import javafx.scene.control.ButtonBar.setButtonData
+import javafx.scene.control.Label
+import javafx.scene.control.TextField
+import javafx.scene.layout.GridPane
+import javafx.stage.Modality
+import javafx.stage.Stage
+import javafx.stage.StageStyle
 import org.kodein.di.generic.instance
-import tornadofx.*
 
-data class Settings(val nickname: String, val realname: String, val username: String)
+object SettingsDialogContract {
+    interface Controller {
+        fun save(nickname: String, realname: String, username: String)
+    }
 
-class SettingsModel : ItemViewModel<Settings>() {
-    private val config1 by kodein.instance<ClientConfig>()
-
-    val nickname = bind { SimpleStringProperty(item?.nickname, null, config1[ClientSpec.DefaultProfile.nickname]) }
-    val realname = bind { SimpleStringProperty(item?.realname, null, config1[ClientSpec.DefaultProfile.realname]) }
-    val username = bind { SimpleStringProperty(item?.username, null, config1[ClientSpec.DefaultProfile.username]) }
-
-    override fun onCommit() {
-        config1[ClientSpec.DefaultProfile.nickname] = nickname.value
-        config1[ClientSpec.DefaultProfile.realname] = realname.value
-        config1[ClientSpec.DefaultProfile.username] = username.value
-        config1.save()
+    interface ViewModel : ValidatingModel {
+        val open: BooleanProperty
+        val nickname: StringProperty
+        val realname: StringProperty
+        val username: StringProperty
+        fun onSavePressed()
+        fun onCancelPressed()
     }
 }
 
-class SettingsDialog : Fragment() {
-    private val model = SettingsModel()
-    override val root = form {
-        fieldset(tr("Profile")) {
-            field(tr("Nickname: ")) {
-                textfield(model.nickname).required()
-            }
-            field(tr("Realname: ")) {
-                textfield(model.realname).required()
-            }
-            field(tr("Username: ")) {
-                textfield(model.username).required()
-            }
+class SettingsDialogController(private val config: ClientConfig) : SettingsDialogContract.Controller {
+
+    override fun save(nickname: String, realname: String, username: String) {
+        config[ClientSpec.DefaultProfile.nickname] = nickname
+        config[ClientSpec.DefaultProfile.realname] = realname
+        config[ClientSpec.DefaultProfile.username] = username
+        config.save()
+    }
+
+}
+
+class SettingsDialogModel(private val controller: SettingsDialogContract.Controller, config: ClientConfig) : SettingsDialogContract.ViewModel {
+    override val valid = ValidatorChain()
+    override val open = SimpleBooleanProperty(true)
+    override val nickname = SimpleStringProperty(config[ClientSpec.DefaultProfile.nickname])
+    override val realname = SimpleStringProperty(config[ClientSpec.DefaultProfile.realname])
+    override val username = SimpleStringProperty(config[ClientSpec.DefaultProfile.username])
+
+    override fun onSavePressed() {
+        println("SDaving")
+        if (!valid.value) {
+            return
         }
-        buttonbar {
-            button(tr("Close"), ButtonBar.ButtonData.CANCEL_CLOSE).action {
-                model.rollback()
+        println("Valid")
+        controller.save(nickname.value, realname.value, username.value)
+        println("closing")
+        close()
+    }
+
+    override fun onCancelPressed()  = close()
+
+    private fun close() = open.set(false)
+}
+
+class SettingsDialog(model: SettingsDialogContract.ViewModel) : Stage() {
+    init {
+        val primaryStage by kodein.instance<Stage>()
+        model.open.addListener { _, _, newValue ->
+            if (newValue == false) {
                 close()
             }
-            button(tr("Reset"), ButtonBar.ButtonData.OTHER).action {
-                model.rollback()
-            }
-            button(tr("Save"), ButtonBar.ButtonData.OK_DONE) {
-                enableWhen(model.valid.and(model.dirty))
-                action {
-                    model.commit()
-                    close()
-                }
-            }
         }
-        model.validate(decorateErrors = true)
+        initOwner(primaryStage)
+        initStyle(StageStyle.DECORATED)
+        initModality(Modality.APPLICATION_MODAL)
+        scene = Scene(GridPane().apply {
+            add(Label(tr("Profile")), 0, 0, 2, 1)
+            add(Label(tr("Nickname: ")), 0, 1)
+            add(TextField().apply {
+                bindRequiredTextControl(this, model.nickname, model)
+            }, 1, 1)
+            add(Label(tr("Realname: ")), 0, 2)
+            add(TextField().apply {
+                bindRequiredTextControl(this, model.realname, model)
+            }, 1, 2)
+            add(Label(tr("Username: ")), 0, 3)
+            add(TextField().apply {
+                bindRequiredTextControl(this, model.username, model)
+            }, 1, 3)
+            add(ButtonBar().apply {
+                buttons.addAll(
+                    Button(tr("Save")).apply {
+                        setButtonData(this, ButtonBar.ButtonData.OK_DONE)
+                        setOnAction {
+                            disableProperty().bind(model.valid.not())
+                            model.onSavePressed()
+                        }
+                    }
+                    ,
+                    Button(tr("Close")).apply {
+                        setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
+                        setOnAction {
+                            model.onCancelPressed()
+                        }
+                    }
+                )
+            }, 0, 4, 2, 1)
+        })
     }
 }

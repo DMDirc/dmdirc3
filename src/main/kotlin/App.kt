@@ -44,6 +44,10 @@ fun initKodein(stage: Stage): Kodein {
         bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
         bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
         bind<JoinDialog>() with provider { JoinDialog(instance()) }
+
+        bind<SettingsDialogContract.Controller>() with provider { SettingsDialogController(instance()) }
+        bind<SettingsDialogContract.ViewModel>() with provider { SettingsDialogModel(instance(), instance()) }
+        bind<SettingsDialog>() with provider { SettingsDialog(instance()) }
     }
 }
 

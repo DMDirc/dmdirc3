@@ -20,6 +20,7 @@ fun bindTextControl(c: TextInputControl, p: StringProperty, v: Validator<TextFie
     val validationSupport = ValidationSupport()
     validationSupport.registerValidator(c, v)
     m.valid.addValidator(validationSupport.invalidProperty())
+    c.textProperty().set(p.value)
     p.bindBidirectional(c.textProperty())
 }
 
