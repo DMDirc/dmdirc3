@@ -61,9 +61,9 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
                     }
                 }
             }
-            AnchorPane.setTopAnchor(this, 0.0);
-            AnchorPane.setLeftAnchor(this, 0.0);
-            AnchorPane.setRightAnchor(this, 0.0);
+            AnchorPane.setTopAnchor(this, 0.0)
+            AnchorPane.setLeftAnchor(this, 0.0)
+            AnchorPane.setRightAnchor(this, 0.0)
             AnchorPane.setBottomAnchor(this, 0.0)
         }
         children.add(borderPane)
