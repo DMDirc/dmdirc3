@@ -151,9 +151,9 @@ fun String.convertControlCodes() = sequence {
                 // We've expecting the first colour, have got enough chars, and hit a comma:
                 nextColour == 0 && colours[nextColour].length >= nextColourLength.first && it == ',' -> nextColour = 1
                 // We're expecting a colour, hit a valid char for our colour, and don't yet have enough chars:
-                nextColour >= 0 && nextColourFilter(it) && colours[nextColour].length < nextColourLength.second -> colours[nextColour].append(it)
+                nextColourFilter(it) && colours[nextColour].length < nextColourLength.second -> colours[nextColour].append(it)
                 // We're expecting a colour but got something else:
-                nextColour >= 0 -> yieldAll(emitThen { buffer.append(it) })
+                else -> yieldAll(emitThen { buffer.append(it) })
             }
         }
     }
