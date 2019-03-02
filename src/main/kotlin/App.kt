@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
+import org.kodein.di.generic.provider
 import org.kodein.di.generic.singleton
 import tornadofx.App
 import tornadofx.launch
@@ -17,12 +18,13 @@ import java.util.*
 import java.util.logging.LogManager
 
 
-internal var kodein = Kodein {
-    bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
-}
+internal lateinit var kodein: Kodein
 
 class MainApp : App(MainView::class) {
     override fun start(stage: Stage) {
+        kodein = createKodein(stage)
+        val config by kodein.instance<ClientConfig>()
+        initInternationalisation(Path.of("translations"), config[ClientSpec.language])
         with(stage) {
             minWidth = 800.0
             minHeight = 600.0
@@ -34,18 +36,31 @@ class MainApp : App(MainView::class) {
     }
 }
 
-fun main(args: Array<String>) {
-    LogManager.getLogManager().readConfiguration(MainApp::class.java.getResourceAsStream("/logs.properties"))
-    initInternationalisation(Path.of("translations"))
-    launch<MainApp>(args)
+private fun createKodein(stage: Stage) = Kodein {
+    bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
+    bind<Stage>() with instance(stage)
+    bind<MainController>() with singleton { MainController(instance()) }
+    bind<MainContract.Controller>() with singleton { instance<MainController>() }
+
+    bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
+    bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
+    bind<JoinDialog>() with provider { JoinDialog(instance(), instance()) }
+
+    bind<SettingsDialogContract.Controller>() with provider { SettingsDialogController(instance()) }
+    bind<SettingsDialogContract.ViewModel>() with provider { SettingsDialogModel(instance(), instance()) }
+    bind<SettingsDialog>() with provider { SettingsDialog(instance()) }
 }
 
-fun initInternationalisation(path: Path) {
+private fun initInternationalisation(path: Path, locale: String?) {
     if (!Files.exists(path)) {
         Files.createDirectory(path)
     }
 
-    val config by kodein.instance<ClientConfig>()
     I.init(path.toFile(), Locale.ENGLISH, "messages")
-    I.setLanguage(Locale.forLanguageTag(config[ClientSpec.language]))
+    I.setLanguage(Locale.forLanguageTag(locale))
+}
+
+fun main(args: Array<String>) {
+    LogManager.getLogManager().readConfiguration(MainApp::class.java.getResourceAsStream("/logs.properties"))
+    launch<MainApp>(args)
 }

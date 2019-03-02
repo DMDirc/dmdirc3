@@ -1,30 +1,16 @@
 
-import com.dmdirc.ClientConfig
-import com.dmdirc.ClientSpec
-import com.dmdirc.SettingsModel
-import com.dmdirc.kodein
+import com.dmdirc.*
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import javafx.beans.property.SimpleBooleanProperty
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.kodein.di.Kodein
-import org.kodein.di.generic.bind
-import org.kodein.di.generic.provider
 
 private class SettingsModelTest {
 
+    private val mockController = mockk<SettingsDialogContract.Controller>()
     private val mockConfig = mockk<ClientConfig>()
-
-    @BeforeEach
-    fun setup() {
-        val original = kodein
-        kodein = Kodein {
-            extend(original, allowOverride = true)
-            bind<ClientConfig>(overrides = true) with provider { mockConfig }
-        }
-    }
 
     @Test
     fun `defaults profile fields to values from config`() {
@@ -32,7 +18,7 @@ private class SettingsModelTest {
         every { mockConfig[ClientSpec.DefaultProfile.username] } returns "burn"
         every { mockConfig[ClientSpec.DefaultProfile.realname] } returns "Libby"
 
-        val model = SettingsModel()
+        val model = SettingsDialogModel(mockController, mockConfig)
         assertEquals("acidBurn", model.nickname.value)
         assertEquals("burn", model.username.value)
         assertEquals("Libby", model.realname.value)
@@ -40,20 +26,35 @@ private class SettingsModelTest {
 
     @Test
     fun `updates config with new profile values and saves on commit`() {
-        every { mockConfig[ClientSpec.DefaultProfile.nickname] } returns "zeroCool"
-        every { mockConfig[ClientSpec.DefaultProfile.username] } returns "zero"
-        every { mockConfig[ClientSpec.DefaultProfile.realname] } returns "Dade"
+        every { mockConfig[ClientSpec.DefaultProfile.nickname] } returns "acidBurn"
+        every { mockConfig[ClientSpec.DefaultProfile.username] } returns "burn"
+        every { mockConfig[ClientSpec.DefaultProfile.realname] } returns "Libby"
 
-        val model = SettingsModel()
+        val model = SettingsDialogModel(mockController, mockConfig)
+        val truthValidator = SimpleBooleanProperty(true)
+        model.valid.addValidator(truthValidator)
         model.nickname.value = "crashOverride"
         model.username.value = "crash"
         model.realname.value = "???"
-        model.onCommit()
+        model.onSavePressed()
 
         verify {
+            mockController.save("crashOverride", "???", "crash")
+        }
+    }
+
+    @Test
+    fun `test config saves on controller save`() {
+        every { mockConfig[ClientSpec.DefaultProfile.nickname] } returns "acidBurn"
+        every { mockConfig[ClientSpec.DefaultProfile.username] } returns "burn"
+        every { mockConfig[ClientSpec.DefaultProfile.realname] } returns "Libby"
+
+        val controller = SettingsDialogController(mockConfig)
+        controller.save("crashOverride", "crash", "???")
+        verify {
             mockConfig[ClientSpec.DefaultProfile.nickname] = "crashOverride"
-            mockConfig[ClientSpec.DefaultProfile.username] = "crash"
-            mockConfig[ClientSpec.DefaultProfile.realname] = "???"
+            mockConfig[ClientSpec.DefaultProfile.realname] = "crash"
+            mockConfig[ClientSpec.DefaultProfile.username] = "???"
             mockConfig.save()
         }
     }

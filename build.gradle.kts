@@ -6,14 +6,20 @@ val mainClass = "com.dmdirc.AppKt"
 
 plugins {
     application
+    jacoco
     kotlin("jvm").version("1.3.21")
     id("org.openjfx.javafxplugin").version("0.0.7")
     id("name.remal.check-updates") version "1.0.113"
 }
 
+jacoco {
+    toolVersion = "0.8.3"
+}
+
 repositories {
     mavenCentral()
     jcenter()
+    mavenLocal()
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -30,11 +36,13 @@ application {
 
 dependencies {
     implementation("no.tornado:tornadofx:1.7.18")
+    implementation("org.controlsfx:controlsfx:9.0.0")
     implementation("org.fxmisc.richtext:richtextfx:0.9.2")
-    implementation("com.dmdirc:ktirc:0.10.1")
+    implementation("com.dmdirc:ktirc:0.10.3")
     implementation("com.uchuhimo:konf:0.13.1")
     implementation("org.kodein.di:kodein-di-generic-jvm:6.1.0")
     implementation("com.jukusoft:easy-i18n-gettext:1.2.0")
+    implementation("de.jensd:fontawesomefx-fontawesome:4.7.0-9")
 
     runtime("org.openjfx:javafx-graphics:$javafx.version:win")
     runtime("org.openjfx:javafx-graphics:$javafx.version:linux")
@@ -77,6 +85,22 @@ tasks {
             put("Main-Class", mainClass)
         }
         from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    withType<JacocoReport> {
+        executionData(fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec"))
+
+        sourceSets(sourceSets["main"])
+
+        reports {
+            xml.isEnabled = true
+            xml.destination = File("$buildDir/reports/jacoco/report.xml")
+            html.isEnabled = true
+            csv.isEnabled = false
+        }
+
+        dependsOn("test")
     }
 
 }

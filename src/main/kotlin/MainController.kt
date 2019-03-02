@@ -2,13 +2,19 @@ package com.dmdirc
 
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ObservableList
-import org.kodein.di.generic.instance
 import tornadofx.Controller
 import tornadofx.observable
 
-class MainController : Controller() {
+object MainContract {
+    interface Controller {
+        fun connect(connectionDetails: ConnectionDetails)
+        fun joinChannel(channel: String)
+        fun leaveChannel(channel: String)
+    }
+}
 
-    private val config1 by kodein.instance<ClientConfig>()
+class MainController(private val config1: ClientConfig) : Controller(), MainContract.Controller {
+
     val windows: ObservableList<WindowModel> = emptyList<WindowModel>().toMutableList().observable()
     val selectedWindow: SimpleObjectProperty<WindowModel> = SimpleObjectProperty()
     val windowUis = mutableMapOf<WindowModel, WindowUI>()
@@ -21,16 +27,16 @@ class MainController : Controller() {
         config1[ClientSpec.servers].filter { it.autoconnect }.forEach(this::connect)
     }
 
-    fun connect(connectionDetails: ConnectionDetails) {
+    override fun connect(connectionDetails: ConnectionDetails) {
         Connection(connectionDetails.hostname,  connectionDetails.port, connectionDetails.password, connectionDetails.tls, config1, this).connect()
     }
 
-    fun joinChannel(value: String) {
-        selectedWindow.value.connection?.joinChannel(value)
+    override fun joinChannel(channel: String) {
+        selectedWindow.value.connection?.joinChannel(channel)
     }
 
-    fun leaveChannel(name: String) {
-        selectedWindow.value.connection?.leaveChannel(name)
+    override fun leaveChannel(channel: String) {
+        selectedWindow.value.connection?.leaveChannel(channel)
     }
 
 }

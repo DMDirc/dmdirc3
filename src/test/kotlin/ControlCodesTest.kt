@@ -56,9 +56,41 @@ internal class ControlCodesTest {
                 StyledSpan("burn", emptySet())
             )),
 
+            arguments("\u00034,Crash and \u0004burn", listOf(
+                StyledSpan(",Crash and ", setOf(Style.ColourStyle(4, null))),
+                StyledSpan("burn", emptySet())
+            )),
+
+            arguments("\u0004FFFFFFCrash and burn", listOf(
+                StyledSpan("Crash and burn", setOf(Style.HexColourStyle("FFFFFF", null)))
+            )),
+
+            arguments("\u000412cdefCrash and burn", listOf(
+                StyledSpan("Crash and burn", setOf(Style.HexColourStyle("12cdef", null)))
+            )),
+
+            arguments("\u0004FF0000,000000Crash and \u000fburn", listOf(
+                StyledSpan("Crash and ", setOf(Style.HexColourStyle("FF0000", "000000"))),
+                StyledSpan("burn", emptySet())
+            )),
+
+            arguments("\u0004aabbcc,Crash and \u0004burn", listOf(
+                StyledSpan(",Crash and ", setOf(Style.HexColourStyle("aabbcc", null))),
+                StyledSpan("burn", emptySet())
+            )),
+
+            arguments("\u0004Crash and burn", listOf(
+                StyledSpan("Crash and burn", emptySet())
+            )),
+
             arguments("\u0017Crash and \u0017burn", listOf(
                 StyledSpan("Crash and ", setOf(Style.Link("Crash and "))),
                 StyledSpan("burn", emptySet())
+            )),
+
+            arguments("\u0019Crash\u0019 and burn", listOf(
+                StyledSpan("Crash", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan(" and burn", emptySet())
             ))
         )
     }

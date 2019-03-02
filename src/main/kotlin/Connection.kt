@@ -6,7 +6,9 @@ import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.messages.sendPart
 import com.dmdirc.ktirc.model.ServerFeature
+import com.dmdirc.ktirc.model.User
 import com.jukusoft.i18n.I.tr
+import com.uchuhimo.konf.Item
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.runLater
 import java.time.format.DateTimeFormatter
@@ -19,7 +21,7 @@ class Connection(
     private val port: Int,
     private val password: String?,
     private val tls: Boolean,
-    private val config: ClientConfig,
+    private val config1: ClientConfig,
     private val controller: MainController
 ) {
     private val window = WindowModel(
@@ -36,9 +38,9 @@ class Connection(
     private val client: IrcClient = IrcClient {
         server(host, port, tls, password)
         profile {
-            nickname = config[ClientSpec.DefaultProfile.nickname]
-            realName = config[ClientSpec.DefaultProfile.realname]
-            username = config[ClientSpec.DefaultProfile.username]
+            nickname = config1[ClientSpec.DefaultProfile.nickname]
+            realName = config1[ClientSpec.DefaultProfile.realname]
+            username = config1[ClientSpec.DefaultProfile.username]
         }
         behaviour {
             alwaysEchoMessages = true
@@ -72,7 +74,7 @@ class Connection(
         when {
             event is BatchReceived -> event.events.forEach(this::handleEvent)
             event is ServerConnected -> runLater {
-                window.addLine(event, tr("*** Connected"))
+                window.addLine(event.timestamp, ClientSpec.Formatting.serverEvent, tr("Connected"))
                 connected.value = true
             }
             event is ServerReady -> {
@@ -80,11 +82,11 @@ class Connection(
                 serverName = client.serverState.serverName
             }
             event is ServerDisconnected -> runLater {
-                window.addLine(event, tr("*** Disconnected"))
+                window.addLine(event.timestamp, ClientSpec.Formatting.serverEvent, tr("Disconnected"))
                 connected.value = false
             }
             event is ServerConnectionError -> runLater {
-                window.addLine(event, tr("*** Error: %s - %s").format(event.error, event.details ?: ""))
+                window.addLine(event.timestamp, ClientSpec.Formatting.serverEvent, tr("Error: %s - %s").format(event.error, event.details ?: ""))
             }
             event is ChannelJoined && client.isLocalUser(event.user) -> runLater {
                 val model = WindowModel(
@@ -107,51 +109,54 @@ class Connection(
         when (event) {
             is ChannelJoined -> {
                 users.add(event.user.nickname)
-                addLine(event, tr("-- %s joined").format(event.user.nickname))
+                addLine(event.timestamp, ClientSpec.Formatting.channelEvent, tr("%s joined").format(event.user.formattedNickname))
             }
             is ChannelParted -> {
                 users.remove(event.user.nickname)
                 if (event.reason.isEmpty()) {
-                    addLine(event, tr("-- %s left").format(event.user.nickname))
+                    addLine(event.timestamp, ClientSpec.Formatting.channelEvent, tr("%s left").format(event.user.formattedNickname))
                 } else {
-                    addLine(event, tr("-- %s left (%s)").format(event.user.nickname, event.reason))
+                    addLine(event.timestamp, ClientSpec.Formatting.channelEvent, tr("%s left (%s)").format(event.user.formattedNickname, event.reason))
                 }
                 if (client.isLocalUser(event.user)) {
                     controller.windows.removeIf { it.connection == this@Connection && it.name == event.target }
                     controller.windowUis.remove(this)
                 }
             }
-            is MessageReceived -> addLine(event, "<${event.user.nickname}> ${event.message}")
-            is ActionReceived -> addLine(event, "* ${event.user.nickname} ${event.action}")
+            is MessageReceived -> addLine(event.timestamp, ClientSpec.Formatting.message, event.user.formattedNickname, event.message)
+            is ActionReceived -> addLine(event.timestamp, ClientSpec.Formatting.action, event.user.formattedNickname, event.action)
             is ChannelNamesFinished -> {
                 users.clear()
                 users.addAll(client.channelState[event.target]?.users?.map { it.nickname } ?: emptyList())
             }
             is ChannelQuit -> {
                 users.remove(event.user.nickname)
-                addLine(event, tr("-- %s quit").format(event.user.nickname))
+                addLine(event.timestamp, ClientSpec.Formatting.channelEvent, tr("%s quit").format(event.user.formattedNickname))
             }
             else -> {
             }
         }
     }
 
-    private val IrcEvent.timestamp: String
-        get() = metadata.time.format(DateTimeFormatter.ofPattern(config[ClientSpec.Formatting.timestamp]))
+    private val User.formattedNickname: String
+        get() = "${ControlCode.InternalNicknames}${nickname}${ControlCode.InternalNicknames}"
 
-    private fun WindowModel.addLine(event: IrcEvent, line: String) =
+    private val IrcEvent.timestamp: String
+        get() = metadata.time.format(DateTimeFormatter.ofPattern(config1[ClientSpec.Formatting.timestamp]))
+
+    private fun WindowModel.addLine(timestamp: String, format: Item<String>, vararg args: String) =
         addLine(
             sequenceOf(
                 StyledSpan(
-                    event.timestamp,
+                    timestamp,
                     setOf(Style.CustomStyle("timestamp"))
                 )
-            ) + " $line".detectLinks().convertControlCodes()
+            ) + " ${config1[format].format(*args)}".detectLinks().convertControlCodes()
         )
 
     private fun WindowModel.addLine(spans: Sequence<StyledSpan>) {
         lines.add(spans.toList().toTypedArray())
-        if (this@Connection.config[ClientSpec.Display.embedImages]) {
+        if (config1[ClientSpec.Display.embedImages]) {
             val images = spans
                 .toList()
                 .flatMap { it.styles }
