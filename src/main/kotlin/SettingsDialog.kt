@@ -51,13 +51,10 @@ class SettingsDialogModel(private val controller: SettingsDialogContract.Control
     override val username = SimpleStringProperty(config[ClientSpec.DefaultProfile.username])
 
     override fun onSavePressed() {
-        println("SDaving")
         if (!valid.value) {
             return
         }
-        println("Valid")
         controller.save(nickname.value, realname.value, username.value)
-        println("closing")
         close()
     }
 
