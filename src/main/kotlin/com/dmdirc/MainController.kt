@@ -3,7 +3,7 @@ package com.dmdirc
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ObservableList
-import tornadofx.observable
+import javafx.application.HostServices
 
 object MainContract {
     interface Controller {
@@ -15,7 +15,7 @@ object MainContract {
     }
 }
 
-class MainController(private val config1: ClientConfig) : MainContract.Controller {
+class MainController(private val config1: ClientConfig, private val hostServices: HostServices) : MainContract.Controller {
 
     override val windows: ObservableList<WindowModel> = emptyList<WindowModel>().toMutableList().observable()
     override val selectedWindow: SimpleObjectProperty<WindowModel> = SimpleObjectProperty()
@@ -29,7 +29,7 @@ class MainController(private val config1: ClientConfig) : MainContract.Controlle
     }
 
     override fun connect(connectionDetails: ConnectionDetails) {
-        Connection(connectionDetails.hostname,  connectionDetails.port, connectionDetails.password, connectionDetails.tls, config1, this).connect()
+        Connection(connectionDetails.hostname,  connectionDetails.port, connectionDetails.password, connectionDetails.tls, config1, this, hostServices).connect()
     }
 
     override fun joinChannel(channel: String) {

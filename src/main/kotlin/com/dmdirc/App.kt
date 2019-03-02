@@ -1,6 +1,11 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I
+import javafx.application.HostServices
+import javafx.collections.FXCollections
+import javafx.collections.ObservableList
+import javafx.collections.ObservableMap
+import javafx.collections.ObservableSet
 import javafx.stage.Stage
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -21,7 +26,7 @@ internal lateinit var kodein: Kodein
 
 class MainApp : App(MainView::class) {
     override fun start(stage: Stage) {
-        kodein = createKodein(stage)
+        kodein = createKodein(stage, hostServices)
         val config by kodein.instance<ClientConfig>()
         initInternationalisation(Path.of("translations"), config[ClientSpec.language])
         with(stage) {
@@ -35,9 +40,10 @@ class MainApp : App(MainView::class) {
     }
 }
 
-private fun createKodein(stage: Stage) = Kodein {
+private fun createKodein(stage: Stage, hostServices: HostServices) = Kodein {
     bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
-    bind<MainContract.Controller>() with singleton { MainController(instance()) }
+    bind<HostServices>() with singleton { hostServices }
+    bind<MainContract.Controller>() with singleton { MainController(instance(), instance()) }
     bind<Stage>().subTypes() with {
         when (it.jvmType) {
             JoinDialog::class.java -> provider { JoinDialog(instance(), instance()) }
@@ -66,3 +72,7 @@ fun main(args: Array<String>) {
     LogManager.getLogManager().readConfiguration(MainApp::class.java.getResourceAsStream("/logs.properties"))
     launch<MainApp>(args)
 }
+
+fun <T> List<T>.observable(): ObservableList<T> = FXCollections.observableList(this)
+fun <T> Set<T>.observable(): ObservableSet<T> = FXCollections.observableSet(this)
+fun <K, V> Map<K, V>.observable(): ObservableMap<K, V> = FXCollections.observableMap(this)

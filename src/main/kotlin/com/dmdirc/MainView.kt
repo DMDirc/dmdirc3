@@ -88,9 +88,9 @@ class MainView : View() {
         controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
             windowProperty.value = newValue?.let {
                 if (it.isConnection) {
-                    it.connection?.window?.root
+                    it.connection?.window
                 } else {
-                    it.connection?.children?.get(it.name)?.second?.root
+                    it.connection?.children?.get(it.name)?.second
                 }
             } ?: vbox {}
         })

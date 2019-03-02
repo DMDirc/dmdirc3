@@ -10,6 +10,7 @@ import com.dmdirc.ktirc.model.ServerFeature
 import com.dmdirc.ktirc.model.User
 import com.jukusoft.i18n.I.tr
 import com.uchuhimo.konf.Item
+import javafx.application.HostServices
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.runLater
 import java.time.format.DateTimeFormatter
@@ -24,7 +25,8 @@ class Connection(
     private val password: String?,
     private val tls: Boolean,
     private val config1: ClientConfig,
-    private val controller: MainContract.Controller
+    private val controller: MainContract.Controller,
+    private val hostServices: HostServices
 ) {
     private val model = WindowModel(
         host,
@@ -35,7 +37,7 @@ class Connection(
     )
 
     private val connected = SimpleBooleanProperty(false)
-    val window = WindowUI(model)
+    val window = WindowUI(model, hostServices)
     val children = ConnectionChildrenMap { client.caseMapping }
     var networkName = ""
 
@@ -96,7 +98,7 @@ class Connection(
                     model.connectionId
                 )
                 controller.windows.add(model)
-                children += model to WindowUI(model)
+                children += model to WindowUI(model, hostServices)
                 withWindowModel(event.target) { handleTargetedEvent(event) }
             }
             event is ChannelParted && client.isLocalUser(event.user) -> runLater {
