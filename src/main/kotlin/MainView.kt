@@ -12,7 +12,7 @@ import tornadofx.*
 
 class MainView : View() {
 
-    private val controller: MainController by kodein.instance()
+    private val controller: MainContract.Controller by kodein.instance()
     private val joinDialogProvider: () -> JoinDialog by kodein.provider()
     private val settingsDialogProvider: () -> SettingsDialog by kodein.provider()
     private val windowProperty = SimpleObjectProperty<Node>()

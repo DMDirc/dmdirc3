@@ -22,7 +22,7 @@ class Connection(
     private val password: String?,
     private val tls: Boolean,
     private val config1: ClientConfig,
-    private val controller: MainController
+    private val controller: MainContract.Controller
 ) {
     private val window = WindowModel(
         host,

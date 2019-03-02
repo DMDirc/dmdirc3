@@ -5,10 +5,9 @@ import javafx.stage.Stage
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
-import org.kodein.di.generic.bind
-import org.kodein.di.generic.instance
-import org.kodein.di.generic.provider
-import org.kodein.di.generic.singleton
+import org.kodein.di.bindings.subTypes
+import org.kodein.di.generic.*
+import org.kodein.di.jvmType
 import tornadofx.App
 import tornadofx.launch
 import java.nio.file.Files
@@ -38,17 +37,20 @@ class MainApp : App(MainView::class) {
 
 private fun createKodein(stage: Stage) = Kodein {
     bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
-    bind<Stage>() with instance(stage)
-    bind<MainController>() with singleton { MainController(instance()) }
-    bind<MainContract.Controller>() with singleton { instance<MainController>() }
+    bind<MainContract.Controller>() with singleton { MainController(instance()) }
+    bind<Stage>().subTypes() with {
+        when (it.jvmType) {
+            JoinDialog::class.java -> provider { JoinDialog(instance(), instance()) }
+            SettingsDialog::class.java -> provider { SettingsDialog(instance()) }
+            else -> instance(stage)
+        }
+    }
 
     bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
     bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
-    bind<JoinDialog>() with provider { JoinDialog(instance(), instance()) }
 
     bind<SettingsDialogContract.Controller>() with provider { SettingsDialogController(instance()) }
     bind<SettingsDialogContract.ViewModel>() with provider { SettingsDialogModel(instance(), instance()) }
-    bind<SettingsDialog>() with provider { SettingsDialog(instance()) }
 }
 
 private fun initInternationalisation(path: Path, locale: String?) {
