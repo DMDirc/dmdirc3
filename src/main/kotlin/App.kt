@@ -40,10 +40,11 @@ fun initKodein(stage: Stage): Kodein {
         bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
         bind<Stage>() with instance(stage)
         bind<MainController>() with singleton { MainController(instance()) }
+        bind<MainContract.Controller>() with singleton { instance<MainController>() }
 
         bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
         bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
-        bind<JoinDialog>() with provider { JoinDialog(instance()) }
+        bind<JoinDialog>() with provider { JoinDialog(instance(), instance()) }
 
         bind<SettingsDialogContract.Controller>() with provider { SettingsDialogController(instance()) }
         bind<SettingsDialogContract.ViewModel>() with provider { SettingsDialogModel(instance(), instance()) }

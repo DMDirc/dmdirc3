@@ -14,7 +14,6 @@ import javafx.scene.layout.VBox
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
-import org.kodein.di.generic.instance
 
 object JoinDialogContract {
     interface Controller {
@@ -30,7 +29,7 @@ object JoinDialogContract {
     }
 }
 
-class JoinDialogController(private val controller: MainController) : JoinDialogContract.Controller {
+class JoinDialogController(private val controller: MainContract.Controller) : JoinDialogContract.Controller {
     override fun join(channel: String) {
         controller.joinChannel(channel)
     }
@@ -58,9 +57,8 @@ class JoinDialogModel(private val controller: JoinDialogContract.Controller) : J
 
 }
 
-class JoinDialog(model: JoinDialogContract.ViewModel) : Stage() {
+class JoinDialog(model: JoinDialogContract.ViewModel, primaryStage: Stage) : Stage() {
     init {
-        val primaryStage by kodein.instance<Stage>()
         model.open.addListener { _, _, newValue ->
             if (newValue == false) {
                 close()
