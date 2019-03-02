@@ -5,7 +5,15 @@ import javafx.collections.ObservableList
 import tornadofx.Controller
 import tornadofx.observable
 
-class MainController(private val config1: ClientConfig) : Controller() {
+object MainContract {
+    interface Controller {
+        fun connect(connectionDetails: ConnectionDetails)
+        fun joinChannel(channel: String)
+        fun leaveChannel(channel: String)
+    }
+}
+
+class MainController(private val config1: ClientConfig) : Controller(), MainContract.Controller {
 
     val windows: ObservableList<WindowModel> = emptyList<WindowModel>().toMutableList().observable()
     val selectedWindow: SimpleObjectProperty<WindowModel> = SimpleObjectProperty()
@@ -19,16 +27,16 @@ class MainController(private val config1: ClientConfig) : Controller() {
         config1[ClientSpec.servers].filter { it.autoconnect }.forEach(this::connect)
     }
 
-    fun connect(connectionDetails: ConnectionDetails) {
+    override fun connect(connectionDetails: ConnectionDetails) {
         Connection(connectionDetails.hostname,  connectionDetails.port, connectionDetails.password, connectionDetails.tls, config1, this).connect()
     }
 
-    fun joinChannel(value: String) {
-        selectedWindow.value.connection?.joinChannel(value)
+    override fun joinChannel(channel: String) {
+        selectedWindow.value.connection?.joinChannel(channel)
     }
 
-    fun leaveChannel(name: String) {
-        selectedWindow.value.connection?.leaveChannel(name)
+    override fun leaveChannel(channel: String) {
+        selectedWindow.value.connection?.leaveChannel(channel)
     }
 
 }
