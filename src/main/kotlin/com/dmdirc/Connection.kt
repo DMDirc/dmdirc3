@@ -9,6 +9,7 @@ import com.dmdirc.ktirc.model.ServerFeature
 import com.dmdirc.ktirc.model.User
 import com.jukusoft.i18n.I.tr
 import com.uchuhimo.konf.Item
+import javafx.application.HostServices
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.runLater
 import java.time.format.DateTimeFormatter
@@ -22,7 +23,8 @@ class Connection(
     private val password: String?,
     private val tls: Boolean,
     private val config1: ClientConfig,
-    private val controller: MainContract.Controller
+    private val controller: MainContract.Controller,
+    private val hostServices: HostServices
 ) {
     private val window = WindowModel(
         host,

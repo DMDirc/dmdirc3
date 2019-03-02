@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.transformation.SortedList
 import javafx.scene.Node
 import javafx.scene.image.Image
+import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import org.kodein.di.generic.instance
 import org.kodein.di.generic.provider
@@ -86,7 +87,7 @@ class MainView : View() {
 
     init {
         controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
-            windowProperty.value = controller.windowUis[newValue]?.root ?: vbox {}
+            windowProperty.value = controller.windowUis[newValue]?.root ?: VBox()
         })
     }
 }
