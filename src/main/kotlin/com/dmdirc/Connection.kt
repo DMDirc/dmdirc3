@@ -2,6 +2,7 @@ package com.dmdirc
 
 import com.dmdirc.ktirc.IrcClient
 import com.dmdirc.ktirc.events.*
+import com.dmdirc.ktirc.io.CaseMapping
 import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.messages.sendPart
@@ -13,6 +14,7 @@ import javafx.application.HostServices
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.runLater
 import java.time.format.DateTimeFormatter
+import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 private val connectionCounter = AtomicLong(0)
@@ -26,16 +28,18 @@ class Connection(
     private val controller: MainContract.Controller,
     private val hostServices: HostServices
 ) {
-    private val window = WindowModel(
+    private val model = WindowModel(
         host,
         WindowType.SERVER,
         this,
         true,
         connectionCounter.incrementAndGet().toString(16).padStart(20)
     )
+
     private val connected = SimpleBooleanProperty(false)
+    val window = WindowUI(model, hostServices)
+    val children = ConnectionChildrenMap { client.caseMapping }
     var networkName = ""
-    var serverName = ""
 
     private val client: IrcClient = IrcClient {
         server(host, port, tls, password)
@@ -49,14 +53,9 @@ class Connection(
         }
     }
 
-    init {
-        controller.windowUis[window] = WindowUI(window, hostServices)
-    }
-
     fun connect() {
         client.onEvent(this::handleEvent)
-        serverName = client.serverState.serverName
-        controller.windows.add(window)
+        controller.windows.add(model)
         client.connect()
     }
 
@@ -76,19 +75,19 @@ class Connection(
         when {
             event is BatchReceived -> event.events.forEach(this::handleEvent)
             event is ServerConnected -> runLater {
-                window.addLine(event.timestamp, ClientSpec.Formatting.serverEvent, tr("Connected"))
+                model.addLine(event.timestamp, ClientSpec.Formatting.serverEvent, tr("Connected"))
                 connected.value = true
             }
             event is ServerReady -> {
                 networkName = client.serverState.features[ServerFeature.Network] ?: ""
-                serverName = client.serverState.serverName
+                model.name = client.serverState.serverName
             }
             event is ServerDisconnected -> runLater {
-                window.addLine(event.timestamp, ClientSpec.Formatting.serverEvent, tr("Disconnected"))
+                model.addLine(event.timestamp, ClientSpec.Formatting.serverEvent, tr("Disconnected"))
                 connected.value = false
             }
             event is ServerConnectionError -> runLater {
-                window.addLine(event.timestamp, ClientSpec.Formatting.serverEvent, tr("Error: %s - %s").format(event.error, event.details ?: ""))
+                model.addLine(event.timestamp, ClientSpec.Formatting.serverEvent, tr("Error: %s - %s").format(event.error, event.details ?: ""))
             }
             event is ChannelJoined && client.isLocalUser(event.user) -> runLater {
                 val model = WindowModel(
@@ -96,10 +95,15 @@ class Connection(
                     WindowType.CHANNEL,
                     this,
                     false,
-                    window.connectionId
+                    model.connectionId
                 )
                 controller.windows.add(model)
-                controller.windowUis[model] = WindowUI(model, hostServices)
+                children += model to WindowUI(model, hostServices)
+                withWindowModel(event.target) { handleTargetedEvent(event) }
+            }
+            event is ChannelParted && client.isLocalUser(event.user) -> runLater {
+                controller.windows.removeIf { it.connection == this@Connection && it.name == event.target }
+                children -= event.target
             }
             event is TargetedEvent -> runLaterWithWindowUi(event.target) { handleTargetedEvent(event) }
             else -> {
@@ -120,11 +124,7 @@ class Connection(
                 } else {
                     addLine(event.timestamp, ClientSpec.Formatting.channelEvent, tr("%s left (%s)").format(event.user.formattedNickname, event.reason))
                 }
-                if (client.isLocalUser(event.user)) {
-                    controller.windows.removeIf { it.connection == this@Connection && it.name == event.target }
-                    controller.windowUis.remove(this)
-                }
-            }
+              }
             is MessageReceived -> addLine(event.timestamp, ClientSpec.Formatting.message, event.user.formattedNickname, event.message)
             is ActionReceived -> addLine(event.timestamp, ClientSpec.Formatting.action, event.user.formattedNickname, event.action)
             is ChannelNamesFinished -> {
@@ -141,7 +141,7 @@ class Connection(
     }
 
     private val User.formattedNickname: String
-        get() = "${ControlCode.InternalNicknames}${nickname}${ControlCode.InternalNicknames}"
+        get() = "${ControlCode.InternalNicknames}$nickname${ControlCode.InternalNicknames}"
 
     private val IrcEvent.timestamp: String
         get() = metadata.time.format(DateTimeFormatter.ofPattern(config1[ClientSpec.Formatting.timestamp]))
@@ -179,14 +179,31 @@ class Connection(
         }
 
     private fun withWindowModel(windowName: String, block: WindowModel.() -> Unit) =
-        controller.windows.find {
-            it.connection == this && it.name == windowName
-        }?.block()
+        children[windowName]?.first?.block()
 
     fun disconnect() {
         client.disconnect()
         controller.windows.removeIf { it.connection == this@Connection }
-        controller.windowUis.remove(window)
     }
+
+}
+
+class ConnectionChildrenMap(private val caseMappingProvider: () -> CaseMapping) : Iterable<Pair<WindowModel, WindowUI>> {
+
+    private val values = Collections.synchronizedSet(HashSet<Pair<WindowModel, WindowUI>>())
+
+    operator fun get(name: String) = synchronized(values) { values.find { caseMappingProvider().areEquivalent(it.first.name, name) } }
+
+    operator fun plusAssign(value: Pair<WindowModel, WindowUI>): Unit = synchronized(values) {
+        values.add(value)
+    }
+
+    operator fun minusAssign(name: String): Unit = synchronized(values) {
+        values.removeIf { caseMappingProvider().areEquivalent(it.first.name, name) }
+    }
+
+    operator fun contains(name: String) = get(name) != null
+
+    override fun iterator() = HashSet(values).iterator().iterator()
 
 }

@@ -9,7 +9,6 @@ object MainContract {
     interface Controller {
         val windows: ObservableList<WindowModel>
         val selectedWindow: ObjectProperty<WindowModel>
-        val windowUis: MutableMap<WindowModel, WindowUI>
         fun connect(connectionDetails: ConnectionDetails)
         fun joinChannel(channel: String)
         fun leaveChannel(channel: String)
@@ -20,7 +19,6 @@ class MainController(private val config1: ClientConfig, private val hostServices
 
     override val windows: ObservableList<WindowModel> = emptyList<WindowModel>().toMutableList().observable()
     override val selectedWindow: SimpleObjectProperty<WindowModel> = SimpleObjectProperty()
-    override val windowUis = mutableMapOf<WindowModel, WindowUI>()
 
     init {
         autoConnect()

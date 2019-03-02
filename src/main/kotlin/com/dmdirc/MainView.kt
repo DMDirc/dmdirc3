@@ -5,9 +5,6 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.transformation.SortedList
 import javafx.scene.Node
 import javafx.scene.image.Image
-import javafx.scene.layout.HBox
-import javafx.scene.layout.Priority
-import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import org.kodein.di.generic.instance
 import org.kodein.di.generic.provider
@@ -89,8 +86,13 @@ class MainView : View() {
 
     init {
         controller.selectedWindow.addListener(ChangeListener { _, _, newValue ->
-            val windowUI = controller.windowUis[newValue] ?: VBox()
-            windowProperty.value = windowUI
+            windowProperty.value = newValue?.let {
+                if (it.isConnection) {
+                    it.connection?.window
+                } else {
+                    it.connection?.children?.get(it.name)?.second
+                }
+            } ?: vbox {}
         })
     }
 }
