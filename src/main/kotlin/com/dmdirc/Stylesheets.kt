@@ -1,9 +1,8 @@
 package com.dmdirc
 
+import javafx.application.Platform
 import javafx.scene.Scene
-import tornadofx.runLater
 import java.nio.file.*
-
 
 fun installStyles(root: Scene, file: Path) {
     file.checkAndInstall(root)
@@ -14,7 +13,7 @@ fun installStyles(root: Scene, file: Path) {
 }
 
 private fun Path.checkAndInstall(root: Scene) {
-    runLater {
+    Platform.runLater {
         root.stylesheets.clear()
         root.stylesheets.add(MainApp::class.java.getResource("/stylesheet.css").toExternalForm())
         if (Files.exists(this)) {
