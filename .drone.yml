@@ -2,7 +2,16 @@ kind: pipeline
 name: default
 
 steps:
+
   - name: Test
     image: openjdk:11-jdk
     commands:
-      - ./gradlew build test
+      - ./gradlew build test jacocoTestReport
+
+  - name: Coverage
+    image: plugins/codecov
+    settings:
+      token:
+        from_secret: CODECOV_TOKEN
+      files:
+        - build/reports/jacoco/report.xml

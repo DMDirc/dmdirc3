@@ -6,9 +6,14 @@ val mainClass = "com.dmdirc.AppKt"
 
 plugins {
     application
+    jacoco
     kotlin("jvm").version("1.3.21")
     id("org.openjfx.javafxplugin").version("0.0.7")
     id("name.remal.check-updates") version "1.0.113"
+}
+
+jacoco {
+    toolVersion = "0.8.3"
 }
 
 repositories {
@@ -81,6 +86,21 @@ tasks {
         }
         from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    withType<JacocoReport> {
+        executionData(fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec"))
+
+        sourceSets(sourceSets["main"])
+
+        reports {
+            xml.isEnabled = true
+            xml.destination = File("$buildDir/reports/jacoco/report.xml")
+            html.isEnabled = true
+            csv.isEnabled = false
+        }
+
+        dependsOn("test")
     }
 
 }
