@@ -12,7 +12,7 @@ enum class WindowType {
 }
 
 class WindowModel(
-    val name: String,
+    var name: String,
     val type: WindowType,
     var connection: Connection?,
     var isConnection: Boolean,
