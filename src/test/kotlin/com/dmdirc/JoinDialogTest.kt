@@ -1,4 +1,4 @@
-
+package com.dmdirc
 import com.dmdirc.JoinDialogContract
 import com.dmdirc.JoinDialogController
 import com.dmdirc.JoinDialogModel

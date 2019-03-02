@@ -1,4 +1,4 @@
-
+package com.dmdirc
 import com.dmdirc.ClientConfig
 import com.dmdirc.ClientSpec
 import com.dmdirc.ConnectionDetails
