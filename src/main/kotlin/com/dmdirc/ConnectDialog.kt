@@ -1,38 +1,39 @@
 package com.dmdirc
 
-import com.jukusoft.i18n.I.tr
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.geometry.Pos
-import javafx.scene.control.ButtonBar
-import org.kodein.di.generic.instance
-import tornadofx.*
+import javafx.scene.Scene
+import javafx.scene.control.*
+import javafx.scene.control.ButtonBar.setButtonData
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.GridPane
+import javafx.stage.Modality
+import javafx.stage.Stage
+import javafx.stage.StageStyle
+import javafx.util.Callback
 
 class ConnectionDetailsEditable(
-    hostname: String,
-    password: String,
-    port: Int,
-    tls: Boolean = true,
-    autoconnect: Boolean = false
-) {
-    val hostname = SimpleStringProperty(hostname)
-    val password = SimpleStringProperty(password)
-    val port = SimpleIntegerProperty(port)
-    val tls = SimpleBooleanProperty(tls)
-    val autoconnect = SimpleBooleanProperty(autoconnect)
-}
+    var hostname: String,
+    var password: String,
+    var port: Int,
+    var tls: Boolean = true,
+    var autoconnect: Boolean = false
+)
 
-class ServerListController(private val controller: MainContract.Controller) {
-    private val config1 by kodein.instance<ClientConfig>()
+class ServerListController(private val controller: MainContract.Controller, private val stage: Stage, private val config: ClientConfig) {
     private var model: ServerListModel? = null
     fun create() {
         val model = ServerListModel(this)
         this.model = model
-        ServerlistDialog(model).openModal()
-        model.servers.addAll(config1[ClientSpec.servers]
+        ServerlistDialog(model, stage).show()
+        model.servers.addAll(config[ClientSpec.servers]
             .map { ConnectionDetailsEditable(it.hostname, it.password, it.port, it.tls, it.autoconnect) }
             .toMutableList().observable())
+        if (model.servers.isNotEmpty()) {
+            model.selected.value = model.servers.first()
+        }
     }
 
     fun connect(server: ConnectionDetailsEditable) {
@@ -40,137 +41,166 @@ class ServerListController(private val controller: MainContract.Controller) {
     }
 
     fun save(servers: List<ConnectionDetailsEditable>) {
-        config1[ClientSpec.servers] = servers.map {
+        config[ClientSpec.servers] = servers.map {
             getConnectionDetails(it)
         }
-        config1.save()
+        config.save()
         model?.closeDialog()
     }
 
     private fun getConnectionDetails(server: ConnectionDetailsEditable) =
         ConnectionDetails(
-            server.hostname.value,
-            server.password.value,
-            server.port.value,
-            server.tls.value,
-            server.autoconnect.value
+            server.hostname,
+            server.password,
+            server.port,
+            server.tls,
+            server.autoconnect
         )
 }
 
-class ServerListModel(private val controller: ServerListController) : ItemViewModel<ConnectionDetailsEditable>() {
+class ServerListModel(private val controller: ServerListController) : ValidatingModel {
+    override val valid = ValidatorChain()
     val open = SimpleBooleanProperty(true)
     val servers = emptyList<ConnectionDetailsEditable>().toMutableList().observable()
-    val hostname = bind(autocommit = true, defaultValue = "") { item?.hostname }
-    val password = bind(autocommit = true, defaultValue = "") { item?.password }
-    val port = bind(autocommit = true, defaultValue = 6697) { item?.port }
-    val tls = bind(autocommit = true, defaultValue = true) { item?.tls }
-    val autoconnect = bind(autocommit = true, defaultValue = false) { item?.autoconnect }
+    val selected = SimpleObjectProperty<ConnectionDetailsEditable>()
+    val hostname = SimpleStringProperty()
+    val password = SimpleStringProperty()
+    val port = SimpleIntegerProperty()
+    val tls = SimpleBooleanProperty()
+    val autoconnect = SimpleBooleanProperty()
 
-    override fun onCommit() {
-        controller.save(servers)
-    }
-
-    fun join(server: ConnectionDetailsEditable?) {
-        if (server == null) return
-        controller.connect(server)
+    init {
+        selected.addListener { _, oldValue, newValue ->
+            if (oldValue != null) {
+                oldValue.autoconnect = autoconnect.value
+                oldValue.hostname = hostname.value
+                oldValue.password = password.value
+                oldValue.port = port.value
+                oldValue.tls = tls.value
+            }
+            if (newValue != null) {
+                autoconnect.value = newValue.autoconnect
+                hostname.value = newValue.hostname
+                password.value = newValue.password
+                port.value = newValue.port
+                tls.value = newValue.tls
+            }
+        }
     }
 
     fun closeDialog() {
         open.value = false
     }
+
+    fun connectPressed() {
+        controller.connect(selected.value)
+    }
+
+    fun deletePressed() {
+        servers.remove(selected.value)
+    }
+
+    fun savePressed() {
+        controller.save(servers)
+        closeDialog()
+    }
+
+    fun cancelPressed() {
+        closeDialog()
+    }
 }
 
-class ServerlistDialog(private val model: ServerListModel) : Fragment() {
-    override val root = form {
-        borderpane {
-            minWidth = 600.toDouble()
-            minHeight = 400.toDouble()
-            left = listview(model.servers) {
-                bindSelected(model)
-                cellFormat {
-                    text = if (it.hostname.value.isEmpty()) {
-                        tr("[Empty]")
-                    } else {
-                        it.hostname.value
-                    }
+class ConnectionDetailsListCellFactory :
+    Callback<ListView<ConnectionDetailsEditable>, ListCell<ConnectionDetailsEditable>> {
+    override fun call(param: ListView<ConnectionDetailsEditable>?): ListCell<ConnectionDetailsEditable> {
+        return ConnectionDetailsListCell()
+    }
+}
+
+class ConnectionDetailsListCell : ListCell<ConnectionDetailsEditable>() {
+    override fun updateItem(connectionDetails: ConnectionDetailsEditable?, empty: Boolean) {
+        super.updateItem(connectionDetails, empty)
+        text = connectionDetails?.hostname ?: ""
+    }
+}
+
+class ServerlistDialog(private val model: ServerListModel, primaryStage: Stage) : Stage() {
+    init {
+        model.open.addListener { _, _, newValue ->
+            if (newValue == false) {
+                close()
+            }
+        }
+        initOwner(primaryStage)
+        initStyle(StageStyle.DECORATED)
+        initModality(Modality.APPLICATION_MODAL)
+        scene = Scene(BorderPane().apply {
+            left = ListView(model.servers).apply {
+                cellFactory = ConnectionDetailsListCellFactory()
+                selectionModel.selectedItemProperty().addListener { _, _, newValue ->
+                    model.selected.value = newValue
+                }
+                model.selected.addListener { _, _, newValue ->
+                    selectionModel.select(model.servers.find {
+                            connectionDetailsEditable -> connectionDetailsEditable == newValue
+                    })
                 }
             }
-            center = form {
-                fieldset {
-                    field(tr("Server Name")) {
-                        textfield(model.hostname) {
-                            enableWhen(!model.empty)
-                            required()
-                        }
-                    }
-                    field(tr("Port")) {
-                        spinner(editable = true, property = model.port, min = 1, max = 65535) {
-                            enableWhen(!model.empty)
-                        }
-                    }
-                    field(tr("Password")) {
-                        textfield(model.password) {
-                            enableWhen(!model.empty)
-                        }
-                    }
-                    field(tr("TLS")) {
-                        checkbox(property = model.tls) {
-                            enableWhen(!model.empty)
-                        }
-                    }
-                    field(tr("Auto Connect")) {
-                        checkbox(property = model.autoconnect) {
-                            enableWhen(!model.empty)
-                        }
-                    }
+            center = BorderPane().apply {
+                center = GridPane().apply {
+                    add(Label("Server Name: "), 0, 0)
+                    add(TextField().apply {
+                        bindRequiredTextControl(this, model.hostname, model)
+                    }, 1, 0)
+                    add(Label("Port: "), 0, 1)
+                    add(Spinner<Number>(1, 65535, model.port.value).apply {
+                        model.port.bindBidirectional(valueFactory.valueProperty())
+                    }, 1, 1)
+                    add(Label("Password: "), 0, 2)
+                    add(TextField().apply {
+                        model.password.bindBidirectional(this.textProperty())
+                    }, 1, 2)
+                    add(Label("TLS: "), 0, 3)
+                    add(CheckBox().apply {
+                        model.tls.bindBidirectional(this.selectedProperty())
+                    }, 1, 3)
+                    add(Label("AutoConnect: "), 0, 4)
+                    add(CheckBox().apply {
+                        model.autoconnect.bindBidirectional(this.selectedProperty())
+                    }, 1, 4)
                 }
-                hbox {
-                    buttonbar {
-                        alignment = Pos.BASELINE_RIGHT
-                        button(tr("Connect"), ButtonBar.ButtonData.OK_DONE) {
-                            action {
-                                model.join(model.item)
+                bottom = ButtonBar().apply {
+                    buttons.addAll(
+                        Button("Connect").apply {
+                            setButtonData(this, ButtonBar.ButtonData.OK_DONE)
+                            setOnAction {
+                                model.connectPressed()
+                            }
+                        }, Button("Delete").apply {
+                            setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
+                            setOnAction {
+                                model.deletePressed()
                             }
                         }
-                    }
-                }
-                bottom = buttonbar {
-                    button(tr("Add"), ButtonBar.ButtonData.LEFT) {
-                        action {
-                            model.servers.add(
-                                ConnectionDetailsEditable(
-                                    hostname = "",
-                                    password = "",
-                                    port = 6667,
-                                    tls = false,
-                                    autoconnect = false
-                                )
-                            )
-                        }
-                    }
-                    button(tr("Delete"), ButtonBar.ButtonData.LEFT) {
-                        action {
-                            model.servers.remove(model.item)
-                        }
-                    }
-                    button(tr("Save"), ButtonBar.ButtonData.OK_DONE) {
-                        enableWhen(model.valid)
-                        action {
-                            model.commit()
-                        }
-                    }
-                    button(tr("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE) {
-                        action {
-                            close()
-                        }
-                    }
+                    )
                 }
             }
-            model.open.addListener(ChangeListener { _, _, newValue ->
-                if (!newValue) {
-                    close()
-                }
-            })
-        }
+            bottom = ButtonBar().apply {
+                buttons.addAll(
+                    Button("Save").apply {
+                        setButtonData(this, ButtonBar.ButtonData.OK_DONE)
+                        setOnAction {
+                            model.savePressed()
+                        }
+                    },
+                    Button("Cancel").apply {
+                        setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
+                        setOnAction {
+                            model.cancelPressed()
+                        }
+                    }
+                )
+            }
+        })
     }
 }
