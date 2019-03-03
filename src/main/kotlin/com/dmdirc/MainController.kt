@@ -1,9 +1,10 @@
 package com.dmdirc
 
+import javafx.application.Platform
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ObservableList
-import javafx.application.HostServices
+import javafx.collections.SetChangeListener
 
 object MainContract {
     interface Controller {
@@ -15,10 +16,13 @@ object MainContract {
     }
 }
 
-class MainController(private val config1: ClientConfig, private val hostServices: HostServices) : MainContract.Controller {
+class MainController(
+    private val config1: ClientConfig,
+    private val connectionFactory: (ConnectionDetails) -> Connection
+) : MainContract.Controller {
 
-    override val windows: ObservableList<WindowModel> = emptyList<WindowModel>().toMutableList().observable()
-    override val selectedWindow: SimpleObjectProperty<WindowModel> = SimpleObjectProperty()
+    override val windows = emptyList<WindowModel>().toMutableList().observable()
+    override val selectedWindow = SimpleObjectProperty<WindowModel>()
 
     init {
         autoConnect()
@@ -29,7 +33,18 @@ class MainController(private val config1: ClientConfig, private val hostServices
     }
 
     override fun connect(connectionDetails: ConnectionDetails) {
-        Connection(connectionDetails.hostname,  connectionDetails.port, connectionDetails.password, connectionDetails.tls, config1, this, hostServices).connect()
+        with(connectionFactory(connectionDetails)) {
+            windows.addAll(children.map { it.model })
+            children.observable.addListener(SetChangeListener<Connection.Child> {
+                Platform.runLater {
+                    when {
+                        it.wasAdded() -> windows.add(it.elementAdded.model)
+                        it.wasRemoved() -> windows.remove(it.elementRemoved.model)
+                    }
+                }
+            })
+            connect()
+        }
     }
 
     override fun joinChannel(channel: String) {
