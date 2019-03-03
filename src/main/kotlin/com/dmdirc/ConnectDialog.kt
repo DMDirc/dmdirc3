@@ -48,7 +48,7 @@ class ServerListController(private val controller: MainContract.Controller, priv
         model?.closeDialog()
     }
 
-    private fun getConnectionDetails(server: ConnectionDetailsEditable) =
+    internal fun getConnectionDetails(server: ConnectionDetailsEditable) =
         ConnectionDetails(
             server.hostname,
             server.password,
@@ -93,11 +93,15 @@ class ServerListModel(private val controller: ServerListController) : Validating
     }
 
     fun connectPressed() {
-        controller.connect(selected.value)
+        if (selected.value != null) {
+            controller.connect(selected.value)
+        }
     }
 
     fun deletePressed() {
-        servers.remove(selected.value)
+        if (selected.value != null) {
+            servers.remove(selected.value)
+        }
     }
 
     fun savePressed() {
