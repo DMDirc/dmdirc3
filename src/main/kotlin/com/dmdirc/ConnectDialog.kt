@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import com.jukusoft.i18n.I.tr
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -152,23 +153,23 @@ class ServerlistDialog(private val model: ServerListModel, primaryStage: Stage) 
             }
             center = BorderPane().apply {
                 center = GridPane().apply {
-                    add(Label("Server Name: "), 0, 0)
+                    add(Label(tr("Server Name: ")), 0, 0)
                     add(TextField().apply {
                         bindRequiredTextControl(this, model.hostname, model)
                     }, 1, 0)
-                    add(Label("Port: "), 0, 1)
+                    add(Label(tr("Port: ")), 0, 1)
                     add(Spinner<Number>(1, 65535, model.port.value).apply {
                         model.port.bindBidirectional(valueFactory.valueProperty())
                     }, 1, 1)
-                    add(Label("Password: "), 0, 2)
+                    add(Label(tr("Password: ")), 0, 2)
                     add(TextField().apply {
                         model.password.bindBidirectional(this.textProperty())
                     }, 1, 2)
-                    add(Label("TLS: "), 0, 3)
+                    add(Label(tr("TLS: ")), 0, 3)
                     add(CheckBox().apply {
                         model.tls.bindBidirectional(this.selectedProperty())
                     }, 1, 3)
-                    add(Label("AutoConnect: "), 0, 4)
+                    add(Label(tr("AutoConnect: ")), 0, 4)
                     add(CheckBox().apply {
                         model.autoconnect.bindBidirectional(this.selectedProperty())
                     }, 1, 4)
