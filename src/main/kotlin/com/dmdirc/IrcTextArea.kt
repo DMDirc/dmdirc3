@@ -85,7 +85,7 @@ class IrcTextArea(linkClickHandler: (String) -> Unit) :
                         te.styleClass.add("text")
                         applyStyles(te, ss.style, linkClickHandler)
                     }
-                    is Segment.Image -> with (ImageView(seg.url)) {
+                    is Segment.Image -> with(ImageView(seg.url)) {
                         // We can't seem to set the width/height in CSS :(
                         fitWidth = 250.0
                         fitHeight = 250.0
@@ -102,7 +102,13 @@ class IrcTextArea(linkClickHandler: (String) -> Unit) :
                 }
             }
         }
-    )
+    ) {
+
+    init {
+        isEditable = false
+        isWrapText = true
+    }
+}
 
 private fun applyStyles(node: Node, styles: Collection<Style>, linkClickHandler: (String) -> Unit) {
     styles.forEach { style ->

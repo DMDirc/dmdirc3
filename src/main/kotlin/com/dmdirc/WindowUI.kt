@@ -43,10 +43,7 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
 
     init {
         val borderPane = BorderPane().apply {
-            center = VirtualizedScrollPane(textArea.apply {
-                isEditable = false
-                isWrapText = true
-            })
+            center = VirtualizedScrollPane(textArea)
             right = ListView<String>(model.users).apply {
                 styleClass.add("nick-list")
                 prefWidth = 148.0

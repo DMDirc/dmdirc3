@@ -119,6 +119,7 @@ class Connection(
                     false,
                     model.connectionId
                 )
+                model.addImageHandler(config1)
                 children += Child(model, WindowUI(model, hostServices))
                 withWindowModel(event.target) { handleTargetedEvent(event) }
             }
@@ -204,19 +205,6 @@ class Connection(
 
     private fun WindowModel.addLine(spans: Sequence<StyledSpan>) {
         lines.add(spans.toList().toTypedArray())
-        if (config1[ClientSpec.Display.embedImages]) {
-            val images = spans
-                .toList()
-                .flatMap { it.styles }
-                .filterIsInstance(Style.Link::class.java)
-                .map { it.url }
-                .filter { it.matches(Regex(".*\\.(png|jpg|jpeg)$", RegexOption.IGNORE_CASE)) }
-                .map { StyledSpan("${ControlCode.InternalImages}$it", emptySet()) }
-                .toTypedArray()
-            if (images.isNotEmpty()) {
-                lines.add(images)
-            }
-        }
     }
 
     private fun runLaterWithWindowUi(windowName: String, block: WindowModel.() -> Unit) =
