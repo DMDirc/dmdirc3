@@ -20,7 +20,7 @@ enum class WindowType {
 class WindowModel(
     var name: String,
     val type: WindowType,
-    var connection: Connection?,
+    var connection: ConnectionContract.Controller?,
     var isConnection: Boolean,
     val connectionId: String?
 ) {

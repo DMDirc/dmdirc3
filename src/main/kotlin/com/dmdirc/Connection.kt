@@ -24,7 +24,12 @@ private val connectionCounter = AtomicLong(0)
 object ConnectionContract {
     interface Controller {
         val children: Connection.WindowMap
+        var networkName: String
         fun connect()
+        fun sendMessage(channel: String, name: String)
+        fun joinChannel(channel: String)
+        fun leaveChannel(channel: String)
+        fun disconnect()
     }
 }
 
@@ -48,7 +53,7 @@ class Connection(
         this += Child(model, WindowUI(model, hostServices))
     }
 
-    var networkName = ""
+    override var networkName = ""
 
     private val client: IrcClient = IrcClient {
         server {
@@ -72,15 +77,15 @@ class Connection(
         client.connect()
     }
 
-    fun sendMessage(channel: String, name: String) {
+    override fun sendMessage(channel: String, name: String) {
         client.sendMessage(channel, name)
     }
 
-    fun joinChannel(channel: String) {
+    override fun joinChannel(channel: String) {
         client.sendJoin(channel)
     }
 
-    fun leaveChannel(channel: String) {
+    override fun leaveChannel(channel: String) {
         client.sendPart(channel)
     }
 
@@ -222,7 +227,7 @@ class Connection(
     private fun withWindowModel(windowName: String, block: WindowModel.() -> Unit) =
         children[windowName]?.model?.block()
 
-    fun disconnect() {
+    override fun disconnect() {
         client.disconnect()
         children.clear()
     }
