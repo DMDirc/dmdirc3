@@ -13,6 +13,7 @@ import tornadofx.*
 class MainView : View() {
 
     private val controller: MainContract.Controller by kodein.instance()
+    private val config1: ClientConfig by kodein.instance()
     private val joinDialogProvider: () -> JoinDialog by kodein.provider()
     private val settingsDialogProvider: () -> SettingsDialog by kodein.provider()
     private val windowProperty = SimpleObjectProperty<Node>()
@@ -32,7 +33,7 @@ class MainView : View() {
                 menu(tr("IRC")) {
                     item(tr("Server List")) {
                         action {
-                            ServerListController(controller).create()
+                            ServerListController(controller, primaryStage, config1).create()
                         }
                     }
                     item(tr("Join")) {
