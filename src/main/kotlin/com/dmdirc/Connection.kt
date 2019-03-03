@@ -13,6 +13,7 @@ import com.uchuhimo.konf.Item
 import javafx.application.HostServices
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableSet
+import javafx.scene.Node
 import tornadofx.runLater
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -20,11 +21,18 @@ import java.util.concurrent.atomic.AtomicLong
 
 private val connectionCounter = AtomicLong(0)
 
+object ConnectionContract {
+    interface Controller {
+        val children: Connection.WindowMap
+        fun connect()
+    }
+}
+
 class Connection(
     private val connectionDetails: ConnectionDetails,
     private val config1: ClientConfig,
     private val hostServices: HostServices
-) {
+) : ConnectionContract.Controller {
 
     private val model = WindowModel(
         connectionDetails.hostname,
@@ -36,7 +44,7 @@ class Connection(
 
     private val connected = SimpleBooleanProperty(false)
 
-    val children = WindowMap { client.caseMapping }.apply {
+    override val children = WindowMap { client.caseMapping }.apply {
         this += Child(model, WindowUI(model, hostServices))
     }
 
@@ -59,7 +67,7 @@ class Connection(
         }
     }
 
-    fun connect() {
+    override fun connect() {
         client.onEvent(this::handleEvent)
         client.connect()
     }
@@ -219,7 +227,7 @@ class Connection(
         children.clear()
     }
 
-    data class Child(val model: WindowModel, val ui: WindowUI)
+    data class Child(val model: WindowModel, val ui: Node)
 
     class WindowMap(private val caseMappingProvider: () -> CaseMapping) : Iterable<Child> {
 

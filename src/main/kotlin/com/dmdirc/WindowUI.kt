@@ -23,8 +23,7 @@ class WindowModel(
     var connection: Connection?,
     var isConnection: Boolean,
     val connectionId: String?
-): ValidatingModel {
-    override val valid = ValidatorChain()
+) {
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else name.toLowerCase()}"
     val users = mutableListOf<String>().observable()
     val lines = mutableListOf<Array<StyledSpan>>().observable()
