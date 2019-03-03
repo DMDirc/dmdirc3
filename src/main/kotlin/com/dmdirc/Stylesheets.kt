@@ -1,6 +1,5 @@
 package com.dmdirc
 
-import javafx.application.Platform
 import javafx.scene.Scene
 import java.nio.file.*
 
@@ -13,7 +12,7 @@ fun installStyles(root: Scene, file: Path) {
 }
 
 private fun Path.checkAndInstall(root: Scene) {
-    Platform.runLater {
+    runLater {
         root.stylesheets.clear()
         root.stylesheets.add(MainApp::class.java.getResource("/stylesheet.css").toExternalForm())
         if (Files.exists(this)) {
