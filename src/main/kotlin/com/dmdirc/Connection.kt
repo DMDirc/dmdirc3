@@ -7,40 +7,52 @@ import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.messages.sendPart
 import com.dmdirc.ktirc.model.ServerFeature
-import com.dmdirc.ktirc.model.User
 import com.jukusoft.i18n.I.tr
-import com.uchuhimo.konf.Item
 import javafx.application.HostServices
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableSet
-import tornadofx.runLater
+import javafx.scene.Node
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 private val connectionCounter = AtomicLong(0)
 
+object ConnectionContract {
+    interface Controller {
+        val children: Connection.WindowMap
+        var networkName: String
+        fun connect()
+        fun sendMessage(channel: String, name: String)
+        fun joinChannel(channel: String)
+        fun leaveChannel(channel: String)
+        fun disconnect()
+    }
+}
+
 class Connection(
     private val connectionDetails: ConnectionDetails,
     private val config1: ClientConfig,
     private val hostServices: HostServices
-) {
+) : ConnectionContract.Controller {
+
+    private val connectionId = connectionCounter.incrementAndGet().toString(16).padStart(20)
 
     private val model = WindowModel(
         connectionDetails.hostname,
         WindowType.SERVER,
         this,
-        true,
-        connectionCounter.incrementAndGet().toString(16).padStart(20)
+        config1,
+        connectionId
     )
 
     private val connected = SimpleBooleanProperty(false)
 
-    val children = WindowMap { client.caseMapping }.apply {
+    override val children = WindowMap { client.caseMapping }.apply {
         this += Child(model, WindowUI(model, hostServices))
     }
 
-    var networkName = ""
+    override var networkName = ""
 
     private val client: IrcClient = IrcClient {
         server {
@@ -59,20 +71,20 @@ class Connection(
         }
     }
 
-    fun connect() {
+    override fun connect() {
         client.onEvent(this::handleEvent)
         client.connect()
     }
 
-    fun sendMessage(channel: String, name: String) {
+    override fun sendMessage(channel: String, name: String) {
         client.sendMessage(channel, name)
     }
 
-    fun joinChannel(channel: String) {
+    override fun joinChannel(channel: String) {
         client.sendJoin(channel)
     }
 
-    fun leaveChannel(channel: String) {
+    override fun leaveChannel(channel: String) {
         client.sendPart(channel)
     }
 
@@ -103,9 +115,10 @@ class Connection(
                     event.target,
                     WindowType.CHANNEL,
                     this,
-                    false,
-                    model.connectionId
+                    config1,
+                    connectionId
                 )
+                model.addImageHandler(config1)
                 children += Child(model, WindowUI(model, hostServices))
                 withWindowModel(event.target) { handleTargetedEvent(event) }
             }
@@ -113,98 +126,24 @@ class Connection(
                 children -= event.target
             }
             event is TargetedEvent -> runLaterWithWindowUi(event.target) { handleTargetedEvent(event) }
-            else -> {
-            }
         }
     }
 
     private fun WindowModel.handleTargetedEvent(event: TargetedEvent) {
+        displayEvent(event)
         when (event) {
-            is ChannelJoined -> {
-                users.add(event.user.nickname)
-                addLine(
-                    event.timestamp,
-                    ClientSpec.Formatting.channelEvent,
-                    tr("%s joined").format(event.user.formattedNickname)
-                )
-            }
-            is ChannelParted -> {
-                users.remove(event.user.nickname)
-                if (event.reason.isEmpty()) {
-                    addLine(
-                        event.timestamp,
-                        ClientSpec.Formatting.channelEvent,
-                        tr("%s left").format(event.user.formattedNickname)
-                    )
-                } else {
-                    addLine(
-                        event.timestamp,
-                        ClientSpec.Formatting.channelEvent,
-                        tr("%s left (%s)").format(event.user.formattedNickname, event.reason)
-                    )
-                }
-            }
-            is MessageReceived -> addLine(
-                event.timestamp,
-                ClientSpec.Formatting.message,
-                event.user.formattedNickname,
-                event.message
-            )
-            is ActionReceived -> addLine(
-                event.timestamp,
-                ClientSpec.Formatting.action,
-                event.user.formattedNickname,
-                event.action
-            )
+            is ChannelJoined -> users.add(event.user.nickname)
+            is ChannelParted -> users.remove(event.user.nickname)
             is ChannelNamesFinished -> {
                 users.clear()
                 users.addAll(client.channelState[event.target]?.users?.map { it.nickname } ?: emptyList())
             }
-            is ChannelQuit -> {
-                users.remove(event.user.nickname)
-                addLine(
-                    event.timestamp,
-                    ClientSpec.Formatting.channelEvent,
-                    tr("%s quit").format(event.user.formattedNickname)
-                )
-            }
-            else -> {
-            }
+            is ChannelQuit -> users.remove(event.user.nickname)
         }
     }
-
-    private val User.formattedNickname: String
-        get() = "${ControlCode.InternalNicknames}$nickname${ControlCode.InternalNicknames}"
 
     private val IrcEvent.timestamp: String
         get() = metadata.time.format(DateTimeFormatter.ofPattern(config1[ClientSpec.Formatting.timestamp]))
-
-    private fun WindowModel.addLine(timestamp: String, format: Item<String>, vararg args: String) =
-        addLine(
-            sequenceOf(
-                StyledSpan(
-                    timestamp,
-                    setOf(Style.CustomStyle("timestamp"))
-                )
-            ) + " ${config1[format].format(*args)}".detectLinks().convertControlCodes()
-        )
-
-    private fun WindowModel.addLine(spans: Sequence<StyledSpan>) {
-        lines.add(spans.toList().toTypedArray())
-        if (config1[ClientSpec.Display.embedImages]) {
-            val images = spans
-                .toList()
-                .flatMap { it.styles }
-                .filterIsInstance(Style.Link::class.java)
-                .map { it.url }
-                .filter { it.matches(Regex(".*\\.(png|jpg|jpeg)$", RegexOption.IGNORE_CASE)) }
-                .map { StyledSpan("${ControlCode.InternalImages}$it", emptySet()) }
-                .toTypedArray()
-            if (images.isNotEmpty()) {
-                lines.add(images)
-            }
-        }
-    }
 
     private fun runLaterWithWindowUi(windowName: String, block: WindowModel.() -> Unit) =
         runLater {
@@ -214,12 +153,12 @@ class Connection(
     private fun withWindowModel(windowName: String, block: WindowModel.() -> Unit) =
         children[windowName]?.model?.block()
 
-    fun disconnect() {
+    override fun disconnect() {
         client.disconnect()
         children.clear()
     }
 
-    data class Child(val model: WindowModel, val ui: WindowUI)
+    data class Child(val model: WindowModel, val ui: Node)
 
     class WindowMap(private val caseMappingProvider: () -> CaseMapping) : Iterable<Child> {
 

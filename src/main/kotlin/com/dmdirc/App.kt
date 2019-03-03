@@ -2,6 +2,7 @@ package com.dmdirc
 
 import com.jukusoft.i18n.I
 import javafx.application.HostServices
+import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.collections.ObservableMap
@@ -53,7 +54,7 @@ private fun createKodein(stage: Stage, hostServices: HostServices) = Kodein {
         }
     }
 
-    bind<Connection>() with factory { connectionDetails: ConnectionDetails -> Connection(connectionDetails, instance(), instance()) }
+    bind<ConnectionContract.Controller>() with factory { connectionDetails: ConnectionDetails -> Connection(connectionDetails, instance(), instance()) }
     bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
     bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
 
@@ -80,3 +81,7 @@ fun <T> Set<T>.observable(): ObservableSet<T> = FXCollections.observableSet(this
 fun <T> ObservableSet<T>.synchronized(): ObservableSet<T> = FXCollections.synchronizedObservableSet(this)
 fun <T> ObservableSet<T>.readOnly(): ObservableSet<T> = FXCollections.unmodifiableObservableSet(this)
 fun <K, V> Map<K, V>.observable(): ObservableMap<K, V> = FXCollections.observableMap(this)
+
+// For testing purposes: we can swap out the Platform call to something we control
+internal var runLaterProvider: (Runnable) -> Unit = Platform::runLater
+fun runLater(block: () -> Unit) = runLaterProvider(Runnable(block))

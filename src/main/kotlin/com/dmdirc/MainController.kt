@@ -1,6 +1,5 @@
 package com.dmdirc
 
-import javafx.application.Platform
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ObservableList
@@ -18,7 +17,7 @@ object MainContract {
 
 class MainController(
     private val config1: ClientConfig,
-    private val connectionFactory: (ConnectionDetails) -> Connection
+    private val connectionFactory: (ConnectionDetails) -> ConnectionContract.Controller
 ) : MainContract.Controller {
 
     override val windows = emptyList<WindowModel>().toMutableList().observable()
@@ -36,7 +35,7 @@ class MainController(
         with(connectionFactory(connectionDetails)) {
             windows.addAll(children.map { it.model })
             children.observable.addListener(SetChangeListener<Connection.Child> {
-                Platform.runLater {
+                runLater {
                     when {
                         it.wasAdded() -> windows.add(it.elementAdded.model)
                         it.wasRemoved() -> windows.remove(it.elementRemoved.model)

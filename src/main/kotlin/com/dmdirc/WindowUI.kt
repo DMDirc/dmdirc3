@@ -1,5 +1,12 @@
 package com.dmdirc
 
+import com.dmdirc.ClientSpec.Formatting.action
+import com.dmdirc.ClientSpec.Formatting.channelEvent
+import com.dmdirc.ClientSpec.Formatting.message
+import com.dmdirc.ktirc.events.*
+import com.dmdirc.ktirc.model.User
+import com.jukusoft.i18n.I.tr
+import com.uchuhimo.konf.Item
 import javafx.application.HostServices
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ListChangeListener
@@ -10,6 +17,7 @@ import javafx.scene.layout.BorderPane
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.fxmisc.flowless.VirtualizedScrollPane
+import java.time.format.DateTimeFormatter
 
 enum class WindowType {
     ROOT,
@@ -20,11 +28,11 @@ enum class WindowType {
 class WindowModel(
     var name: String,
     val type: WindowType,
-    var connection: Connection?,
-    var isConnection: Boolean,
-    val connectionId: String?
-): ValidatingModel {
-    override val valid = ValidatorChain()
+    val connection: ConnectionContract.Controller?,
+    private val config: ClientConfig,
+    connectionId: String?
+) {
+    val isConnection = type == WindowType.SERVER
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else name.toLowerCase()}"
     val users = mutableListOf<String>().observable()
     val lines = mutableListOf<Array<StyledSpan>>().observable()
@@ -36,6 +44,51 @@ class WindowModel(
             inputField.value = ""
         }
     }
+
+    fun displayEvent(event: IrcEvent) {
+        val ts = event.timestamp
+        when (event) {
+            is ChannelJoined -> addLine(ts, channelEvent, tr("%s joined").format(event.user.formattedNickname))
+            is ChannelParted -> addLine(
+                ts, channelEvent,
+                if (event.reason.isEmpty())
+                    tr("%s left").format(event.user.formattedNickname)
+                else
+                    tr("%s left (%s)").format(event.user.formattedNickname, event.reason)
+            )
+            is ChannelQuit -> addLine(
+                ts, channelEvent,
+                if (event.reason.isEmpty())
+                    tr("%s quit").format(event.user.formattedNickname)
+                else
+                    tr("%s quit (%s)").format(event.user.formattedNickname, event.reason)
+            )
+
+            is MessageReceived -> addLine(ts, message, event.user.formattedNickname, event.message)
+            is ActionReceived -> addLine(ts, action, event.user.formattedNickname, event.action)
+        }
+    }
+
+    fun addLine(timestamp: String, format: Item<String>, vararg args: String) =
+        addLine(
+            sequenceOf(
+                StyledSpan(
+                    timestamp,
+                    setOf(Style.CustomStyle("timestamp"))
+                )
+            ) + " ${config[format].format(*args)}".detectLinks().convertControlCodes()
+        )
+
+    private fun addLine(spans: Sequence<StyledSpan>) {
+        lines.add(spans.toList().toTypedArray())
+    }
+
+    private val User.formattedNickname: String
+        get() = "${ControlCode.InternalNicknames}$nickname${ControlCode.InternalNicknames}"
+
+    private val IrcEvent.timestamp: String
+        get() = metadata.time.format(DateTimeFormatter.ofPattern(config[ClientSpec.Formatting.timestamp]))
+
 }
 
 class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
@@ -44,10 +97,7 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
 
     init {
         val borderPane = BorderPane().apply {
-            center = VirtualizedScrollPane(textArea.apply {
-                isEditable = false
-                isWrapText = true
-            })
+            center = VirtualizedScrollPane(textArea)
             right = ListView<String>(model.users).apply {
                 styleClass.add("nick-list")
                 prefWidth = 148.0
