@@ -7,13 +7,11 @@ import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.messages.sendPart
 import com.dmdirc.ktirc.model.ServerFeature
-import com.dmdirc.ktirc.model.User
 import com.jukusoft.i18n.I.tr
 import javafx.application.HostServices
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableSet
 import javafx.scene.Node
-import tornadofx.runLater
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
@@ -128,68 +126,21 @@ class Connection(
                 children -= event.target
             }
             event is TargetedEvent -> runLaterWithWindowUi(event.target) { handleTargetedEvent(event) }
-            else -> {
-            }
         }
     }
 
     private fun WindowModel.handleTargetedEvent(event: TargetedEvent) {
+        displayEvent(event)
         when (event) {
-            is ChannelJoined -> {
-                users.add(event.user.nickname)
-                addLine(
-                    event.timestamp,
-                    ClientSpec.Formatting.channelEvent,
-                    tr("%s joined").format(event.user.formattedNickname)
-                )
-            }
-            is ChannelParted -> {
-                users.remove(event.user.nickname)
-                if (event.reason.isEmpty()) {
-                    addLine(
-                        event.timestamp,
-                        ClientSpec.Formatting.channelEvent,
-                        tr("%s left").format(event.user.formattedNickname)
-                    )
-                } else {
-                    addLine(
-                        event.timestamp,
-                        ClientSpec.Formatting.channelEvent,
-                        tr("%s left (%s)").format(event.user.formattedNickname, event.reason)
-                    )
-                }
-            }
-            is MessageReceived -> addLine(
-                event.timestamp,
-                ClientSpec.Formatting.message,
-                event.user.formattedNickname,
-                event.message
-            )
-            is ActionReceived -> addLine(
-                event.timestamp,
-                ClientSpec.Formatting.action,
-                event.user.formattedNickname,
-                event.action
-            )
+            is ChannelJoined -> users.add(event.user.nickname)
+            is ChannelParted -> users.remove(event.user.nickname)
             is ChannelNamesFinished -> {
                 users.clear()
                 users.addAll(client.channelState[event.target]?.users?.map { it.nickname } ?: emptyList())
             }
-            is ChannelQuit -> {
-                users.remove(event.user.nickname)
-                addLine(
-                    event.timestamp,
-                    ClientSpec.Formatting.channelEvent,
-                    tr("%s quit").format(event.user.formattedNickname)
-                )
-            }
-            else -> {
-            }
+            is ChannelQuit -> users.remove(event.user.nickname)
         }
     }
-
-    private val User.formattedNickname: String
-        get() = "${ControlCode.InternalNicknames}$nickname${ControlCode.InternalNicknames}"
 
     private val IrcEvent.timestamp: String
         get() = metadata.time.format(DateTimeFormatter.ofPattern(config1[ClientSpec.Formatting.timestamp]))
