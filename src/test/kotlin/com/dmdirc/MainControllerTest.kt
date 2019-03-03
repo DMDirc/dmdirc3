@@ -77,7 +77,7 @@ internal class MainControllerTest {
         val details = ConnectionDetails("host3", "pass3", 1235, tls = true, autoconnect = false)
 
         every { factory.invoke(details) } returns mockServer1
-        val model = WindowModel("name", WindowType.CHANNEL, null, false, null)
+        val model = WindowModel("name", WindowType.CHANNEL, null, mockk(), null)
         mockServer1.children += Connection.Child(model, mockk())
 
         controller.connect(details)
@@ -96,7 +96,7 @@ internal class MainControllerTest {
 
         assumeTrue(controller.windows.isEmpty())
 
-        val model = WindowModel("name", WindowType.CHANNEL, null, false, null)
+        val model = WindowModel("name", WindowType.CHANNEL, null, mockk(), null)
         mockServer1.children += Connection.Child(model, mockk())
 
         assertEquals(1, controller.windows.size)
@@ -112,7 +112,7 @@ internal class MainControllerTest {
 
         controller.connect(details)
 
-        val model = WindowModel("name", WindowType.CHANNEL, null, false, null)
+        val model = WindowModel("name", WindowType.CHANNEL, null, mockk(), null)
         mockServer1.children += Connection.Child(model, mockk())
 
         assumeTrue(1 == controller.windows.size)

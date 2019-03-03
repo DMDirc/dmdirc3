@@ -9,7 +9,6 @@ import com.dmdirc.ktirc.messages.sendPart
 import com.dmdirc.ktirc.model.ServerFeature
 import com.dmdirc.ktirc.model.User
 import com.jukusoft.i18n.I.tr
-import com.uchuhimo.konf.Item
 import javafx.application.HostServices
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableSet
@@ -39,12 +38,14 @@ class Connection(
     private val hostServices: HostServices
 ) : ConnectionContract.Controller {
 
+    private val connectionId = connectionCounter.incrementAndGet().toString(16).padStart(20)
+
     private val model = WindowModel(
         connectionDetails.hostname,
         WindowType.SERVER,
         this,
-        true,
-        connectionCounter.incrementAndGet().toString(16).padStart(20)
+        config1,
+        connectionId
     )
 
     private val connected = SimpleBooleanProperty(false)
@@ -116,8 +117,8 @@ class Connection(
                     event.target,
                     WindowType.CHANNEL,
                     this,
-                    false,
-                    model.connectionId
+                    config1,
+                    connectionId
                 )
                 model.addImageHandler(config1)
                 children += Child(model, WindowUI(model, hostServices))
@@ -192,20 +193,6 @@ class Connection(
 
     private val IrcEvent.timestamp: String
         get() = metadata.time.format(DateTimeFormatter.ofPattern(config1[ClientSpec.Formatting.timestamp]))
-
-    private fun WindowModel.addLine(timestamp: String, format: Item<String>, vararg args: String) =
-        addLine(
-            sequenceOf(
-                StyledSpan(
-                    timestamp,
-                    setOf(Style.CustomStyle("timestamp"))
-                )
-            ) + " ${config1[format].format(*args)}".detectLinks().convertControlCodes()
-        )
-
-    private fun WindowModel.addLine(spans: Sequence<StyledSpan>) {
-        lines.add(spans.toList().toTypedArray())
-    }
 
     private fun runLaterWithWindowUi(windowName: String, block: WindowModel.() -> Unit) =
         runLater {

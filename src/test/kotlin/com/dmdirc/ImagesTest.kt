@@ -11,9 +11,9 @@ internal class ImagesTest {
 
     private val url = "https://localhost/image.png"
 
-    private val fakeModel = WindowModel("", WindowType.CHANNEL, null, false, null)
-
     private val mockConfig = mockk<ClientConfig>()
+
+    private val fakeModel = WindowModel("", WindowType.CHANNEL, null, mockConfig, null)
 
     @BeforeEach
     fun setup() {

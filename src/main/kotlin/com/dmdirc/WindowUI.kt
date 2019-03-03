@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import com.uchuhimo.konf.Item
 import javafx.application.HostServices
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ListChangeListener
@@ -20,10 +21,11 @@ enum class WindowType {
 class WindowModel(
     var name: String,
     val type: WindowType,
-    var connection: ConnectionContract.Controller?,
-    var isConnection: Boolean,
-    val connectionId: String?
+    val connection: ConnectionContract.Controller?,
+    private val config: ClientConfig,
+    connectionId: String?
 ) {
+    val isConnection = type == WindowType.SERVER
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else name.toLowerCase()}"
     val users = mutableListOf<String>().observable()
     val lines = mutableListOf<Array<StyledSpan>>().observable()
@@ -35,6 +37,21 @@ class WindowModel(
             inputField.value = ""
         }
     }
+
+    fun addLine(timestamp: String, format: Item<String>, vararg args: String) =
+        addLine(
+            sequenceOf(
+                StyledSpan(
+                    timestamp,
+                    setOf(Style.CustomStyle("timestamp"))
+                )
+            ) + " ${config[format].format(*args)}".detectLinks().convertControlCodes()
+        )
+
+    private fun addLine(spans: Sequence<StyledSpan>) {
+        lines.add(spans.toList().toTypedArray())
+    }
+
 }
 
 class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
