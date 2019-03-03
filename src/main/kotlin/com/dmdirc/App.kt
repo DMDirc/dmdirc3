@@ -42,8 +42,9 @@ class MainApp : App(MainView::class) {
 
 private fun createKodein(stage: Stage, hostServices: HostServices) = Kodein {
     bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
-    bind<HostServices>() with singleton { hostServices }
-    bind<MainContract.Controller>() with singleton { MainController(instance(), instance()) }
+    bind<HostServices>() with instance(hostServices)
+    bind<MainContract.Controller>() with singleton { MainController(instance(), factory()) }
+
     bind<Stage>().subTypes() with {
         when (it.jvmType) {
             JoinDialog::class.java -> provider { JoinDialog(instance(), instance()) }
@@ -52,6 +53,7 @@ private fun createKodein(stage: Stage, hostServices: HostServices) = Kodein {
         }
     }
 
+    bind<Connection>() with factory { connectionDetails: ConnectionDetails -> Connection(connectionDetails, instance(), instance()) }
     bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
     bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
 
@@ -75,4 +77,6 @@ fun main(args: Array<String>) {
 
 fun <T> List<T>.observable(): ObservableList<T> = FXCollections.observableList(this)
 fun <T> Set<T>.observable(): ObservableSet<T> = FXCollections.observableSet(this)
+fun <T> ObservableSet<T>.synchronized(): ObservableSet<T> = FXCollections.synchronizedObservableSet(this)
+fun <T> ObservableSet<T>.readOnly(): ObservableSet<T> = FXCollections.unmodifiableObservableSet(this)
 fun <K, V> Map<K, V>.observable(): ObservableMap<K, V> = FXCollections.observableMap(this)
