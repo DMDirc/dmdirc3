@@ -176,12 +176,12 @@ class ServerlistDialog(private val model: ServerListModel, primaryStage: Stage) 
                 }
                 bottom = ButtonBar().apply {
                     buttons.addAll(
-                        Button("Connect").apply {
+                        Button(tr("Connect")).apply {
                             setButtonData(this, ButtonBar.ButtonData.OK_DONE)
                             setOnAction {
                                 model.connectPressed()
                             }
-                        }, Button("Delete").apply {
+                        }, Button(tr("Delete")).apply {
                             setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
                             setOnAction {
                                 model.deletePressed()
@@ -192,13 +192,13 @@ class ServerlistDialog(private val model: ServerListModel, primaryStage: Stage) 
             }
             bottom = ButtonBar().apply {
                 buttons.addAll(
-                    Button("Save").apply {
+                    Button(tr("Save")).apply {
                         setButtonData(this, ButtonBar.ButtonData.OK_DONE)
                         setOnAction {
                             model.savePressed()
                         }
                     },
-                    Button("Cancel").apply {
+                    Button(tr("Cancel")).apply {
                         setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
                         setOnAction {
                             model.cancelPressed()
