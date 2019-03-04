@@ -8,7 +8,6 @@ import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.messages.sendPart
 import com.dmdirc.ktirc.model.ChannelUser
 import com.dmdirc.ktirc.model.ServerFeature
-import com.jukusoft.i18n.I.tr
 import javafx.application.HostServices
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableSet
@@ -95,25 +94,12 @@ class Connection(
     private fun handleEvent(event: IrcEvent) {
         when {
             event is BatchReceived -> event.events.forEach(this::handleEvent)
-            event is ServerConnected -> runLater {
-                model.addLine(event.timestamp, ClientSpec.Formatting.serverEvent, tr("Connected"))
-                connected.value = true
-            }
             event is ServerReady -> {
+                connected.value = true
                 networkName = client.serverState.features[ServerFeature.Network] ?: ""
                 model.name = client.serverState.serverName
             }
-            event is ServerDisconnected -> runLater {
-                model.addLine(event.timestamp, ClientSpec.Formatting.serverEvent, tr("Disconnected"))
-                connected.value = false
-            }
-            event is ServerConnectionError -> runLater {
-                model.addLine(
-                    event.timestamp,
-                    ClientSpec.Formatting.serverEvent,
-                    tr("Error: %s - %s").format(event.error, event.details ?: "")
-                )
-            }
+            event is ServerDisconnected -> runLater { connected.value = false }
             event is ChannelJoined && client.isLocalUser(event.user) -> runLater {
                 val model = WindowModel(
                     event.target,
@@ -124,10 +110,15 @@ class Connection(
                 )
                 model.addImageHandler(config1)
                 children += Child(model, WindowUI(model, hostServices))
-                windowModel(event.target)?.handleEvent(event)
             }
             event is ChannelParted && client.isLocalUser(event.user) -> runLater { children -= event.target }
-            event is TargetedEvent -> runLater { windowModel(event.target)?.handleEvent(event) }
+        }
+
+        if (event is TargetedEvent) {
+            // TODO: Handle events that are targetted to us (private messages etc)
+            runLater { windowModel(event.target)?.handleEvent(event) }
+        } else {
+            runLater { model.handleEvent(event) }
         }
     }
 
