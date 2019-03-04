@@ -96,6 +96,19 @@ class MainView(
                 controller.selectedWindow.value = newValue
             }
             cellFactory = NodeListCellFactory()
+            contextMenu = ContextMenu().apply {
+                items.addAll(
+                    MenuItem(tr("Close")).apply {
+                        setOnAction {
+                            if (controller.selectedWindow.value.isConnection) {
+                                controller.selectedWindow.value.connection?.disconnect()
+                            } else {
+                                controller.leaveChannel(controller.selectedWindow.value.name)
+                            }
+                        }
+                    }
+                )
+            }
         }
         centerProperty().bindBidirectional(selectedWindow)
         primaryStage.icons.add(Image(MainView::class.java.getResourceAsStream("/logo.png")))
