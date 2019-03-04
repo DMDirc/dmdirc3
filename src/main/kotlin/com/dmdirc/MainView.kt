@@ -52,7 +52,7 @@ class MainView(
                     items.add(
                         MenuItem(tr("Quit")).apply {
                             setOnAction {
-                                visibleProperty().value = false
+                                primaryStage.close()
                             }
                         }
                     )
