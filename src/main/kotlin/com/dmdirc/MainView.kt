@@ -1,12 +1,16 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.transformation.SortedList
+import javafx.event.EventHandler
 import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.image.Image
+import javafx.scene.input.MouseButton
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
@@ -27,22 +31,33 @@ class NodeListCell(list: ListView<WindowModel>) : ListCell<WindowModel>() {
     override fun updateItem(node: WindowModel?, empty: Boolean) {
         super.updateItem(node, empty)
         if (node != null && !empty) {
-            styleClass.removeIf { s ->
-                s.startsWith("node-")
+            graphic = BorderPane().apply {
+                styleClass.add("node-${node.type.name.toLowerCase()}")
+                if (node.hasUnreadMessages.value) {
+                    styleClass.add("node-unread")
+                }
+                if (node.type == WindowType.SERVER) {
+                    right = Label().apply {
+                        styleClass.add("node-cog}")
+                        graphic = FontAwesomeIconView(FontAwesomeIcon.COG)
+                        contextMenu = ContextMenu().apply {
+                            items.add(MenuItem(tr("Placeholder")))
+                        }
+                        //TODO: This needs to work cross platform as expected
+                        onMouseClicked = EventHandler {
+                            if (it.button == MouseButton.PRIMARY) {
+                                contextMenu.show(graphic, it.screenX, it.screenY)
+                            }
+                        }
+
+                    }
+                }
+                left = Label(node.title.value)
             }
-            styleClass.add("node-${node.type.name.toLowerCase()}")
-            text = node.title.value
             tooltip = Tooltip(node.title.value)
-            if (node.hasUnreadMessages.value) {
-                styleClass.add("node-unread")
-            }
         }
         if (empty) {
-            text = ""
             graphic = null
-            styleClass.removeIf { s ->
-                s.startsWith("node-")
-            }
         }
     }
 }
