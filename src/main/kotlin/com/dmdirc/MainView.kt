@@ -38,7 +38,7 @@ class NodeListCell(list: ListView<WindowModel>) : ListCell<WindowModel>() {
                 }
                 if (node.type == WindowType.SERVER) {
                     right = Label().apply {
-                        styleClass.add("node-cog}")
+                        styleClass.add("node-cog")
                         graphic = FontAwesomeIconView(FontAwesomeIcon.COG)
                         contextMenu = ContextMenu().apply {
                             items.add(MenuItem(tr("Placeholder")))
