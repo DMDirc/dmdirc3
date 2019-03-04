@@ -10,7 +10,7 @@ msgstr ""
 "Last-Translator: chameth <crowdin@vacso.co.uk>\n"
 "Language-Team: Backwards\n"
 "Language: en_BW\n"
-"PO-Revision-Date: 2019-03-04 16:19\n"
+"PO-Revision-Date: 2019-03-04 16:27\n"
 
 #: src/main/kotlin/com/dmdirc/WindowUI.kt:65
 msgid "%s joined"
@@ -30,11 +30,11 @@ msgstr "%s tiuq"
 
 #: src/main/kotlin/com/dmdirc/WindowUI.kt:80
 msgid "%s quit (%s)"
-msgstr ""
+msgstr "%s tiuq (%s)"
 
 #: src/main/kotlin/com/dmdirc/ConnectDialog.kt:172
 msgid "AutoConnect: "
-msgstr ""
+msgstr "TcennocOtua: "
 
 #: src/main/kotlin/com/dmdirc/ConnectDialog.kt:201
 #: src/main/kotlin/com/dmdirc/JoinDialog.kt:83
@@ -92,7 +92,7 @@ msgstr "Nioj"
 
 #: src/main/kotlin/com/dmdirc/MainView.kt:74
 msgid "Join Channel"
-msgstr ""
+msgstr "Lennahc Nioj"
 
 #: src/main/kotlin/com/dmdirc/SettingsDialog.kt:79
 msgid "Nickname: "
@@ -100,11 +100,11 @@ msgstr "Emankcin: "
 
 #: src/main/kotlin/com/dmdirc/ConnectDialog.kt:164
 msgid "Password: "
-msgstr ""
+msgstr "Drowssap: "
 
 #: src/main/kotlin/com/dmdirc/ConnectDialog.kt:160
 msgid "Port: "
-msgstr ""
+msgstr "Trop: "
 
 #: src/main/kotlin/com/dmdirc/SettingsDialog.kt:78
 msgid "Profile"
@@ -129,7 +129,7 @@ msgstr "Tsil revres"
 
 #: src/main/kotlin/com/dmdirc/ConnectDialog.kt:156
 msgid "Server Name: "
-msgstr ""
+msgstr "Eman revres: "
 
 #: src/main/kotlin/com/dmdirc/MainView.kt:82
 #: src/main/kotlin/com/dmdirc/MainView.kt:84
@@ -138,7 +138,7 @@ msgstr "Sgnittes"
 
 #: src/main/kotlin/com/dmdirc/ConnectDialog.kt:168
 msgid "TLS: "
-msgstr ""
+msgstr "SLT: "
 
 #: src/main/kotlin/com/dmdirc/SettingsDialog.kt:87
 msgid "Username: "
@@ -146,17 +146,17 @@ msgstr "Emanresu: "
 
 #: src/main/kotlin/com/dmdirc/Translations.kt:21
 msgid "the address could not be resolved"
-msgstr ""
+msgstr "devloser eb ton dluoc sserdda eht"
 
 #: src/main/kotlin/com/dmdirc/Translations.kt:22
 msgid "the connection was refused"
-msgstr ""
+msgstr "desufer saw noitcennoc eht"
 
 #: src/main/kotlin/com/dmdirc/Translations.kt:23
 msgid "the server's certificate was not valid"
-msgstr ""
+msgstr "dilav ton saw etacfitrec s'revres eht"
 
 #: src/main/kotlin/com/dmdirc/Translations.kt:20
 msgid "unknown error"
-msgstr ""
+msgstr "rorre nwonknu"
 
