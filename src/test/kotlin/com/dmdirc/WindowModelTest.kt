@@ -127,7 +127,7 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.displayEvent(ChannelJoined(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
+        model.handleEvent(ChannelJoined(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -145,7 +145,7 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.displayEvent(ChannelParted(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
+        model.handleEvent(ChannelParted(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -163,7 +163,7 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.displayEvent(ChannelParted(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "Mess with the best"))
+        model.handleEvent(ChannelParted(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "Mess with the best"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -181,7 +181,7 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.message] } returns "<%s> %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.displayEvent(MessageReceived(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "Mess with the best"))
+        model.handleEvent(MessageReceived(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "Mess with the best"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -199,7 +199,7 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.action] } returns "* %s %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.displayEvent(ActionReceived(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "hacks"))
+        model.handleEvent(ActionReceived(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "hacks"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -217,7 +217,7 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.displayEvent(ChannelQuit(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
+        model.handleEvent(ChannelQuit(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -235,7 +235,7 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.displayEvent(ChannelQuit(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "Mess with the best"))
+        model.handleEvent(ChannelQuit(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "Mess with the best"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
