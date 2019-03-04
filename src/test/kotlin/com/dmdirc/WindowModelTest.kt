@@ -69,6 +69,16 @@ internal class WindowModelTest {
     }
 
     @Test
+    fun `sends actions to controller when input is prefixed with me`() {
+        val model = WindowModel("name", WindowType.ROOT, mockConnection, mockk(), null)
+        model.inputField.value = "/me hacks the planet"
+        model.handleInput()
+        verify {
+            mockConnection.sendAction("name", "hacks the planet")
+        }
+    }
+
+    @Test
     fun `blanks input field after sending message`() {
         val model = WindowModel("name", WindowType.ROOT, mockConnection, mockk(), null)
         model.inputField.value = "Mess with the best"
