@@ -66,15 +66,6 @@ private fun createKodein(stage: Stage, hostServices: HostServices) = Kodein {
     bind<SettingsDialogContract.ViewModel>() with provider { SettingsDialogModel(instance(), instance()) }
 }
 
-private fun initInternationalisation(path: Path, locale: String?) {
-    if (!Files.exists(path)) {
-        Files.createDirectory(path)
-    }
-
-    I.init(path.toFile(), Locale.ENGLISH, "messages")
-    I.setLanguage(Locale.forLanguageTag(locale))
-}
-
 fun main(args: Array<String>) {
     LogManager.getLogManager().readConfiguration(MainApp::class.java.getResourceAsStream("/logs.properties"))
     Application.launch(MainApp::class.java)
