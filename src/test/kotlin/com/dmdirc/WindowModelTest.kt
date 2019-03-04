@@ -313,7 +313,7 @@ internal class WindowModelTest {
         assertArrayEquals(
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- Error: BadTlsCertificate - details", emptySet())
+                StyledSpan(" -- Error: the server's certificate was not valid - details", emptySet())
             ), model.lines[0]
         )
     }

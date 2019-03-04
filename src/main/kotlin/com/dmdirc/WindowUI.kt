@@ -59,7 +59,7 @@ class WindowModel(
             is ServerDisconnected ->
                 addLine(ts, serverEvent, tr("Disconnected"))
             is ServerConnectionError ->
-                addLine(ts, serverEvent, tr("Error: %s - %s").format(event.error, event.details ?: ""))
+                addLine(ts, serverEvent, tr("Error: %s - %s").format(event.error.translated(), event.details ?: ""))
 
             is ChannelJoined ->
                 addLine(ts, channelEvent, tr("%s joined").format(event.user.formattedNickname))
