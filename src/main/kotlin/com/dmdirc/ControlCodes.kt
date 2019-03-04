@@ -127,7 +127,6 @@ fun String.convertControlCodes() = sequence {
             ControlCode.Monospace -> yieldAll(emitThen { styles.toggle(Style.MonospaceStyle) })
             ControlCode.Underline -> yieldAll(emitThen { styles.toggle(Style.UnderlineStyle) })
             ControlCode.Strikethrough -> yieldAll(emitThen { styles.toggle(Style.StrikethroughStyle) })
-            ControlCode.InternalNicknames -> yieldAll(emitThen { styles.toggle(Style.CustomStyle("irc-nickname")) })
             ControlCode.Reset -> yieldAll(emitThen { styles.clear() })
             ControlCode.Colour -> yieldAll(emitThen {
                 nextColour = 0
@@ -144,6 +143,12 @@ fun String.convertControlCodes() = sequence {
                     (link as Style.Link).url = buffer.toString()
                     yieldAll(emitThen { styles.removeAll { l -> l is Style.Link } })
                 } ?: yieldAll(emitThen { styles.add(Style.Link("")) })
+            }
+            ControlCode.InternalNicknames -> {
+                styles.firstOrNull { s -> s is Style.Nickname }?.let { link ->
+                    (link as Style.Nickname).nick = buffer.toString()
+                    yieldAll(emitThen { styles.removeAll { l -> l is Style.Nickname } })
+                } ?: yieldAll(emitThen { styles.add(Style.Nickname("")) })
             }
             else -> when {
                 // We're not expecting a colour argument:

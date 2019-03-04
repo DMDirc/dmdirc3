@@ -102,12 +102,12 @@ internal class ControlCodesTest {
             )),
 
             arguments("\u0019Crash\u0019 and burn", listOf(
-                StyledSpan("Crash", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("Crash", setOf(Style.Nickname("Crash"))),
                 StyledSpan(" and burn", emptySet())
             )),
 
             arguments("\u0019\u0002Crash\u0019 and burn", listOf(
-                StyledSpan("Crash", setOf(Style.CustomStyle("irc-nickname"), Style.BoldStyle)),
+                StyledSpan("Crash", setOf(Style.Nickname("Crash"), Style.BoldStyle)),
                 StyledSpan(" and burn", setOf(Style.BoldStyle))
             ))
         )
