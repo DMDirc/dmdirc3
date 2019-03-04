@@ -20,6 +20,7 @@ sealed class Style {
     data class ColourStyle(val foreground: Int, val background: Int?) : Style()
     data class HexColourStyle(val foreground: String, val background: String?) : Style()
     data class Link(var url: String) : Style()
+    data class Nickname(var nick: String) : Style()
 }
 
 sealed class Segment {
@@ -129,6 +130,7 @@ private fun applyStyles(node: Node, styles: Collection<Style>, linkClickHandler:
                 node.styleClass.add("irc-link")
                 node.setOnMouseClicked { linkClickHandler(style.url) }
             }
+            is Style.Nickname -> node.styleClass.addAll("irc-nickname", "irc-nickname-${style.nick.colourHash()}")
         }
     }
 }
@@ -138,3 +140,8 @@ private fun Node.addInlineStyle(newStyle: String) = if (style.isEmpty()) {
 } else {
     style += ";$newStyle"
 }
+
+/**
+ * Calculates a "colour hash", a number in the range 0-7 that is used to assign a pseudo-random colour to the string.
+ */
+internal fun String.colourHash() = fold(0) { i, c -> i + c.toInt() } % 8

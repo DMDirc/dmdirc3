@@ -135,7 +135,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" joined", emptySet())
             ), model.lines[0]
         )
@@ -153,7 +153,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" left", emptySet())
             ), model.lines[0]
         )
@@ -178,7 +178,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" left (Mess with the best)", emptySet())
             ), model.lines[0]
         )
@@ -203,7 +203,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" <", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan("> Mess with the best", emptySet())
             ), model.lines[0]
         )
@@ -221,7 +221,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" * ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" hacks", emptySet())
             ), model.lines[0]
         )
@@ -239,7 +239,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" quit", emptySet())
             ), model.lines[0]
         )
@@ -264,7 +264,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" quit (Mess with the best)", emptySet())
             ), model.lines[0]
         )
