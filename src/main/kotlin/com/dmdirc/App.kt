@@ -1,12 +1,14 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I
+import javafx.application.Application
 import javafx.application.HostServices
 import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.collections.ObservableMap
 import javafx.collections.ObservableSet
+import javafx.scene.Scene
 import javafx.stage.Stage
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -14,8 +16,6 @@ import org.kodein.di.Kodein
 import org.kodein.di.bindings.subTypes
 import org.kodein.di.generic.*
 import org.kodein.di.jvmType
-import tornadofx.App
-import tornadofx.launch
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -25,15 +25,19 @@ import java.util.logging.LogManager
 
 internal lateinit var kodein: Kodein
 
-class MainApp : App(MainView::class) {
+class MainApp : Application() {
     override fun start(stage: Stage) {
         kodein = createKodein(stage, hostServices)
         val config by kodein.instance<ClientConfig>()
         initInternationalisation(Path.of("translations"), config[ClientSpec.language])
+        val controller: MainContract.Controller by kodein.instance()
+        val joinDialogProvider: () -> JoinDialog by kodein.provider()
+        val settingsDialogProvider: () -> SettingsDialog by kodein.provider()
         with(stage) {
             minWidth = 800.0
             minHeight = 600.0
-            super.start(this)
+            scene = Scene(MainView(controller, config, joinDialogProvider, settingsDialogProvider, stage, titleProperty()))
+            show()
         }
         GlobalScope.launch {
             installStyles(stage.scene, Paths.get("stylesheet.css"))
@@ -73,7 +77,7 @@ private fun initInternationalisation(path: Path, locale: String?) {
 
 fun main(args: Array<String>) {
     LogManager.getLogManager().readConfiguration(MainApp::class.java.getResourceAsStream("/logs.properties"))
-    launch<MainApp>(args)
+    Application.launch(MainApp::class.java)
 }
 
 fun <T> List<T>.observable(): ObservableList<T> = FXCollections.observableList(this)
