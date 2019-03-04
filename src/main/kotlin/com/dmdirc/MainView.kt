@@ -31,12 +31,8 @@ class NodeListCell(list: ListView<WindowModel>) : ListCell<WindowModel>() {
                 s.startsWith("node-")
             }
             styleClass.add("node-${node.type.name.toLowerCase()}")
-            val title = when (node.type) {
-                WindowType.SERVER -> "${node.name.value} [${node.connection?.networkName ?: ""}]"
-                else -> node.name.value
-            }
-            text = title
-            tooltip = Tooltip(title)
+            text = node.title.value
+            tooltip = Tooltip(node.title.value)
             if (node.hasUnreadMessages.value) {
                 styleClass.add("node-unread")
             }

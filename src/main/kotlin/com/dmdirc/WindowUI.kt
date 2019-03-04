@@ -9,6 +9,7 @@ import com.dmdirc.ktirc.model.User
 import com.jukusoft.i18n.I.tr
 import com.uchuhimo.konf.Item
 import javafx.application.HostServices
+import javafx.beans.Observable
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
@@ -18,6 +19,7 @@ import javafx.scene.control.ListView
 import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.BorderPane
+import javafx.util.Callback
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.fxmisc.flowless.VirtualizedScrollPane
@@ -37,12 +39,19 @@ class WindowModel(
     connectionId: String?
 ) {
     val name: StringProperty = SimpleStringProperty(initialName)
+    val title: StringProperty = SimpleStringProperty(initialName)
     val hasUnreadMessages: BooleanProperty = SimpleBooleanProperty(false)
     val nickList = NickListModel(connection)
     val isConnection = type == WindowType.SERVER
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else initialName.toLowerCase()}"
     val lines = mutableListOf<Array<StyledSpan>>().observable()
     val inputField: StringProperty = SimpleStringProperty("")
+
+    companion object {
+        fun extractor(): Callback<WindowModel, Array<Observable>> {
+            return Callback { m -> arrayOf(m.title) }
+        }
+    }
 
     fun handleInput() {
         if (inputField.value.isNotEmpty()) {

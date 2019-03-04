@@ -97,7 +97,10 @@ class Connection(
             event is ServerReady -> {
                 connected.value = true
                 networkName = client.serverState.features[ServerFeature.Network] ?: ""
-                model.name.value = client.serverState.serverName
+                runLater {
+                    model.name.value = client.serverState.serverName
+                    model.title.value = "${model.name.value} [${model.connection?.networkName ?: ""}]"
+                }
             }
             event is ServerDisconnected -> runLater { connected.value = false }
             event is ChannelJoined && client.isLocalUser(event.user) -> runLater {

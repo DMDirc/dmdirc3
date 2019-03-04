@@ -2,6 +2,7 @@ package com.dmdirc
 
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.collections.SetChangeListener
 
@@ -20,7 +21,7 @@ class MainController(
     private val connectionFactory: (ConnectionDetails) -> ConnectionContract.Controller
 ) : MainContract.Controller {
 
-    override val windows = emptyList<WindowModel>().toMutableList().observable()
+    override val windows: ObservableList<WindowModel> = FXCollections.observableArrayList(WindowModel.extractor())
     override val selectedWindow = SimpleObjectProperty<WindowModel>()
 
     init {
