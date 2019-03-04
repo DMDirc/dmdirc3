@@ -32,9 +32,9 @@ class WindowModel(
     private val config: ClientConfig,
     connectionId: String?
 ) {
+    val nickList = NickListModel(connection)
     val isConnection = type == WindowType.SERVER
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else name.toLowerCase()}"
-    val users = mutableListOf<String>().observable()
     val lines = mutableListOf<Array<StyledSpan>>().observable()
     val inputField = SimpleStringProperty("")
 
@@ -45,7 +45,12 @@ class WindowModel(
         }
     }
 
-    fun displayEvent(event: IrcEvent) {
+    fun handleEvent(event: IrcEvent) {
+        displayEvent(event)
+        nickList.handleEvent(event)
+    }
+
+    private fun displayEvent(event: IrcEvent) {
         val ts = event.timestamp
         when (event) {
             is ChannelJoined -> addLine(ts, channelEvent, tr("%s joined").format(event.user.formattedNickname))
@@ -98,7 +103,7 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
     init {
         val borderPane = BorderPane().apply {
             center = VirtualizedScrollPane(textArea)
-            right = ListView<String>(model.users).apply {
+            right = ListView<String>(model.nickList.users).apply {
                 styleClass.add("nick-list")
                 prefWidth = 148.0
             }

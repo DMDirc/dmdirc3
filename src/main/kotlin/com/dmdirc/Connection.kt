@@ -6,6 +6,7 @@ import com.dmdirc.ktirc.io.CaseMapping
 import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.messages.sendPart
+import com.dmdirc.ktirc.model.ChannelUser
 import com.dmdirc.ktirc.model.ServerFeature
 import com.jukusoft.i18n.I.tr
 import javafx.application.HostServices
@@ -26,6 +27,7 @@ object ConnectionContract {
         fun sendMessage(channel: String, name: String)
         fun joinChannel(channel: String)
         fun leaveChannel(channel: String)
+        fun getUsers(channel: String): Iterable<ChannelUser>
         fun disconnect()
     }
 }
@@ -88,6 +90,8 @@ class Connection(
         client.sendPart(channel)
     }
 
+    override fun getUsers(channel: String): Iterable<ChannelUser> = client.channelState[channel]?.users ?: emptyList()
+
     private fun handleEvent(event: IrcEvent) {
         when {
             event is BatchReceived -> event.events.forEach(this::handleEvent)
@@ -120,38 +124,17 @@ class Connection(
                 )
                 model.addImageHandler(config1)
                 children += Child(model, WindowUI(model, hostServices))
-                withWindowModel(event.target) { handleTargetedEvent(event) }
+                windowModel(event.target)?.handleEvent(event)
             }
-            event is ChannelParted && client.isLocalUser(event.user) -> runLater {
-                children -= event.target
-            }
-            event is TargetedEvent -> runLaterWithWindowUi(event.target) { handleTargetedEvent(event) }
-        }
-    }
-
-    private fun WindowModel.handleTargetedEvent(event: TargetedEvent) {
-        displayEvent(event)
-        when (event) {
-            is ChannelJoined -> users.add(event.user.nickname)
-            is ChannelParted -> users.remove(event.user.nickname)
-            is ChannelNamesFinished -> {
-                users.clear()
-                users.addAll(client.channelState[event.target]?.users?.map { it.nickname } ?: emptyList())
-            }
-            is ChannelQuit -> users.remove(event.user.nickname)
+            event is ChannelParted && client.isLocalUser(event.user) -> runLater { children -= event.target }
+            event is TargetedEvent -> runLater { windowModel(event.target)?.handleEvent(event) }
         }
     }
 
     private val IrcEvent.timestamp: String
         get() = metadata.time.format(DateTimeFormatter.ofPattern(config1[ClientSpec.Formatting.timestamp]))
 
-    private fun runLaterWithWindowUi(windowName: String, block: WindowModel.() -> Unit) =
-        runLater {
-            withWindowModel(windowName, block)
-        }
-
-    private fun withWindowModel(windowName: String, block: WindowModel.() -> Unit) =
-        children[windowName]?.model?.block()
+    private fun windowModel(windowName: String) = children[windowName]?.model
 
     override fun disconnect() {
         client.disconnect()
