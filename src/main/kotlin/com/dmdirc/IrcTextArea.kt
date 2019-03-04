@@ -3,13 +3,11 @@ package com.dmdirc
 import javafx.scene.Node
 import javafx.scene.image.ImageView
 import javafx.scene.layout.Pane
-import javafx.scene.paint.Paint
 import org.fxmisc.richtext.GenericStyledArea
 import org.fxmisc.richtext.TextExt
 import org.fxmisc.richtext.model.SegmentOpsBase
 import org.fxmisc.richtext.model.StyledSegment
 import org.fxmisc.richtext.model.TextOps
-import tornadofx.style
 import java.util.*
 
 sealed class Style {
@@ -85,7 +83,7 @@ class IrcTextArea(linkClickHandler: (String) -> Unit) :
                         te.styleClass.add("text")
                         applyStyles(te, ss.style, linkClickHandler)
                     }
-                    is Segment.Image -> with (ImageView(seg.url)) {
+                    is Segment.Image -> with(ImageView(seg.url)) {
                         // We can't seem to set the width/height in CSS :(
                         fitWidth = 250.0
                         fitHeight = 250.0
@@ -102,7 +100,13 @@ class IrcTextArea(linkClickHandler: (String) -> Unit) :
                 }
             }
         }
-    )
+    ) {
+
+    init {
+        isEditable = false
+        isWrapText = true
+    }
+}
 
 private fun applyStyles(node: Node, styles: Collection<Style>, linkClickHandler: (String) -> Unit) {
     styles.forEach { style ->
@@ -117,8 +121,8 @@ private fun applyStyles(node: Node, styles: Collection<Style>, linkClickHandler:
                 style.background?.let { bg -> node.styleClass.add("irc-colour-bg-$bg") }
             }
             is Style.HexColourStyle -> {
-                node.style(append = true) { fill = Paint.valueOf(style.foreground) }
-                style.background?.let { node.style(append = true) { "-rtfx-background-color" force Paint.valueOf(it) } }
+                node.addInlineStyle("-fx-fill: #${style.foreground}")
+                style.background?.let { node.addInlineStyle("-rtfx-background-color: #$it") }
             }
             is Style.CustomStyle -> node.styleClass.add(style.style)
             is Style.Link -> {
@@ -127,4 +131,10 @@ private fun applyStyles(node: Node, styles: Collection<Style>, linkClickHandler:
             }
         }
     }
+}
+
+private fun Node.addInlineStyle(newStyle: String) = if (style.isEmpty()) {
+    style = newStyle
+} else {
+    style += ";$newStyle"
 }

@@ -1,9 +1,7 @@
 package com.dmdirc
 
 import javafx.scene.Scene
-import tornadofx.runLater
 import java.nio.file.*
-
 
 fun installStyles(root: Scene, file: Path) {
     file.checkAndInstall(root)

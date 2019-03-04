@@ -1,7 +1,4 @@
-
-import com.dmdirc.Style
-import com.dmdirc.StyledSpan
-import com.dmdirc.convertControlCodes
+package com.dmdirc
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -79,6 +76,17 @@ internal class ControlCodesTest {
                 StyledSpan("burn", emptySet())
             )),
 
+            arguments("\u0004aabbcc,Crash\u0002 and \u0004burn", listOf(
+                StyledSpan(",Crash", setOf(Style.HexColourStyle("aabbcc", null))),
+                StyledSpan(" and ", setOf(Style.HexColourStyle("aabbcc", null), Style.BoldStyle)),
+                StyledSpan("burn", setOf(Style.BoldStyle))
+            )),
+
+            arguments("\u0004Crash and \u0004burn", listOf(
+                StyledSpan("Crash and ", emptySet()),
+                StyledSpan("burn", emptySet())
+            )),
+
             arguments("\u0004Crash and burn", listOf(
                 StyledSpan("Crash and burn", emptySet())
             )),
@@ -88,10 +96,35 @@ internal class ControlCodesTest {
                 StyledSpan("burn", emptySet())
             )),
 
+            arguments("\u0002\u0017Crash and \u0017burn", listOf(
+                StyledSpan("Crash and ", setOf(Style.Link("Crash and "), Style.BoldStyle)),
+                StyledSpan("burn", setOf(Style.BoldStyle))
+            )),
+
             arguments("\u0019Crash\u0019 and burn", listOf(
                 StyledSpan("Crash", setOf(Style.CustomStyle("irc-nickname"))),
                 StyledSpan(" and burn", emptySet())
+            )),
+
+            arguments("\u0019\u0002Crash\u0019 and burn", listOf(
+                StyledSpan("Crash", setOf(Style.CustomStyle("irc-nickname"), Style.BoldStyle)),
+                StyledSpan(" and burn", setOf(Style.BoldStyle))
             ))
+        )
+
+        @JvmStatic
+        @Suppress("unused")
+        fun detectLinksArgumentsProvider(): Stream<Arguments> = Stream.of(
+            arguments("", ""),
+
+            arguments(
+                "https://google.com",
+                "${ControlCode.InternalLinks}https://google.com${ControlCode.InternalLinks}"),
+
+            arguments(
+                "abc https://google.com def",
+                "abc ${ControlCode.InternalLinks}https://google.com${ControlCode.InternalLinks} def")
+
         )
     }
 
@@ -99,6 +132,12 @@ internal class ControlCodesTest {
     @MethodSource("convertControlCodesArgumentsProvider")
     fun `converts control codes`(input: String, spans: List<StyledSpan>) {
         assertEquals(spans, input.convertControlCodes().toList())
+    }
+
+    @ParameterizedTest
+    @MethodSource("detectLinksArgumentsProvider")
+    fun `detects links`(input: String, expected: String) {
+        assertEquals(expected, input.detectLinks())
     }
 
 }

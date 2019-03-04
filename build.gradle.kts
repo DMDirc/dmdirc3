@@ -27,7 +27,7 @@ java {
 }
 
 javafx {
-    modules = listOf("javafx.controls", "javafx.fxml")
+    modules = listOf("javafx.controls", "javafx.fxml", "javafx.swing")
 }
 
 application {
@@ -35,14 +35,13 @@ application {
 }
 
 dependencies {
-    implementation("no.tornado:tornadofx:1.7.18")
     implementation("org.controlsfx:controlsfx:9.0.0")
-    implementation("org.fxmisc.richtext:richtextfx:0.9.2")
+    implementation("org.fxmisc.richtext:richtextfx:0.9.3")
     implementation("com.dmdirc:ktirc:0.10.3")
     implementation("com.uchuhimo:konf:0.13.1")
     implementation("org.kodein.di:kodein-di-generic-jvm:6.1.0")
     implementation("com.jukusoft:easy-i18n-gettext:1.2.0")
-    implementation("de.jensd:fontawesomefx-fontawesome:4.7.0-9")
+    implementation("de.jensd:fontawesomefx-fontawesome:4.7.0-11")
 
     runtime("org.openjfx:javafx-graphics:$javafx.version:win")
     runtime("org.openjfx:javafx-graphics:$javafx.version:linux")

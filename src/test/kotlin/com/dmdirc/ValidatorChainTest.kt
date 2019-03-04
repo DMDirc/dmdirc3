@@ -1,3 +1,5 @@
+package com.dmdirc
+
 import com.dmdirc.ValidatorChain
 import io.mockk.mockk
 import io.mockk.verify
