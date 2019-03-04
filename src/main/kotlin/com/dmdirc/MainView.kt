@@ -22,7 +22,7 @@ class NodeListCellFactory : Callback<ListView<WindowModel>, ListCell<WindowModel
 class NodeListCell : ListCell<WindowModel>() {
     override fun updateItem(node: WindowModel?, empty: Boolean) {
         super.updateItem(node, empty)
-        if (node != null) {
+        if (node != null && !empty) {
             styleClass.removeIf { s ->
                 s.startsWith("node-")
             }
@@ -30,6 +30,13 @@ class NodeListCell : ListCell<WindowModel>() {
             text = when (node.type) {
                 WindowType.SERVER -> "${node.name} [${node.connection?.networkName ?: ""}]"
                 else -> node.name
+            }
+        }
+        if (empty) {
+            text = ""
+            graphic = null
+            styleClass.removeIf { s ->
+                s.startsWith("node-")
             }
         }
     }
