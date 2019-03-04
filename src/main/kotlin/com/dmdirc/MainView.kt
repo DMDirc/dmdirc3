@@ -21,7 +21,7 @@ class NodeListCellFactory(private val list: ListView<WindowModel>) : Callback<Li
 
 class NodeListCell(list: ListView<WindowModel>) : ListCell<WindowModel>() {
     init {
-        prefWidthProperty().bind(list.widthProperty().subtract(20))
+        prefWidthProperty().bind(list.widthProperty())
         maxWidth = Control.USE_PREF_SIZE
     }
     override fun updateItem(node: WindowModel?, empty: Boolean) {
