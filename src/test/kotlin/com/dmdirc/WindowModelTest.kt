@@ -1,6 +1,7 @@
 package com.dmdirc
 
 import com.dmdirc.ktirc.events.*
+import com.dmdirc.ktirc.model.ConnectionError
 import com.dmdirc.ktirc.model.User
 import com.jukusoft.i18n.I
 import io.mockk.every
@@ -163,7 +164,14 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ChannelParted(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "Mess with the best"))
+        model.handleEvent(
+            ChannelParted(
+                EventMetadata(TestConstants.time),
+                User("acidBurn"),
+                "#channel",
+                "Mess with the best"
+            )
+        )
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -181,7 +189,14 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.message] } returns "<%s> %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(MessageReceived(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "Mess with the best"))
+        model.handleEvent(
+            MessageReceived(
+                EventMetadata(TestConstants.time),
+                User("acidBurn"),
+                "#channel",
+                "Mess with the best"
+            )
+        )
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -235,7 +250,14 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ChannelQuit(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "Mess with the best"))
+        model.handleEvent(
+            ChannelQuit(
+                EventMetadata(TestConstants.time),
+                User("acidBurn"),
+                "#channel",
+                "Mess with the best"
+            )
+        )
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -244,6 +266,54 @@ internal class WindowModelTest {
                 StyledSpan(" -- ", emptySet()),
                 StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
                 StyledSpan(" quit (Mess with the best)", emptySet())
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays connected events`() {
+        val model = WindowModel("server", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.serverEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ServerConnected(EventMetadata(TestConstants.time)))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- Connected", emptySet())
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays disconnected events`() {
+        val model = WindowModel("server", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.serverEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ServerDisconnected(EventMetadata(TestConstants.time)))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- Disconnected", emptySet())
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays connection errors with details`() {
+        val model = WindowModel("server", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.serverEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ServerConnectionError(EventMetadata(TestConstants.time), ConnectionError.BadTlsCertificate, "details"))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- Error: BadTlsCertificate - details", emptySet())
             ), model.lines[0]
         )
     }
