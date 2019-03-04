@@ -48,23 +48,23 @@ class MainView(
     init {
         top = MenuBar().apply {
             menus.addAll(
-                Menu("File").apply {
+                Menu(tr("File")).apply {
                     items.add(
-                        MenuItem("Quit").apply {
+                        MenuItem(tr("Quit")).apply {
                             setOnAction {
                                 visibleProperty().value = false
                             }
                         }
                     )
                 },
-                Menu("IRC").apply {
+                Menu(tr("IRC")).apply {
                     items.addAll(
-                        MenuItem("Server List").apply {
+                        MenuItem(tr("Server List")).apply {
                             setOnAction {
                                 ServerListController(controller, primaryStage, config).create()
                             }
                         },
-                        MenuItem("Join Channel").apply {
+                        MenuItem(tr("Join Channel")).apply {
                             setOnAction {
                                 joinDialogProvider().show()
                             }
@@ -72,9 +72,9 @@ class MainView(
                         }
                     )
                 },
-                Menu("Settings").apply {
+                Menu(tr("Settings")).apply {
                     items.add(
-                        MenuItem("Settings").apply {
+                        MenuItem(tr("Settings")).apply {
                             setOnAction {
                                 settingsDialogProvider().show()
                             }
