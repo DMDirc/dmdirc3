@@ -13,13 +13,17 @@ import javafx.stage.Stage
 import javafx.util.Callback
 import javafx.util.StringConverter
 
-class NodeListCellFactory : Callback<ListView<WindowModel>, ListCell<WindowModel>> {
+class NodeListCellFactory(private val list: ListView<WindowModel>) : Callback<ListView<WindowModel>, ListCell<WindowModel>> {
     override fun call(param: ListView<WindowModel>?): ListCell<WindowModel> {
-        return NodeListCell()
+        return NodeListCell(list)
     }
 }
 
-class NodeListCell : ListCell<WindowModel>() {
+class NodeListCell(list: ListView<WindowModel>) : ListCell<WindowModel>() {
+    init {
+        prefWidthProperty().bind(list.widthProperty().subtract(20))
+        maxWidth = Control.USE_PREF_SIZE
+    }
     override fun updateItem(node: WindowModel?, empty: Boolean) {
         super.updateItem(node, empty)
         if (node != null && !empty) {
@@ -31,6 +35,10 @@ class NodeListCell : ListCell<WindowModel>() {
                 WindowType.SERVER -> "${node.name} [${node.connection?.networkName ?: ""}]"
                 else -> node.name
             }
+            tooltip = Tooltip(when (node.type) {
+                WindowType.SERVER -> "${node.name} [${node.connection?.networkName ?: ""}]"
+                else -> node.name
+            })
         }
         if (empty) {
             text = ""
@@ -95,7 +103,7 @@ class MainView(
             selectionModel.selectedItemProperty().addListener { _, _, newValue ->
                 controller.selectedWindow.value = newValue
             }
-            cellFactory = NodeListCellFactory()
+            cellFactory = NodeListCellFactory(this)
             contextMenu = ContextMenu().apply {
                 items.addAll(
                     MenuItem(tr("Close")).apply {
