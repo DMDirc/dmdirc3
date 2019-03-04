@@ -10,133 +10,153 @@ msgstr ""
 "Last-Translator: chameth <crowdin@vacso.co.uk>\n"
 "Language-Team: English, United States\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2019-03-02 12:14\n"
+"PO-Revision-Date: 2019-03-04 16:19\n"
 
-#: src/main/kotlin/Connection.kt:112
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:65
 msgid "%s joined"
 msgstr ""
 
-#: src/main/kotlin/Connection.kt:117
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:70
 msgid "%s left"
 msgstr ""
 
-#: src/main/kotlin/Connection.kt:119
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:72
 msgid "%s left (%s)"
 msgstr ""
 
-#: src/main/kotlin/Connection.kt:134
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:78
 msgid "%s quit"
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:138
-msgid "Add"
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:80
+msgid "%s quit (%s)"
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:121
-msgid "Auto Connect"
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:172
+msgid "AutoConnect: "
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:162 src/main/kotlin/JoinDialog.kt:83
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:201
+#: src/main/kotlin/com/dmdirc/JoinDialog.kt:83
 msgid "Cancel"
 msgstr ""
 
-#: src/main/kotlin/MainView.kt:69 src/main/kotlin/SettingsDialog.kt:101
+#: src/main/kotlin/com/dmdirc/MainView.kt:101
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:101
 msgid "Close"
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:130
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:179
 msgid "Connect"
 msgstr ""
 
-#: src/main/kotlin/Connection.kt:77
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:58
 msgid "Connected"
 msgstr ""
 
-#: src/main/kotlin/MainView.kt:99
+#: src/main/kotlin/com/dmdirc/MainView.kt:129
 msgid "DMDirc"
 msgstr ""
 
-#: src/main/kotlin/MainView.kt:100
+#: src/main/kotlin/com/dmdirc/MainView.kt:130
 msgid "DMDirc: %s"
 msgstr ""
 
-#: src/main/kotlin/MainView.kt:101
+#: src/main/kotlin/com/dmdirc/MainView.kt:131
 msgid "DMDirc: %s | %s"
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:151
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:184
 msgid "Delete"
 msgstr ""
 
-#: src/main/kotlin/Connection.kt:85
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:60
 msgid "Disconnected"
 msgstr ""
 
-#: src/main/kotlin/Connection.kt:89
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:62
 msgid "Error: %s - %s"
 msgstr ""
 
-#: src/main/kotlin/MainView.kt:25
+#: src/main/kotlin/com/dmdirc/MainView.kt:58
 msgid "File"
 msgstr ""
 
-#: src/main/kotlin/MainView.kt:32
+#: src/main/kotlin/com/dmdirc/MainView.kt:67
 msgid "IRC"
 msgstr ""
 
-#: src/main/kotlin/JoinDialog.kt:78 src/main/kotlin/MainView.kt:38
+#: src/main/kotlin/com/dmdirc/JoinDialog.kt:78
 msgid "Join"
 msgstr ""
 
-#: src/main/kotlin/SettingsDialog.kt:79
+#: src/main/kotlin/com/dmdirc/MainView.kt:74
+msgid "Join Channel"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:79
 msgid "Nickname: "
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:111
-msgid "Password"
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:164
+msgid "Password: "
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:106
-msgid "Port"
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:160
+msgid "Port: "
 msgstr ""
 
-#: src/main/kotlin/SettingsDialog.kt:78
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:78
 msgid "Profile"
 msgstr ""
 
-#: src/main/kotlin/MainView.kt:26
+#: src/main/kotlin/com/dmdirc/MainView.kt:60
 msgid "Quit"
 msgstr ""
 
-#: src/main/kotlin/SettingsDialog.kt:83
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:83
 msgid "Realname: "
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:156 src/main/kotlin/SettingsDialog.kt:93
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:195
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:93
 msgid "Save"
 msgstr ""
 
-#: src/main/kotlin/MainView.kt:33
+#: src/main/kotlin/com/dmdirc/MainView.kt:69
 msgid "Server List"
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:100
-msgid "Server Name"
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:156
+msgid "Server Name: "
 msgstr ""
 
-#: src/main/kotlin/MainView.kt:45 src/main/kotlin/MainView.kt:46
+#: src/main/kotlin/com/dmdirc/MainView.kt:82
+#: src/main/kotlin/com/dmdirc/MainView.kt:84
 msgid "Settings"
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:116
-msgid "TLS"
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:168
+msgid "TLS: "
 msgstr ""
 
-#: src/main/kotlin/SettingsDialog.kt:87
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:87
 msgid "Username: "
 msgstr ""
 
-#: src/main/kotlin/ConnectDialog.kt:92
-msgid "[Empty]"
+#: src/main/kotlin/com/dmdirc/Translations.kt:21
+msgid "the address could not be resolved"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/Translations.kt:22
+msgid "the connection was refused"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/Translations.kt:23
+msgid "the server's certificate was not valid"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/Translations.kt:20
+msgid "unknown error"
 msgstr ""
 

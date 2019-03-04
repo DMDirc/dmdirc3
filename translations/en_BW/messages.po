@@ -10,133 +10,153 @@ msgstr ""
 "Last-Translator: chameth <crowdin@vacso.co.uk>\n"
 "Language-Team: Backwards\n"
 "Language: en_BW\n"
-"PO-Revision-Date: 2019-03-02 12:14\n"
+"PO-Revision-Date: 2019-03-04 16:27\n"
 
-#: src/main/kotlin/Connection.kt:112
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:65
 msgid "%s joined"
-msgstr ""
+msgstr "%s denioj"
 
-#: src/main/kotlin/Connection.kt:117
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:70
 msgid "%s left"
-msgstr ""
+msgstr "%s tfel"
 
-#: src/main/kotlin/Connection.kt:119
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:72
 msgid "%s left (%s)"
-msgstr ""
+msgstr "%s tfel (%s)"
 
-#: src/main/kotlin/Connection.kt:134
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:78
 msgid "%s quit"
-msgstr ""
+msgstr "%s tiuq"
 
-#: src/main/kotlin/ConnectDialog.kt:138
-msgid "Add"
-msgstr "Dda"
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:80
+msgid "%s quit (%s)"
+msgstr "%s tiuq (%s)"
 
-#: src/main/kotlin/ConnectDialog.kt:121
-msgid "Auto Connect"
-msgstr "Tcennoc otuA"
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:172
+msgid "AutoConnect: "
+msgstr "TcennocOtua: "
 
-#: src/main/kotlin/ConnectDialog.kt:162 src/main/kotlin/JoinDialog.kt:83
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:201
+#: src/main/kotlin/com/dmdirc/JoinDialog.kt:83
 msgid "Cancel"
 msgstr "Lecnac"
 
-#: src/main/kotlin/MainView.kt:69 src/main/kotlin/SettingsDialog.kt:101
+#: src/main/kotlin/com/dmdirc/MainView.kt:101
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:101
 msgid "Close"
 msgstr "Esolc"
 
-#: src/main/kotlin/ConnectDialog.kt:130
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:179
 msgid "Connect"
 msgstr "Tcennoc"
 
-#: src/main/kotlin/Connection.kt:77
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:58
 msgid "Connected"
-msgstr ""
+msgstr "Detcennoc"
 
-#: src/main/kotlin/MainView.kt:99
+#: src/main/kotlin/com/dmdirc/MainView.kt:129
 msgid "DMDirc"
 msgstr "CRIdmd"
 
-#: src/main/kotlin/MainView.kt:100
+#: src/main/kotlin/com/dmdirc/MainView.kt:130
 msgid "DMDirc: %s"
 msgstr "CRIdmd: %s"
 
-#: src/main/kotlin/MainView.kt:101
+#: src/main/kotlin/com/dmdirc/MainView.kt:131
 msgid "DMDirc: %s | %s"
 msgstr "CRIdmd: %s | %s"
 
-#: src/main/kotlin/ConnectDialog.kt:151
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:184
 msgid "Delete"
 msgstr "Eteled"
 
-#: src/main/kotlin/Connection.kt:85
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:60
 msgid "Disconnected"
-msgstr ""
+msgstr "Detcennocsid"
 
-#: src/main/kotlin/Connection.kt:89
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:62
 msgid "Error: %s - %s"
-msgstr ""
+msgstr "Rorre: %s - %s"
 
-#: src/main/kotlin/MainView.kt:25
+#: src/main/kotlin/com/dmdirc/MainView.kt:58
 msgid "File"
 msgstr "Elif"
 
-#: src/main/kotlin/MainView.kt:32
+#: src/main/kotlin/com/dmdirc/MainView.kt:67
 msgid "IRC"
 msgstr "CRI"
 
-#: src/main/kotlin/JoinDialog.kt:78 src/main/kotlin/MainView.kt:38
+#: src/main/kotlin/com/dmdirc/JoinDialog.kt:78
 msgid "Join"
 msgstr "Nioj"
 
-#: src/main/kotlin/SettingsDialog.kt:79
+#: src/main/kotlin/com/dmdirc/MainView.kt:74
+msgid "Join Channel"
+msgstr "Lennahc Nioj"
+
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:79
 msgid "Nickname: "
 msgstr "Emankcin: "
 
-#: src/main/kotlin/ConnectDialog.kt:111
-msgid "Password"
-msgstr "Drowssap"
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:164
+msgid "Password: "
+msgstr "Drowssap: "
 
-#: src/main/kotlin/ConnectDialog.kt:106
-msgid "Port"
-msgstr "Trop"
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:160
+msgid "Port: "
+msgstr "Trop: "
 
-#: src/main/kotlin/SettingsDialog.kt:78
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:78
 msgid "Profile"
 msgstr "Eliforp"
 
-#: src/main/kotlin/MainView.kt:26
+#: src/main/kotlin/com/dmdirc/MainView.kt:60
 msgid "Quit"
 msgstr "Tiuq"
 
-#: src/main/kotlin/SettingsDialog.kt:83
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:83
 msgid "Realname: "
 msgstr "Emanlaer: "
 
-#: src/main/kotlin/ConnectDialog.kt:156 src/main/kotlin/SettingsDialog.kt:93
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:195
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:93
 msgid "Save"
 msgstr "Evas"
 
-#: src/main/kotlin/MainView.kt:33
+#: src/main/kotlin/com/dmdirc/MainView.kt:69
 msgid "Server List"
 msgstr "Tsil revres"
 
-#: src/main/kotlin/ConnectDialog.kt:100
-msgid "Server Name"
-msgstr "Eman revres"
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:156
+msgid "Server Name: "
+msgstr "Eman revres: "
 
-#: src/main/kotlin/MainView.kt:45 src/main/kotlin/MainView.kt:46
+#: src/main/kotlin/com/dmdirc/MainView.kt:82
+#: src/main/kotlin/com/dmdirc/MainView.kt:84
 msgid "Settings"
 msgstr "Sgnittes"
 
-#: src/main/kotlin/ConnectDialog.kt:116
-msgid "TLS"
-msgstr "SLT"
+#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:168
+msgid "TLS: "
+msgstr "SLT: "
 
-#: src/main/kotlin/SettingsDialog.kt:87
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:87
 msgid "Username: "
 msgstr "Emanresu: "
 
-#: src/main/kotlin/ConnectDialog.kt:92
-msgid "[Empty]"
-msgstr "[Ytpme]"
+#: src/main/kotlin/com/dmdirc/Translations.kt:21
+msgid "the address could not be resolved"
+msgstr "devloser eb ton dluoc sserdda eht"
+
+#: src/main/kotlin/com/dmdirc/Translations.kt:22
+msgid "the connection was refused"
+msgstr "desufer saw noitcennoc eht"
+
+#: src/main/kotlin/com/dmdirc/Translations.kt:23
+msgid "the server's certificate was not valid"
+msgstr "dilav ton saw etacfitrec s'revres eht"
+
+#: src/main/kotlin/com/dmdirc/Translations.kt:20
+msgid "unknown error"
+msgstr "rorre nwonknu"
 
