@@ -3,6 +3,7 @@ package com.dmdirc
 import com.dmdirc.ClientSpec.Formatting.action
 import com.dmdirc.ClientSpec.Formatting.channelEvent
 import com.dmdirc.ClientSpec.Formatting.message
+import com.dmdirc.ClientSpec.Formatting.serverEvent
 import com.dmdirc.ktirc.events.*
 import com.dmdirc.ktirc.model.User
 import com.jukusoft.i18n.I.tr
@@ -53,35 +54,43 @@ class WindowModel(
     private fun displayEvent(event: IrcEvent) {
         val ts = event.timestamp
         when (event) {
-            is ChannelJoined -> addLine(ts, channelEvent, tr("%s joined").format(event.user.formattedNickname))
-            is ChannelParted -> addLine(
-                ts, channelEvent,
-                if (event.reason.isEmpty())
-                    tr("%s left").format(event.user.formattedNickname)
-                else
-                    tr("%s left (%s)").format(event.user.formattedNickname, event.reason)
-            )
-            is ChannelQuit -> addLine(
-                ts, channelEvent,
-                if (event.reason.isEmpty())
-                    tr("%s quit").format(event.user.formattedNickname)
-                else
-                    tr("%s quit (%s)").format(event.user.formattedNickname, event.reason)
-            )
+            is ServerConnected ->
+                addLine(ts, serverEvent, tr("Connected"))
+            is ServerDisconnected ->
+                addLine(ts, serverEvent, tr("Disconnected"))
+            is ServerConnectionError ->
+                addLine(ts, serverEvent, tr("Error: %s - %s").format(event.error, event.details ?: ""))
 
-            is MessageReceived -> addLine(ts, message, event.user.formattedNickname, event.message)
-            is ActionReceived -> addLine(ts, action, event.user.formattedNickname, event.action)
+            is ChannelJoined ->
+                addLine(ts, channelEvent, tr("%s joined").format(event.user.formattedNickname))
+            is ChannelParted ->
+                addLine(
+                    ts, channelEvent,
+                    if (event.reason.isEmpty())
+                        tr("%s left").format(event.user.formattedNickname)
+                    else
+                        tr("%s left (%s)").format(event.user.formattedNickname, event.reason)
+                )
+            is ChannelQuit ->
+                addLine(
+                    ts, channelEvent,
+                    if (event.reason.isEmpty())
+                        tr("%s quit").format(event.user.formattedNickname)
+                    else
+                        tr("%s quit (%s)").format(event.user.formattedNickname, event.reason)
+                )
+
+            is MessageReceived ->
+                addLine(ts, message, event.user.formattedNickname, event.message)
+            is ActionReceived ->
+                addLine(ts, action, event.user.formattedNickname, event.action)
         }
     }
 
     fun addLine(timestamp: String, format: Item<String>, vararg args: String) =
         addLine(
-            sequenceOf(
-                StyledSpan(
-                    timestamp,
-                    setOf(Style.CustomStyle("timestamp"))
-                )
-            ) + " ${config[format].format(*args)}".detectLinks().convertControlCodes()
+            sequenceOf(StyledSpan(timestamp, setOf(Style.CustomStyle("timestamp"))))
+                    + " ${config[format].format(*args)}".detectLinks().convertControlCodes()
         )
 
     private fun addLine(spans: Sequence<StyledSpan>) {
