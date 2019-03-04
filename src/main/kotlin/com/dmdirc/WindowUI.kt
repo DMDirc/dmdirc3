@@ -54,8 +54,13 @@ class WindowModel(
     }
 
     fun handleInput() {
-        if (inputField.value.isNotEmpty()) {
-            connection?.sendMessage(name.value, inputField.value)
+        val text = inputField.value
+        if (text.isNotEmpty()) {
+            if (text.startsWith("/me ")) {
+                connection?.sendAction(name.value, text.substring(4))
+            } else {
+                connection?.sendMessage(name.value, text)
+            }
             inputField.value = ""
         }
     }
