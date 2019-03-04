@@ -99,10 +99,7 @@ class Connection(
                 networkName = client.serverState.features[ServerFeature.Network] ?: ""
                 runLater {
                     model.name.value = client.serverState.serverName
-                    model.title.value = when (model.type) {
-                        WindowType.SERVER -> "${model.name.value} [${model.connection?.networkName ?: ""}]"
-                        else -> model.name.value
-                    }
+                    model.title.value = "${model.name.value} [${model.connection?.networkName ?: ""}]"
                 }
             }
             event is ServerDisconnected -> runLater { connected.value = false }
