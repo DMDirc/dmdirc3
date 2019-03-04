@@ -97,7 +97,7 @@ class Connection(
             event is ServerReady -> {
                 connected.value = true
                 networkName = client.serverState.features[ServerFeature.Network] ?: ""
-                model.name = client.serverState.serverName
+                model.name.value = client.serverState.serverName
             }
             event is ServerDisconnected -> runLater { connected.value = false }
             event is ChannelJoined && client.isLocalUser(event.user) -> runLater {
@@ -115,7 +115,7 @@ class Connection(
         }
 
         if (event is TargetedEvent) {
-            // TODO: Handle events that are targetted to us (private messages etc)
+            // TODO: Handle events that are targeted to us (private messages etc)
             runLater { windowModel(event.target)?.handleEvent(event) }
         } else {
             runLater { model.handleEvent(event) }
@@ -140,7 +140,7 @@ class Connection(
         val observable: ObservableSet<Child> = values.readOnly()
 
         operator fun get(name: String) = synchronized(values) {
-            values.find { caseMappingProvider().areEquivalent(it.model.name, name) }
+            values.find { caseMappingProvider().areEquivalent(it.model.name.value, name) }
         }
 
         operator fun plusAssign(value: Child): Unit = synchronized(values) {
@@ -148,7 +148,7 @@ class Connection(
         }
 
         operator fun minusAssign(name: String): Unit = synchronized(values) {
-            values.removeIf { caseMappingProvider().areEquivalent(it.model.name, name) }
+            values.removeIf { caseMappingProvider().areEquivalent(it.model.name.value, name) }
         }
 
         operator fun contains(name: String) = get(name) != null

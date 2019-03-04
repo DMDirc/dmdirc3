@@ -31,14 +31,15 @@ class NodeListCell(list: ListView<WindowModel>) : ListCell<WindowModel>() {
                 s.startsWith("node-")
             }
             styleClass.add("node-${node.type.name.toLowerCase()}")
-            text = when (node.type) {
-                WindowType.SERVER -> "${node.name} [${node.connection?.networkName ?: ""}]"
-                else -> node.name
+            val title = when (node.type) {
+                WindowType.SERVER -> "${node.name.value} [${node.connection?.networkName ?: ""}]"
+                else -> node.name.value
             }
-            tooltip = Tooltip(when (node.type) {
-                WindowType.SERVER -> "${node.name} [${node.connection?.networkName ?: ""}]"
-                else -> node.name
-            })
+            text = title
+            tooltip = Tooltip(title)
+            if (node.hasUnreadMessages.value) {
+                styleClass.add("node-unread")
+            }
         }
         if (empty) {
             text = ""
@@ -111,7 +112,7 @@ class MainView(
                             if (controller.selectedWindow.value.isConnection) {
                                 controller.selectedWindow.value.connection?.disconnect()
                             } else {
-                                controller.leaveChannel(controller.selectedWindow.value.name)
+                                controller.leaveChannel(controller.selectedWindow.value.name.value)
                             }
                         }
                     }
@@ -123,7 +124,7 @@ class MainView(
         titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
         controller.selectedWindow.addListener { _, _, newValue ->
             selectedWindow.value = newValue?.let {
-                it.connection?.children?.get(it.name)?.ui
+                it.connection?.children?.get(it.name.value)?.ui
             } ?: VBox()
         }
     }
@@ -136,7 +137,7 @@ class TitleStringConverter : StringConverter<WindowModel>() {
     override fun toString(window: WindowModel?): String = when {
         window == null -> tr("DMDirc")
         window.isConnection -> tr("DMDirc: %s").format(window.connection?.networkName ?: "")
-        else -> tr("DMDirc: %s | %s").format(window.name, window.connection?.networkName ?: "")
+        else -> tr("DMDirc: %s | %s").format(window.name.value, window.connection?.networkName ?: "")
     }
 
 }
