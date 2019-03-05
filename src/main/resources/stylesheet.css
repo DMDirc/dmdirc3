@@ -29,11 +29,7 @@
     visibility: hidden
 }
 
-.tree-view .node-server:hover .node-cog {
-    visibility: visible
-}
-
-.tree-view .cell:selected .node-cog {
+.tree-view .node-server:hover .node-cog, .tree-view .cell:selected .node-cog {
     visibility: visible
 }
 
