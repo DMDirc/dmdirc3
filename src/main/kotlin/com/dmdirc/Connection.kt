@@ -3,6 +3,7 @@ package com.dmdirc
 import com.dmdirc.ktirc.IrcClient
 import com.dmdirc.ktirc.events.*
 import com.dmdirc.ktirc.io.CaseMapping
+import com.dmdirc.ktirc.messages.sendAction
 import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.messages.sendPart
@@ -12,7 +13,6 @@ import javafx.application.HostServices
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableSet
 import javafx.scene.Node
-import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
@@ -23,7 +23,8 @@ object ConnectionContract {
         val children: Connection.WindowMap
         var networkName: String
         fun connect()
-        fun sendMessage(channel: String, name: String)
+        fun sendMessage(channel: String, message: String)
+        fun sendAction(channel: String, action: String)
         fun joinChannel(channel: String)
         fun leaveChannel(channel: String)
         fun getUsers(channel: String): Iterable<ChannelUser>
@@ -77,8 +78,12 @@ class Connection(
         client.connect()
     }
 
-    override fun sendMessage(channel: String, name: String) {
-        client.sendMessage(channel, name)
+    override fun sendMessage(channel: String, message: String) {
+        client.sendMessage(channel, message)
+    }
+
+    override fun sendAction(channel: String, action: String) {
+        client.sendAction(channel, action)
     }
 
     override fun joinChannel(channel: String) {
@@ -124,9 +129,6 @@ class Connection(
             runLater { model.handleEvent(event) }
         }
     }
-
-    private val IrcEvent.timestamp: String
-        get() = metadata.time.format(DateTimeFormatter.ofPattern(config1[ClientSpec.Formatting.timestamp]))
 
     private fun windowModel(windowName: String) = children[windowName]?.model
 

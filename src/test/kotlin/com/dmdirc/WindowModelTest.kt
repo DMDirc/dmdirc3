@@ -69,6 +69,16 @@ internal class WindowModelTest {
     }
 
     @Test
+    fun `sends actions to controller when input is prefixed with me`() {
+        val model = WindowModel("name", WindowType.ROOT, mockConnection, mockk(), null)
+        model.inputField.value = "/me hacks the planet"
+        model.handleInput()
+        verify {
+            mockConnection.sendAction("name", "hacks the planet")
+        }
+    }
+
+    @Test
     fun `blanks input field after sending message`() {
         val model = WindowModel("name", WindowType.ROOT, mockConnection, mockk(), null)
         model.inputField.value = "Mess with the best"
@@ -135,7 +145,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" joined", emptySet())
             ), model.lines[0]
         )
@@ -153,7 +163,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" left", emptySet())
             ), model.lines[0]
         )
@@ -178,7 +188,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" left (Mess with the best)", emptySet())
             ), model.lines[0]
         )
@@ -203,7 +213,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" <", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan("> Mess with the best", emptySet())
             ), model.lines[0]
         )
@@ -221,7 +231,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" * ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" hacks", emptySet())
             ), model.lines[0]
         )
@@ -239,7 +249,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" quit", emptySet())
             ), model.lines[0]
         )
@@ -264,7 +274,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" quit (Mess with the best)", emptySet())
             ), model.lines[0]
         )
