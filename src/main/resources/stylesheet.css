@@ -25,6 +25,18 @@
     -fx-text-fill: #ffffff;
 }
 
+.tree-view .node-server .node-cog {
+    visibility: hidden
+}
+
+.tree-view .node-server:hover .node-cog {
+    visibility: visible
+}
+
+.tree-view .cell:selected .node-cog {
+    visibility: visible
+}
+
 /* Hide the horizontal scrollbar in the tree-view (yuck). */
 .tree-view .scroll-bar:horizontal .increment-arrow,
 .tree-view .scroll-bar:horizontal .decrement-arrow,
