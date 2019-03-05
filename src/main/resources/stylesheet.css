@@ -9,12 +9,11 @@
 }
 
 .tree-view .node-channel {
-    -fx-label-padding: 5px 5px 5px 20px;
+    -fx-padding: 5px 5px 5px 20px;
 }
 
 .tree-view .node-server {
-    -fx-label-padding: 5px 5px 5px 5px;
-    -fx-background-color: #dfdfdf;
+    -fx-padding: 5px 5px 5px 5px;
 }
 
 .tree-view .cell {
