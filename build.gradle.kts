@@ -85,7 +85,17 @@ tasks {
         manifest.attributes.apply {
             put("Main-Class", mainClass)
         }
-        from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+        from(configurations.runtimeClasspath.get().map {
+            if (it.isDirectory) {
+                it
+            } else {
+                zipTree(it).matching {
+                    exclude("META-INF/*.SF")
+                    exclude("META-INF/*.DSA")
+                    exclude("META-INF/*.RSA")
+                }
+            }
+        })
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 
