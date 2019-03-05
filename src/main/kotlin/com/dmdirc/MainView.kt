@@ -17,21 +17,66 @@ import javafx.stage.Stage
 import javafx.util.Callback
 import javafx.util.StringConverter
 
-class NodeListCellFactory(private val list: ListView<WindowModel>) : Callback<ListView<WindowModel>, ListCell<WindowModel>> {
-    override fun call(param: ListView<WindowModel>?): ListCell<WindowModel> {
-        return NodeListCell(list)
+class ServerContextMenu(
+    private val joinDialogProvider: () -> JoinDialog,
+    private val controller: MainContract.Controller
+) : ContextMenu() {
+    init {
+        items.addAll(
+            MenuItem(tr("Join Channel")).apply {
+                setOnAction {
+                    joinDialogProvider().show()
+                }
+                disableProperty().bind(controller.selectedWindow.isNull)
+            },
+            MenuItem(tr("Disconnect")).apply {
+                setOnAction {
+                    controller.selectedWindow.value?.connection?.disconnect()
+                }
+            }
+        )
     }
 }
 
-class NodeListCell(list: ListView<WindowModel>) : ListCell<WindowModel>() {
+class ChannelContextMenu(
+    private val controller: MainContract.Controller
+) : ContextMenu() {
+    init {
+        items.add(
+            MenuItem(tr("Close")).apply {
+                setOnAction {
+                    controller.leaveChannel(controller.selectedWindow.value.name.value)
+                }
+            }
+        )
+    }
+}
+
+class NodeListCellFactory(
+    private val list: ListView<WindowModel>,
+    private val joinDialogProvider: () -> JoinDialog,
+    private val controller: MainContract.Controller
+) : Callback<ListView<WindowModel>, ListCell<WindowModel>> {
+    override fun call(param: ListView<WindowModel>?): ListCell<WindowModel> {
+        return NodeListCell(list, joinDialogProvider, controller)
+    }
+}
+
+class NodeListCell(
+    list: ListView<WindowModel>,
+    private val joinDialogProvider: () -> JoinDialog,
+    private val controller: MainContract.Controller
+) : ListCell<WindowModel>() {
     init {
         prefWidthProperty().bind(list.widthProperty())
         maxWidth = Control.USE_PREF_SIZE
     }
+
     override fun updateItem(node: WindowModel?, empty: Boolean) {
         super.updateItem(node, empty)
         if (node != null && !empty) {
             graphic = BorderPane().apply {
+                contextMenu = ServerContextMenu(joinDialogProvider, controller)
                 styleClass.add("node-${node.type.name.toLowerCase()}")
                 if (node.hasUnreadMessages.value) {
                     styleClass.add("node-unread")
@@ -40,9 +85,7 @@ class NodeListCell(list: ListView<WindowModel>) : ListCell<WindowModel>() {
                     right = Label().apply {
                         styleClass.add("node-cog")
                         graphic = FontAwesomeIconView(FontAwesomeIcon.COG)
-                        contextMenu = ContextMenu().apply {
-                            items.add(MenuItem(tr("Placeholder")))
-                        }
+                        contextMenu = ServerContextMenu(joinDialogProvider, controller)
                         //TODO: This needs to work cross platform as expected
                         onMouseClicked = EventHandler {
                             if (it.button == MouseButton.PRIMARY) {
@@ -51,6 +94,8 @@ class NodeListCell(list: ListView<WindowModel>) : ListCell<WindowModel>() {
                         }
 
                     }
+                } else {
+                    contextMenu = ChannelContextMenu(controller)
                 }
                 left = Label(node.title.value)
             }
@@ -65,7 +110,7 @@ class NodeListCell(list: ListView<WindowModel>) : ListCell<WindowModel>() {
 class MainView(
     private val controller: MainContract.Controller,
     val config: ClientConfig,
-    val joinDialogProvider: () -> JoinDialog,
+    private val joinDialogProvider: () -> JoinDialog,
     val settingsDialogProvider: () -> SettingsDialog,
     private val primaryStage: Stage,
     titleProperty: StringProperty
@@ -75,27 +120,12 @@ class MainView(
     init {
         top = MenuBar().apply {
             menus.addAll(
-                Menu(tr("File")).apply {
-                    items.add(
-                        MenuItem(tr("Quit")).apply {
-                            setOnAction {
-                                primaryStage.close()
-                            }
-                        }
-                    )
-                },
                 Menu(tr("IRC")).apply {
                     items.addAll(
                         MenuItem(tr("Server List")).apply {
                             setOnAction {
                                 ServerListController(controller, primaryStage, config).create()
                             }
-                        },
-                        MenuItem(tr("Join Channel")).apply {
-                            setOnAction {
-                                joinDialogProvider().show()
-                            }
-                            disableProperty().bind(controller.selectedWindow.isNull)
                         }
                     )
                 },
@@ -115,20 +145,7 @@ class MainView(
             selectionModel.selectedItemProperty().addListener { _, _, newValue ->
                 controller.selectedWindow.value = newValue
             }
-            cellFactory = NodeListCellFactory(this)
-            contextMenu = ContextMenu().apply {
-                items.addAll(
-                    MenuItem(tr("Close")).apply {
-                        setOnAction {
-                            if (controller.selectedWindow.value.isConnection) {
-                                controller.selectedWindow.value.connection?.disconnect()
-                            } else {
-                                controller.leaveChannel(controller.selectedWindow.value.name.value)
-                            }
-                        }
-                    }
-                )
-            }
+            cellFactory = NodeListCellFactory(this, joinDialogProvider, controller)
         }
         centerProperty().bindBidirectional(selectedWindow)
         primaryStage.icons.add(Image(MainView::class.java.getResourceAsStream("/logo.png")))
