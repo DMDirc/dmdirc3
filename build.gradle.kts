@@ -1,4 +1,6 @@
+
 import com.install4j.gradle.Install4jTask
+import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "com.dmdirc"
@@ -15,7 +17,11 @@ plugins {
 }
 
 install4j {
-    installDir = File("C:\\Program Files\\install4j7")
+    if (OperatingSystem.current().isLinux) {
+        installDir = File("/opt/install4j7/")
+    } else if (OperatingSystem.current().isWindows) {
+        installDir = File("C:\\Program Files\\install4j7")
+    }
     license = System.getenv("i4jlicense")
 }
 
