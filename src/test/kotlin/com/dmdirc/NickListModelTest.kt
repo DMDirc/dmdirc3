@@ -13,6 +13,7 @@ internal class NickListModelTest {
 
     private val mockController = mockk<ConnectionContract.Controller>()
     private val model = NickListModel(mockController)
+    private val metaData = mockk<EventMetadata>()
 
     @Test
     fun `starts with an empty list`() {
@@ -21,7 +22,7 @@ internal class NickListModelTest {
 
     @Test
     fun `adds user on join`() {
-        model.handleEvent(ChannelJoined(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
+        model.handleEvent(ChannelJoined(metaData, User("acidBurn"), "#channel"))
         assertEquals(1, model.users.size)
         assertEquals("acidBurn", model.users[0])
     }
@@ -30,7 +31,7 @@ internal class NickListModelTest {
     fun `renames user on nick change`() {
         model.users += "acidBurn"
         model.users += "zeroCool"
-        model.handleEvent(ChannelNickChanged(EventMetadata(TestConstants.time), User("zeroCool"), "#channel", "crashOverride"))
+        model.handleEvent(ChannelNickChanged(metaData, User("zeroCool"), "#channel", "crashOverride"))
         assertEquals(2, model.users.size)
         assertEquals("acidBurn", model.users[0])
         assertEquals("crashOverride", model.users[1])
@@ -40,7 +41,7 @@ internal class NickListModelTest {
     fun `removes user on part`() {
         model.users += "acidBurn"
         model.users += "zeroCool"
-        model.handleEvent(ChannelParted(EventMetadata(TestConstants.time), User("zeroCool"), "#channel"))
+        model.handleEvent(ChannelParted(metaData, User("zeroCool"), "#channel"))
         assertEquals(1, model.users.size)
         assertEquals("acidBurn", model.users[0])
     }
@@ -49,7 +50,7 @@ internal class NickListModelTest {
     fun `removes user on quit`() {
         model.users += "acidBurn"
         model.users += "zeroCool"
-        model.handleEvent(ChannelQuit(EventMetadata(TestConstants.time), User("zeroCool"), "#channel"))
+        model.handleEvent(ChannelQuit(metaData, User("zeroCool"), "#channel"))
         assertEquals(1, model.users.size)
         assertEquals("acidBurn", model.users[0])
     }
@@ -58,7 +59,7 @@ internal class NickListModelTest {
     fun `removes user on kick`() {
         model.users += "acidBurn"
         model.users += "zeroCool"
-        model.handleEvent(ChannelUserKicked(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "zeroCool"))
+        model.handleEvent(ChannelUserKicked(metaData, User("acidBurn"), "#channel", "zeroCool"))
         assertEquals(1, model.users.size)
         assertEquals("acidBurn", model.users[0])
     }
@@ -68,7 +69,7 @@ internal class NickListModelTest {
         model.users += "acidBurn"
         model.users += "zeroCool"
         every { mockController.getUsers("#channel") } returns emptyList()
-        model.handleEvent(ChannelNamesFinished(EventMetadata(TestConstants.time), "#channel"))
+        model.handleEvent(ChannelNamesFinished(metaData, "#channel"))
         assertEquals(0, model.users.size)
     }
 
@@ -78,7 +79,7 @@ internal class NickListModelTest {
             ChannelUser("acidBurn"),
             ChannelUser("zeroCool")
         )
-        model.handleEvent(ChannelNamesFinished(EventMetadata(TestConstants.time), "#channel"))
+        model.handleEvent(ChannelNamesFinished(metaData, "#channel"))
         assertEquals(2, model.users.size)
         assertEquals("acidBurn", model.users[0])
         assertEquals("zeroCool", model.users[1])

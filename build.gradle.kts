@@ -50,11 +50,11 @@ application {
 dependencies {
     implementation("org.controlsfx:controlsfx:9.0.0")
     implementation("org.fxmisc.richtext:richtextfx:0.9.3")
-    implementation("com.dmdirc:ktirc:0.10.3")
+    implementation("com.dmdirc:ktirc:0.11.0")
     implementation("com.uchuhimo:konf:0.13.1")
     implementation("org.kodein.di:kodein-di-generic-jvm:6.1.0")
     implementation("com.jukusoft:easy-i18n-gettext:1.2.0")
-    implementation("de.jensd:fontawesomefx-fontawesome:4.7.0-5")
+    implementation("de.jensd:fontawesomefx-fontawesome:4.7.0-11")
     implementation("de.jensd:fontawesomefx-commons:11.0")
     implementation("de.jensd:fontawesomefx-controls:11.0")
 
