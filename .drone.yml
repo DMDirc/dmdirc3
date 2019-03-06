@@ -39,3 +39,18 @@ steps:
     when:
       event:
         - tag
+
+  - name: Publish
+    image: plugins/github-release
+    settings:
+      api_key:
+        from_secret: githubreleasekey
+      files:
+        - /drone/src/build/installer/DMDirc*
+        - /drone/src/build/libs/dmdircui.jar
+      checksum:
+        - sha256
+      title: ${DRONE_TAG}
+    when:
+      event:
+        - tag
