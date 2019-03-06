@@ -1,9 +1,9 @@
 package com.dmdirc
 
-import com.jukusoft.i18n.I
 import javafx.application.Application
 import javafx.application.HostServices
 import javafx.application.Platform
+import javafx.beans.property.StringProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.collections.ObservableMap
@@ -14,12 +14,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.bindings.subTypes
+import org.kodein.di.direct
 import org.kodein.di.generic.*
 import org.kodein.di.jvmType
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.*
 import java.util.logging.LogManager
 
 
@@ -27,16 +26,13 @@ internal lateinit var kodein: Kodein
 
 class MainApp : Application() {
     override fun start(stage: Stage) {
-        kodein = createKodein(stage, hostServices)
+        kodein = createKodein(stage, hostServices, stage.titleProperty())
         val config by kodein.instance<ClientConfig>()
         initInternationalisation(Path.of("translations"), config[ClientSpec.language])
-        val controller: MainContract.Controller by kodein.instance()
-        val joinDialogProvider: () -> JoinDialog by kodein.provider()
-        val settingsDialogProvider: () -> SettingsDialog by kodein.provider()
         with(stage) {
             minWidth = 800.0
             minHeight = 600.0
-            scene = Scene(MainView(controller, config, joinDialogProvider, settingsDialogProvider, stage, titleProperty()))
+            scene = Scene(kodein.direct.instance())
             show()
         }
         GlobalScope.launch {
@@ -45,10 +41,14 @@ class MainApp : Application() {
     }
 }
 
-private fun createKodein(stage: Stage, hostServices: HostServices) = Kodein {
+private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty: StringProperty) = Kodein {
     bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
     bind<HostServices>() with instance(hostServices)
     bind<MainContract.Controller>() with singleton { MainController(instance(), factory()) }
+    bind<StringProperty>("mainViewTitle") with instance(titleProperty)
+    bind<MainView>() with singleton {
+        MainView(instance(), instance(), provider(), provider(), instance(), instance("mainViewTitle"))
+    }
 
     bind<Stage>().subTypes() with {
         when (it.jvmType) {
@@ -66,7 +66,7 @@ private fun createKodein(stage: Stage, hostServices: HostServices) = Kodein {
     bind<SettingsDialogContract.ViewModel>() with provider { SettingsDialogModel(instance(), instance()) }
 }
 
-fun main(args: Array<String>) {
+fun main() {
     LogManager.getLogManager().readConfiguration(MainApp::class.java.getResourceAsStream("/logs.properties"))
     Application.launch(MainApp::class.java)
 }
