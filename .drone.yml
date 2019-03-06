@@ -7,6 +7,11 @@ steps:
     image: openjdk:11-jdk
     commands:
       - ./gradlew build test jacocoTestReport
+    when:
+      event:
+        exclude:
+          - tag
+
 
   - name: Coverage
     image: plugins/codecov
@@ -15,6 +20,10 @@ steps:
         from_secret: CODECOV_TOKEN
       files:
         - build/reports/jacoco/report.xml
+    when:
+      event:
+        exclude:
+          - tag
 
   - name: Installers
     image: openjdk:11-jdk
