@@ -21,6 +21,8 @@ steps:
     commands:
       - wget https://download-keycdn.ej-technologies.com/install4j/install4j_linux_7_0_9.deb
       - dpkg -i install4j_linux_7_0_9.deb
+      - wget -O /opt/install4j7/jres/macosx-amd64-11.0.2.tar.gz https://download.ej-technologies.com/bundles/java9/macosx-amd64-11.0.2.tar.gz
+      - wget -O /opt/install4j7/jres/windows-amd64-11.0.2.tar.gz https://download.ej-technologies.com/bundles/java9/windows-amd64-11.0.2.tar.gz
       - ./gradlew install4j
     environment:
       i4jlicense:
