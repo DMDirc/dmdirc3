@@ -42,7 +42,7 @@
       </splashScreen>
       <java mainClass="com.dmdirc.AppKt" mainMode="1" vmParameters="" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
         <classPath>
-          <archive location="dmdircui-0.1-SNAPSHOT.jar" failOnError="false" />
+          <archive location="dmdircui.jar" failOnError="false" />
         </classPath>
         <modulePath />
         <nativeLibraryDirectories />
