@@ -17,10 +17,10 @@ plugins {
 }
 
 install4j {
-    if (OperatingSystem.current().isLinux) {
-        installDir = File("/opt/install4j7/")
-    } else if (OperatingSystem.current().isWindows) {
-        installDir = File("C:\\Program Files\\install4j7")
+    installDir = when {
+        OperatingSystem.current().isLinux -> File("/opt/install4j7/")
+        OperatingSystem.current().isWindows -> File("C:\\Program Files\\install4j7")
+        else -> File("/opt/install4j7/") //TODO: Figure out where it installs on OS X
     }
     license = System.getenv("i4jlicense")
 }
