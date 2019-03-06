@@ -18,11 +18,13 @@ internal class WindowModelTest {
 
     private val mockConnection = mockk<ConnectionContract.Controller>()
     private val mockConfig = mockk<ClientConfig>()
+    private val metaData = mockk<EventMetadata>()
 
     @BeforeEach
     fun setup() {
         I.init(File("translations"), Locale.ENGLISH, "messages")
         I.setLanguage(Locale.forLanguageTag("en-GB"))
+        every { metaData.time } returns TestConstants.time
     }
 
     @Test
@@ -138,7 +140,7 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ChannelJoined(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
+        model.handleEvent(ChannelJoined(metaData, User("acidBurn"), "#channel"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -156,7 +158,7 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ChannelParted(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
+        model.handleEvent(ChannelParted(metaData, User("acidBurn"), "#channel"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -176,7 +178,7 @@ internal class WindowModelTest {
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
             ChannelParted(
-                EventMetadata(TestConstants.time),
+                metaData,
                 User("acidBurn"),
                 "#channel",
                 "Mess with the best"
@@ -201,7 +203,7 @@ internal class WindowModelTest {
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
             MessageReceived(
-                EventMetadata(TestConstants.time),
+                metaData,
                 User("acidBurn"),
                 "#channel",
                 "Mess with the best"
@@ -224,7 +226,7 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.action] } returns "* %s %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ActionReceived(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "hacks"))
+        model.handleEvent(ActionReceived(metaData, User("acidBurn"), "#channel", "hacks"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -242,7 +244,7 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ChannelQuit(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
+        model.handleEvent(ChannelQuit(metaData, User("acidBurn"), "#channel"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -262,7 +264,7 @@ internal class WindowModelTest {
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
             ChannelQuit(
-                EventMetadata(TestConstants.time),
+                metaData,
                 User("acidBurn"),
                 "#channel",
                 "Mess with the best"
@@ -285,7 +287,7 @@ internal class WindowModelTest {
         val model = WindowModel("server", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.serverEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ServerConnected(EventMetadata(TestConstants.time)))
+        model.handleEvent(ServerConnected(metaData))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -301,7 +303,7 @@ internal class WindowModelTest {
         val model = WindowModel("server", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.serverEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ServerDisconnected(EventMetadata(TestConstants.time)))
+        model.handleEvent(ServerDisconnected(metaData))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -317,7 +319,7 @@ internal class WindowModelTest {
         val model = WindowModel("server", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.serverEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ServerConnectionError(EventMetadata(TestConstants.time), ConnectionError.BadTlsCertificate, "details"))
+        model.handleEvent(ServerConnectionError(metaData, ConnectionError.BadTlsCertificate, "details"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
