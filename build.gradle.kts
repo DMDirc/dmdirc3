@@ -4,7 +4,7 @@ import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "com.dmdirc"
-version = "0.1-SNAPSHOT"
+version = ""
 val mainClass = "com.dmdirc.AppKt"
 
 plugins {
@@ -82,6 +82,7 @@ tasks {
     withType<Install4jTask> {
         dependsOn("jar")
         projectFile = "dmdirc.install4j"
+        release = System.getenv("DRONE_TAG") ?: "0.1-SNAPSHOT"
         debug = true
     }
 
