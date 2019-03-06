@@ -40,7 +40,7 @@ steps:
       event:
         - tag
 
-  -name: Publish
+  - name: Publish
     image: plugins/github-release
     settings:
       api_key:
