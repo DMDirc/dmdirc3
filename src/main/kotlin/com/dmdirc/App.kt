@@ -17,10 +17,8 @@ import org.kodein.di.bindings.subTypes
 import org.kodein.di.direct
 import org.kodein.di.generic.*
 import org.kodein.di.jvmType
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.logging.LogManager
-
 
 internal lateinit var kodein: Kodein
 
@@ -28,7 +26,7 @@ class MainApp : Application() {
     override fun start(stage: Stage) {
         kodein = createKodein(stage, hostServices, stage.titleProperty())
         val config by kodein.instance<ClientConfig>()
-        initInternationalisation(Path.of("translations"), config[ClientSpec.language])
+        initInternationalisation(Paths.get("translations"), config[ClientSpec.language])
         with(stage) {
             minWidth = 800.0
             minHeight = 600.0
