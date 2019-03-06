@@ -1,3 +1,6 @@
+
+import com.install4j.gradle.Install4jTask
+import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "com.dmdirc"
@@ -10,6 +13,16 @@ plugins {
     kotlin("jvm").version("1.3.21")
     id("org.openjfx.javafxplugin").version("0.0.7")
     id("name.remal.check-updates") version "1.0.113"
+    id("com.install4j.gradle") version "7.0.9"
+}
+
+install4j {
+    installDir = when {
+        OperatingSystem.current().isLinux -> File("/opt/install4j7/")
+        OperatingSystem.current().isWindows -> File("C:\\Program Files\\install4j7")
+        else -> File("/opt/install4j7/") //TODO: Figure out where it installs on OS X
+    }
+    license = System.getenv("i4jlicense")
 }
 
 jacoco {
@@ -65,6 +78,12 @@ configurations.all {
 }
 
 tasks {
+
+    withType<Install4jTask> {
+        dependsOn("jar")
+        projectFile = "dmdirc.install4j"
+        debug = true
+    }
 
     withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "1.8"

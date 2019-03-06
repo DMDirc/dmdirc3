@@ -15,3 +15,16 @@ steps:
         from_secret: CODECOV_TOKEN
       files:
         - build/reports/jacoco/report.xml
+
+  - name: Installers
+    image: openjdk:11-jdk
+    commands:
+      - wget https://download-keycdn.ej-technologies.com/install4j/install4j_linux_7_0_9.deb
+      - dpkg -i install4j_linux_7_0_9.deb
+      - ./gradlew install4j
+    environment:
+      i4jlicense:
+        from_secret: install4jkey
+    when:
+      event:
+        - tag
