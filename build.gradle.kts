@@ -83,7 +83,6 @@ tasks {
         dependsOn("jar")
         projectFile = "dmdirc.install4j"
         release = System.getenv("DRONE_TAG") ?: "0.1-SNAPSHOT"
-        debug = true
     }
 
     withType<KotlinCompile> {
