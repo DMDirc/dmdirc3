@@ -3,11 +3,15 @@ package com.dmdirc
 import javafx.application.Application
 import javafx.application.HostServices
 import javafx.application.Platform
+import javafx.beans.property.ObjectProperty
+import javafx.beans.property.Property
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.collections.ObservableMap
 import javafx.collections.ObservableSet
+import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.stage.Stage
 import kotlinx.coroutines.GlobalScope
@@ -31,7 +35,7 @@ class MainApp : Application() {
         with(stage) {
             minWidth = 800.0
             minHeight = 600.0
-            scene = Scene(kodein.direct.instance())
+            scene = Scene(kodein.direct.instance<MainView>())
             show()
         }
         GlobalScope.launch {
@@ -45,14 +49,18 @@ private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty
     bind<ClientConfig>() with singleton { ClientConfig.loadFrom(instance<Path>().resolve("config.yml")) }
     bind<HostServices>() with instance(hostServices)
     bind<MainContract.Controller>() with singleton { MainController(instance(), factory()) }
-    bind<StringProperty>("mainViewTitle") with instance(titleProperty)
+    bind<StringProperty>("mainViewTitle") with singleton { titleProperty }
+    bind<ObjectProperty<Node>>("dialogPane") with singleton { SimpleObjectProperty<Node>() }
     bind<MainView>() with singleton {
-        MainView(instance(), instance(), provider(), provider(), instance(), instance("mainViewTitle"))
+        MainView(instance(), instance(), provider(), provider(), instance(),
+            instance("mainViewTitle"), instance("dialogPane"))
+    }
+    bind<JoinDialog>() with provider {
+        JoinDialog(instance(), instance("dialogPane"))
     }
 
     bind<Stage>().subTypes() with {
         when (it.jvmType) {
-            JoinDialog::class.java -> provider { JoinDialog(instance(), instance()) }
             SettingsDialog::class.java -> provider { SettingsDialog(instance()) }
             else -> instance(stage)
         }
@@ -80,3 +88,9 @@ fun <K, V> Map<K, V>.observable(): ObservableMap<K, V> = FXCollections.observabl
 // For testing purposes: we can swap out the Platform call to something we control
 internal var runLaterProvider: (Runnable) -> Unit = Platform::runLater
 fun runLater(block: () -> Unit) = runLaterProvider(Runnable(block))
+
+fun <T, Y> Property<T>.bindTransform(other: Property<Y>, biFunction: (T, T) -> Y) {
+    addListener { _, oldValue, newValue ->
+        other.value = biFunction(oldValue, newValue)
+    }
+}

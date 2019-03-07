@@ -3,19 +3,23 @@ package com.dmdirc
 import com.jukusoft.i18n.I.tr
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
+import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.transformation.SortedList
 import javafx.event.EventHandler
 import javafx.scene.Node
 import javafx.scene.control.*
+import javafx.scene.effect.GaussianBlur
 import javafx.scene.image.Image
 import javafx.scene.input.MouseButton
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import javafx.util.Callback
 import javafx.util.StringConverter
+
 
 class ServerContextMenu(
     private val joinDialogProvider: () -> JoinDialog,
@@ -92,7 +96,6 @@ class NodeListCell(
                                 contextMenu.show(graphic, it.screenX, it.screenY)
                             }
                         }
-
                     }
                 } else {
                     contextMenu = ChannelContextMenu(controller)
@@ -113,41 +116,65 @@ class MainView(
     private val joinDialogProvider: () -> JoinDialog,
     val settingsDialogProvider: () -> SettingsDialog,
     private val primaryStage: Stage,
-    titleProperty: StringProperty
-) : BorderPane() {
+    titleProperty: StringProperty,
+    dialogPane: ObjectProperty<Node>
+) : StackPane() {
     private val selectedWindow = SimpleObjectProperty<Node>()
 
     init {
-        top = MenuBar().apply {
-            menus.addAll(
-                Menu(tr("IRC")).apply {
-                    items.addAll(
-                        MenuItem(tr("Server List")).apply {
-                            setOnAction {
-                                ServerListController(controller, primaryStage, config).create()
-                            }
-                        }
-                    )
-                },
-                Menu(tr("Settings")).apply {
-                    items.add(
-                        MenuItem(tr("Settings")).apply {
-                            setOnAction {
-                                settingsDialogProvider().show()
-                            }
+        val ui = BorderPane()
+        children.addAll(
+            ui.apply {
+                top = MenuBar().apply {
+                    menus.addAll(
+                        Menu(tr("IRC")).apply {
+                            items.addAll(
+                                MenuItem(tr("Server List")).apply {
+                                    setOnAction {
+                                        ServerListController(controller, primaryStage, config).create()
+                                    }
+                                }
+                            )
+                        },
+                        Menu(tr("Settings")).apply {
+                            items.add(
+                                MenuItem(tr("Settings")).apply {
+                                    setOnAction {
+                                        settingsDialogProvider().show()
+                                    }
+                                }
+                            )
                         }
                     )
                 }
-            )
-        }
-        left = ListView(SortedList(controller.windows, compareBy { it.sortKey })).apply {
-            styleClass.add("tree-view")
-            selectionModel.selectedItemProperty().addListener { _, _, newValue ->
-                controller.selectedWindow.value = newValue
+                left = ListView(SortedList(controller.windows, compareBy { it.sortKey })).apply {
+                    styleClass.add("tree-view")
+                    selectionModel.selectedItemProperty().addListener { _, _, newValue ->
+                        controller.selectedWindow.value = newValue
+                    }
+                    cellFactory = NodeListCellFactory(this, joinDialogProvider, controller)
+                }
+                centerProperty().bindBidirectional(selectedWindow)
+            },
+            BorderPane().apply {
+                top = VBox().apply { minHeightProperty().bind(primaryStage.heightProperty().multiply(0.1)) }
+                bottom = VBox().apply { minHeightProperty().bind(primaryStage.heightProperty().multiply(0.1)) }
+                left = VBox().apply { minWidthProperty().bind(primaryStage.widthProperty().multiply(0.1)) }
+                right = VBox().apply { minWidthProperty().bind(primaryStage.widthProperty().multiply(0.1)) }
+                centerProperty().bindBidirectional(dialogPane)
+                isVisible = false
+                centerProperty().addListener { _, _, newValue ->
+                    isVisible = newValue != null
+                }
+                visibleProperty().bindTransform(ui.effectProperty()) { _, b ->
+                    if (b == true) {
+                        GaussianBlur(5.0)
+                    } else {
+                        null
+                    }
+                }
             }
-            cellFactory = NodeListCellFactory(this, joinDialogProvider, controller)
-        }
-        centerProperty().bindBidirectional(selectedWindow)
+        )
         primaryStage.icons.add(Image(MainView::class.java.getResourceAsStream("/logo.png")))
         titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
         controller.selectedWindow.addListener { _, _, newValue ->
