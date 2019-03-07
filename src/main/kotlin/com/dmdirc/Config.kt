@@ -5,6 +5,8 @@ import com.uchuhimo.konf.ConfigSpec
 import com.uchuhimo.konf.Item
 import com.uchuhimo.konf.source.yaml.toYaml
 import java.io.IOException
+import java.nio.file.FileSystem
+import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.logging.Level
@@ -94,3 +96,57 @@ class ClientConfig private constructor(private val path: Path, private val confi
     }
 }
 
+private const val DIRECTORY_NAME = "dmdirc3"
+
+/**
+ * Gets the config directory that DMDirc should use.
+ */
+fun getConfigDirectory(): Path {
+    val fs = FileSystems.getDefault()
+    val path = fs.getConfigDirectory(
+        System.getProperty("os.name"),
+        fs.getPath(System.getProperty("user.home")),
+        System.getenv()
+    )
+    if (!Files.isDirectory(path)) {
+        Files.createDirectories(path)
+    }
+    return path
+}
+
+/**
+ * Gets the config directory that DMDirc should use, given the [osName], [homeDir] and [envVars].
+ */
+fun FileSystem.getConfigDirectory(osName: String, homeDir: Path, envVars: Map<String, String>): Path =
+    when {
+        "DMDIRC_HOME" in envVars -> getPath(envVars["DMDIRC_HOME"])
+        osName.startsWith("Mac OS") -> resolveMacConfigDirectory(homeDir)
+        osName.startsWith("Windows") -> resolveWindowsConfigDirectory(homeDir, envVars["APPDATA"])
+        else -> resolveOtherConfigDirectory(homeDir, envVars["XDG_CONFIG_HOME"])
+    }.toAbsolutePath()
+
+/**
+ * Resolves the pre-defined config directory relative to the given [homeDir] for macs.
+ */
+private fun resolveMacConfigDirectory(homeDir: Path) =
+    homeDir.resolve("Library").resolve("Preferences").resolve(DIRECTORY_NAME)
+
+/**
+ * Resolves the config directory for Windows, relative to either the [homeDir] or the [appDataDir] if available.
+ */
+private fun FileSystem.resolveWindowsConfigDirectory(homeDir: Path, appDataDir: String?) =
+    if (appDataDir.isNullOrEmpty()) {
+        homeDir.resolve(DIRECTORY_NAME)
+    } else {
+        getPath(appDataDir, DIRECTORY_NAME)
+    }
+
+/**
+ * Resolves the config directory relative to the [homeDir] or [xdgConfigHome] if available.
+ */
+private fun FileSystem.resolveOtherConfigDirectory(homeDir: Path, xdgConfigHome: String?) =
+    if (xdgConfigHome.isNullOrEmpty()) {
+        homeDir.resolve(".$DIRECTORY_NAME")
+    } else {
+        getPath(xdgConfigHome, DIRECTORY_NAME)
+    }
