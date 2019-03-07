@@ -3,6 +3,7 @@ package com.dmdirc
 import com.dmdirc.ClientSpec.Formatting.action
 import com.dmdirc.ClientSpec.Formatting.channelEvent
 import com.dmdirc.ClientSpec.Formatting.message
+import com.dmdirc.ClientSpec.Formatting.notice
 import com.dmdirc.ClientSpec.Formatting.serverEvent
 import com.dmdirc.ktirc.events.*
 import com.dmdirc.ktirc.model.User
@@ -127,6 +128,8 @@ class WindowModel(
 
             is MessageReceived ->
                 addLine(ts, message, event.user.formattedNickname, event.message)
+            is NoticeReceived ->
+                addLine(ts, notice, event.user.formattedNickname, event.message)
             is ActionReceived ->
                 addLine(ts, action, event.user.formattedNickname, event.action)
         }
