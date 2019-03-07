@@ -19,7 +19,6 @@ import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import javafx.util.Callback
 import javafx.util.StringConverter
-import java.util.function.BiFunction
 
 
 class ServerContextMenu(
@@ -167,15 +166,13 @@ class MainView(
                 centerProperty().addListener { _, _, newValue ->
                     isVisible = newValue != null
                 }
-                visibleProperty().bindTransform(ui.effectProperty(),
-                    BiFunction { _, b ->
-                        if (b == true) {
-                            GaussianBlur(5.0)
-                        } else {
-                            null
-                        }
+                visibleProperty().bindTransform(ui.effectProperty()) { _, b ->
+                    if (b == true) {
+                        GaussianBlur(5.0)
+                    } else {
+                        null
                     }
-                )
+                }
             }
         )
         primaryStage.icons.add(Image(MainView::class.java.getResourceAsStream("/logo.png")))
