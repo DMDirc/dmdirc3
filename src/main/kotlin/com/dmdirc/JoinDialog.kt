@@ -1,13 +1,19 @@
 package com.dmdirc
 
-import com.jukusoft.i18n.I.tr
+import com.jukusoft.i18n.I
 import javafx.beans.property.*
+import javafx.geometry.Insets
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
-import javafx.scene.control.ButtonBar.setButtonData
+import javafx.scene.control.Label
 import javafx.scene.control.TextField
-import javafx.scene.layout.VBox
+import javafx.scene.layout.*
+import javafx.scene.layout.BorderWidths
+import javafx.scene.layout.CornerRadii
+import javafx.scene.paint.Color
+
+
 
 object JoinDialogContract {
     interface Controller {
@@ -63,24 +69,45 @@ class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: Object
             }
         }
         children.addAll(
-            TextField().apply {
-                bindRequiredTextControl(this, model.channel, model)
-                setOnAction { model.onTextAction() }
-            },
-            ButtonBar().apply {
-                buttons.addAll(
-                    Button(tr("Join")).apply {
-                        setButtonData(this, ButtonBar.ButtonData.OK_DONE)
-                        disableProperty().bind(model.valid.not())
-                        setOnAction { model.onJoinPressed() }
+            VBox().apply {
+                padding = Insets(15.0, 15.0, 15.0, 15.0)
+                border = Border(
+                    BorderStroke(
+                        Color.BLACK,
+                        BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT
+                    )
+                )
+                background = Background(
+                    BackgroundFill(
+                        Color.WHITESMOKE,
+                        CornerRadii.EMPTY,
+                        Insets.EMPTY
+                    )
+                )
+                children.addAll(
+                    Label("Enter channel to join: "),
+                    TextField().apply {
+                        bindRequiredTextControl(this, model.channel, model)
+                        setOnAction { model.onTextAction() }
                     },
-                    Button(tr("Cancel")).apply {
-                        setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
-                        setOnAction { model.onCancelPressed() }
+                    ButtonBar().apply {
+                        buttons.addAll(
+                            Button(I.tr("Join")).apply {
+                                ButtonBar.setButtonData(this, ButtonBar.ButtonData.OK_DONE)
+                                disableProperty().bind(model.valid.not())
+                                setOnAction { model.onJoinPressed() }
+                            },
+                            Button(I.tr("Cancel")).apply {
+                                ButtonBar.setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
+                                setOnAction { model.onCancelPressed() }
+                            }
+                        )
                     }
                 )
+            },
+            VBox().apply {
+                VBox.setVgrow(this, Priority.ALWAYS);
             }
         )
-        parent.value
     }
 }
