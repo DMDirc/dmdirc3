@@ -17,6 +17,7 @@ import org.kodein.di.bindings.subTypes
 import org.kodein.di.direct
 import org.kodein.di.generic.*
 import org.kodein.di.jvmType
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.logging.LogManager
 
@@ -34,13 +35,14 @@ class MainApp : Application() {
             show()
         }
         GlobalScope.launch {
-            installStyles(stage.scene, Paths.get("stylesheet.css"))
+            installStyles(stage.scene, kodein.direct.instance<Path>().resolve("stylesheet.css"))
         }
     }
 }
 
 private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty: StringProperty) = Kodein {
-    bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
+    bind<Path>() with singleton { getConfigDirectory() }
+    bind<ClientConfig>() with singleton { ClientConfig.loadFrom(instance<Path>().resolve("config.yml")) }
     bind<HostServices>() with instance(hostServices)
     bind<MainContract.Controller>() with singleton { MainController(instance(), factory()) }
     bind<StringProperty>("mainViewTitle") with instance(titleProperty)
