@@ -45,6 +45,7 @@ class MainApp : Application() {
 }
 
 private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty: StringProperty) = Kodein {
+    bind<String>("version") with singleton{ getVersion() }
     bind<Path>() with singleton { getConfigDirectory() }
     bind<ClientConfig>() with singleton { ClientConfig.loadFrom(instance<Path>().resolve("config.yml")) }
     bind<HostServices>() with instance(hostServices)
