@@ -3,12 +3,15 @@ package com.dmdirc
 import javafx.application.Application
 import javafx.application.HostServices
 import javafx.application.Platform
+import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.collections.ObservableMap
 import javafx.collections.ObservableSet
+import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.stage.Stage
 import kotlinx.coroutines.GlobalScope
@@ -45,9 +48,10 @@ private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty
     bind<ClientConfig>() with singleton { ClientConfig.loadFrom(Paths.get("config.yml")) }
     bind<HostServices>() with instance(hostServices)
     bind<MainContract.Controller>() with singleton { MainController(instance(), factory()) }
-    bind<StringProperty>("mainViewTitle") with instance(titleProperty)
+    bind<StringProperty>("mainViewTitle") with singleton { titleProperty }
+    bind<ObjectProperty<Node>>("dialogPane") with singleton { SimpleObjectProperty<Node>() }
     bind<MainView>() with singleton {
-        MainView(instance(), instance(), provider(), provider(), instance(), instance("mainViewTitle"))
+        MainView(instance(), instance(), provider(), provider(), instance(), instance("mainViewTitle"), instance("dialogPane"))
     }
 
     bind<Stage>().subTypes() with {

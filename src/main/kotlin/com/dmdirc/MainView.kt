@@ -3,6 +3,7 @@ package com.dmdirc
 import com.jukusoft.i18n.I.tr
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
+import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.transformation.SortedList
@@ -96,7 +97,6 @@ class NodeListCell(
                                 contextMenu.show(graphic, it.screenX, it.screenY)
                             }
                         }
-
                     }
                 } else {
                     contextMenu = ChannelContextMenu(controller)
@@ -117,10 +117,10 @@ class MainView(
     private val joinDialogProvider: () -> JoinDialog,
     val settingsDialogProvider: () -> SettingsDialog,
     private val primaryStage: Stage,
-    titleProperty: StringProperty
+    titleProperty: StringProperty,
+    dialogPane: ObjectProperty<Node>
 ) : StackPane() {
     private val selectedWindow = SimpleObjectProperty<Node>()
-    private val dialogPane = SimpleObjectProperty<Node>()
 
     init {
         val ui = BorderPane()
