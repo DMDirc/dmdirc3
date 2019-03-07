@@ -240,6 +240,92 @@ internal class WindowModelTest {
     }
 
     @Test
+    fun `displays nick changes`() {
+        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ChannelNickChanged(metaData, User("zeroCool"), "#channel", "crashOverride"))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- ", emptySet()),
+                StyledSpan("zeroCool", setOf(Style.Nickname("zeroCool"))),
+                StyledSpan(" is now known as ", emptySet()),
+                StyledSpan("crashOverride", setOf(Style.Nickname("crashOverride")))
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays topic changes`() {
+        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ChannelTopicChanged(metaData, User("acidBurn"), "#channel", "Mess with the best"))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- ", emptySet()),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
+                StyledSpan(" has changed the topic to: Mess with the best", emptySet())
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays empty topic discovered`() {
+        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ChannelTopicDiscovered(metaData, "#channel", null))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- there is no topic set", emptySet())
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays topic discovered`() {
+        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ChannelTopicDiscovered(metaData, "#channel", "Mess with the best"))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- the topic is: Mess with the best", emptySet())
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays topic metadata`() {
+        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ChannelTopicMetadataDiscovered(metaData, "#channel", User("acidBurn"), TestConstants.time))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- topic was set at 09:00:00 on Friday, 15 September 1995 by ", emptySet()),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn")))
+            ), model.lines[0]
+        )
+    }
+
+    @Test
     fun `displays quit events without reasons`() {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"

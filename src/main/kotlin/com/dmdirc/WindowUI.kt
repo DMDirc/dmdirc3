@@ -98,6 +98,28 @@ class WindowModel(
                     else
                         tr("%s quit (%s)").format(event.user.formattedNickname, event.reason)
                 )
+            is ChannelNickChanged ->
+                addLine(
+                    ts, channelEvent,
+                    tr("%s is now known as %s").format(event.user.formattedNickname, event.newNick.formattedNickname)
+                )
+            is ChannelTopicChanged ->
+                addLine(
+                    ts, channelEvent,
+                    tr("%s has changed the topic to: %s").format(event.user.formattedNickname, event.topic)
+                )
+            is ChannelTopicDiscovered ->
+                if (event.topic.isNullOrEmpty()) {
+                    addLine(ts, channelEvent, tr("there is no topic set"))
+                } else {
+                    addLine(ts, channelEvent, tr("the topic is: %s").format(event.topic))
+                }
+            is ChannelTopicMetadataDiscovered ->
+                addLine(ts, channelEvent, tr("topic was set at %s on %s by %s").format(
+                    event.setTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")),
+                    event.setTime.format(DateTimeFormatter.ofPattern("cccc, d LLLL yyyy")),
+                    event.user.formattedNickname
+                ))
 
             is MessageReceived ->
                 addLine(ts, message, event.user.formattedNickname, event.message)
@@ -117,7 +139,10 @@ class WindowModel(
     }
 
     private val User.formattedNickname: String
-        get() = "${ControlCode.InternalNicknames}$nickname${ControlCode.InternalNicknames}"
+        get() = nickname.formattedNickname
+
+    private val String.formattedNickname: String
+        get() = "${ControlCode.InternalNicknames}$this${ControlCode.InternalNicknames}"
 
     private val IrcEvent.timestamp: String
         get() = metadata.time.format(DateTimeFormatter.ofPattern(config[ClientSpec.Formatting.timestamp]))
