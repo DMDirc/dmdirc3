@@ -3,6 +3,7 @@ package com.dmdirc
 import javafx.application.Application
 import javafx.application.HostServices
 import javafx.application.Platform
+import javafx.beans.property.Property
 import javafx.beans.property.StringProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
@@ -18,6 +19,7 @@ import org.kodein.di.direct
 import org.kodein.di.generic.*
 import org.kodein.di.jvmType
 import java.nio.file.Paths
+import java.util.function.BiFunction
 import java.util.logging.LogManager
 
 internal lateinit var kodein: Kodein
@@ -78,3 +80,9 @@ fun <K, V> Map<K, V>.observable(): ObservableMap<K, V> = FXCollections.observabl
 // For testing purposes: we can swap out the Platform call to something we control
 internal var runLaterProvider: (Runnable) -> Unit = Platform::runLater
 fun runLater(block: () -> Unit) = runLaterProvider(Runnable(block))
+
+fun <T, Y> Property<T>.bindTransform(other: Property<Y>, biFunction: BiFunction<T, T, Y>) {
+    addListener { _, oldValue, newValue ->
+        other.value = biFunction.apply(oldValue, newValue)
+    }
+}
