@@ -41,7 +41,7 @@ class WindowModel(
     val name: StringProperty = SimpleStringProperty(initialName)
     val title: StringProperty = SimpleStringProperty(initialName)
     val hasUnreadMessages: BooleanProperty = SimpleBooleanProperty(false)
-    val nickList = NickListModel(connection)
+    val nickList = NickListModel()
     val isConnection = type == WindowType.SERVER
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else initialName.toLowerCase()}"
     val lines = mutableListOf<Array<StyledSpan>>().observable()
@@ -67,7 +67,9 @@ class WindowModel(
 
     fun handleEvent(event: IrcEvent) {
         displayEvent(event)
-        nickList.handleEvent(event)
+
+        if (event is ChannelMembershipAdjustment)
+            nickList.handleEvent(event)
     }
 
     private fun displayEvent(event: IrcEvent) {
@@ -81,32 +83,32 @@ class WindowModel(
                 addLine(ts, serverEvent, tr("Error: %s - %s").format(event.error.translated(), event.details ?: ""))
 
             is ChannelJoined ->
-                addLine(ts, channelEvent, tr("%s joined").format(event.user.formattedNickname))
+                addLine(ts, channelEvent, tr("%s joined").format(event.formattedNickname))
             is ChannelParted ->
                 addLine(
                     ts, channelEvent,
                     if (event.reason.isEmpty())
-                        tr("%s left").format(event.user.formattedNickname)
+                        tr("%s left").format(event.formattedNickname)
                     else
-                        tr("%s left (%s)").format(event.user.formattedNickname, event.reason)
+                        tr("%s left (%s)").format(event.formattedNickname, event.reason)
                 )
             is ChannelQuit ->
                 addLine(
                     ts, channelEvent,
                     if (event.reason.isEmpty())
-                        tr("%s quit").format(event.user.formattedNickname)
+                        tr("%s quit").format(event.formattedNickname)
                     else
-                        tr("%s quit (%s)").format(event.user.formattedNickname, event.reason)
+                        tr("%s quit (%s)").format(event.formattedNickname, event.reason)
                 )
             is ChannelNickChanged ->
                 addLine(
                     ts, channelEvent,
-                    tr("%s is now known as %s").format(event.user.formattedNickname, event.newNick.formattedNickname)
+                    tr("%s is now known as %s").format(event.formattedNickname, event.newNick.formattedNickname)
                 )
             is ChannelTopicChanged ->
                 addLine(
                     ts, channelEvent,
-                    tr("%s has changed the topic to: %s").format(event.user.formattedNickname, event.topic)
+                    tr("%s has changed the topic to: %s").format(event.formattedNickname, event.topic)
                 )
             is ChannelTopicDiscovered ->
                 if (event.topic.isNullOrEmpty()) {
@@ -115,11 +117,13 @@ class WindowModel(
                     addLine(ts, channelEvent, tr("the topic is: %s").format(event.topic))
                 }
             is ChannelTopicMetadataDiscovered ->
-                addLine(ts, channelEvent, tr("topic was set at %s on %s by %s").format(
-                    event.setTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")),
-                    event.setTime.format(DateTimeFormatter.ofPattern("cccc, d LLLL yyyy")),
-                    event.user.formattedNickname
-                ))
+                addLine(
+                    ts, channelEvent, tr("topic was set at %s on %s by %s").format(
+                        event.setTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")),
+                        event.setTime.format(DateTimeFormatter.ofPattern("cccc, d LLLL yyyy")),
+                        event.user.formattedNickname
+                    )
+                )
 
             is MessageReceived ->
                 addLine(ts, message, event.user.formattedNickname, event.message)
@@ -137,6 +141,9 @@ class WindowModel(
     private fun addLine(spans: Sequence<StyledSpan>) {
         lines.add(spans.toList().toTypedArray())
     }
+
+    private val SourcedEvent.formattedNickname: String
+        get() = user.formattedNickname
 
     private val User.formattedNickname: String
         get() = nickname.formattedNickname
