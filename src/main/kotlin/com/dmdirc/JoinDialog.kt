@@ -1,6 +1,7 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I
+import com.jukusoft.i18n.I.tr
 import javafx.beans.property.*
 import javafx.geometry.Insets
 import javafx.scene.Node
@@ -85,7 +86,7 @@ class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: Object
                     )
                 )
                 children.addAll(
-                    Label("Enter channel to join: "),
+                    Label(tr("Enter channel to join: ")),
                     TextField().apply {
                         bindRequiredTextControl(this, model.channel, model)
                         setOnAction { model.onTextAction() }
