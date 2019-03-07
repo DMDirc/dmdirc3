@@ -32,6 +32,7 @@ jacoco {
 repositories {
     mavenCentral()
     jcenter()
+    maven("https://maven.ej-technologies.com/repository")
     mavenLocal()
 }
 java {
@@ -57,6 +58,8 @@ dependencies {
     implementation("de.jensd:fontawesomefx-fontawesome:4.7.0-11")
     implementation("de.jensd:fontawesomefx-commons:11.0")
     implementation("de.jensd:fontawesomefx-controls:11.0")
+    
+    compileOnly("com.install4j:install4j-runtime:7.0.9")
 
     runtime("org.openjfx:javafx-graphics:$javafx.version:win")
     runtime("org.openjfx:javafx-graphics:$javafx.version:linux")
