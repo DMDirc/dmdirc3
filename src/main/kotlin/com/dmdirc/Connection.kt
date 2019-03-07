@@ -124,11 +124,22 @@ class Connection(
             event is ChannelParted && client.isLocalUser(event.user) -> runLater { children -= event.target }
         }
 
-        if (event is TargetedEvent) {
-            // TODO: Handle events that are targeted to us (private messages etc)
-            runLater { windowModel(event.target)?.handleEvent(event) }
-        } else {
-            runLater { model.handleEvent(event) }
+        runLater {
+            if (event is TargetedEvent) {
+                if (client.isLocalUser(event.target) || event.target == "*") {
+                    handleOwnEvent(event)
+                } else {
+                    windowModel(event.target)?.handleEvent(event)
+                }
+            } else {
+                model.handleEvent(event)
+            }
+        }
+    }
+
+    private fun handleOwnEvent(event: TargetedEvent) {
+        when (event) {
+            is NoticeReceived -> model.handleEvent(event)
         }
     }
 

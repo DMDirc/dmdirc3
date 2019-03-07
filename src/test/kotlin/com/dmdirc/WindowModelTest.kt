@@ -222,6 +222,31 @@ internal class WindowModelTest {
     }
 
     @Test
+    fun `displays notice events`() {
+        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.notice] } returns "-%s- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(
+            NoticeReceived(
+                metaData,
+                User("acidBurn"),
+                "#channel",
+                "Mess with the best"
+            )
+        )
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -", emptySet()),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
+                StyledSpan("- Mess with the best", emptySet())
+            ), model.lines[0]
+        )
+    }
+
+    @Test
     fun `displays action events`() {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.action] } returns "* %s %s"

@@ -36,6 +36,7 @@ object ClientSpec : ConfigSpec("") {
         val serverEvent by optional("** %s")
         val message by optional("<%s> %s")
         val action by optional("* %s %s")
+        val notice by optional("-%s- %s")
     }
 
     object Display : ConfigSpec() {
