@@ -1,7 +1,5 @@
 package com.dmdirc
 
-package com.dmdirc
-
 import com.install4j.api.launcher.Variables
 
 fun checkLauncher() = try {
