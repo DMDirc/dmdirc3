@@ -35,7 +35,7 @@ class MainApp : Application() {
         with(stage) {
             minWidth = 800.0
             minHeight = 600.0
-            scene = Scene(kodein.direct.instance())
+            scene = Scene(kodein.direct.instance<MainView>())
             show()
         }
         GlobalScope.launch {
