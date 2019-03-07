@@ -1,19 +1,13 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
-import javafx.beans.property.BooleanProperty
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleStringProperty
-import javafx.beans.property.StringProperty
-import javafx.scene.Scene
+import javafx.beans.property.*
+import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
 import javafx.scene.control.ButtonBar.setButtonData
 import javafx.scene.control.TextField
 import javafx.scene.layout.VBox
-import javafx.stage.Modality
-import javafx.stage.Stage
-import javafx.stage.StageStyle
 
 object JoinDialogContract {
     interface Controller {
@@ -57,36 +51,36 @@ class JoinDialogModel(private val controller: JoinDialogContract.Controller) : J
 
 }
 
-class JoinDialog(model: JoinDialogContract.ViewModel, primaryStage: Stage) : Stage() {
+class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: ObjectProperty<Node>) : VBox() {
+    fun show() {
+        parent.value = this
+    }
+
     init {
         model.open.addListener { _, _, newValue ->
             if (newValue == false) {
-                close()
+                parent.value = null
             }
         }
-        initOwner(primaryStage)
-        initStyle(StageStyle.DECORATED)
-        initModality(Modality.APPLICATION_MODAL)
-        scene = Scene(VBox().apply {
-            children.addAll(
-                TextField().apply {
-                    bindRequiredTextControl(this, model.channel, model)
-                    setOnAction { model.onTextAction() }
-                },
-                ButtonBar().apply {
-                    buttons.addAll(
-                        Button(tr("Join")).apply {
-                            setButtonData(this, ButtonBar.ButtonData.OK_DONE)
-                            disableProperty().bind(model.valid.not())
-                            setOnAction { model.onJoinPressed() }
-                        },
-                        Button(tr("Cancel")).apply {
-                            setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
-                            setOnAction { model.onCancelPressed() }
-                        }
-                    )
-                }
-            )
-        })
+        children.addAll(
+            TextField().apply {
+                bindRequiredTextControl(this, model.channel, model)
+                setOnAction { model.onTextAction() }
+            },
+            ButtonBar().apply {
+                buttons.addAll(
+                    Button(tr("Join")).apply {
+                        setButtonData(this, ButtonBar.ButtonData.OK_DONE)
+                        disableProperty().bind(model.valid.not())
+                        setOnAction { model.onJoinPressed() }
+                    },
+                    Button(tr("Cancel")).apply {
+                        setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
+                        setOnAction { model.onCancelPressed() }
+                    }
+                )
+            }
+        )
+        parent.value
     }
 }
