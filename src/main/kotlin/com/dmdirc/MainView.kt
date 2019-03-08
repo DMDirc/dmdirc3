@@ -23,11 +23,6 @@ import javafx.scene.control.Tooltip
 import javafx.scene.effect.GaussianBlur
 import javafx.scene.image.Image
 import javafx.scene.input.MouseButton
-import javafx.scene.layout.Background
-import javafx.scene.layout.BackgroundImage
-import javafx.scene.layout.BackgroundPosition
-import javafx.scene.layout.BackgroundRepeat
-import javafx.scene.layout.BackgroundSize
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
@@ -132,13 +127,13 @@ class MainView(
         val settingsDialogProvider: () -> SettingsDialog,
         private val primaryStage: Stage,
         titleProperty: StringProperty,
-        dialogPane: ObjectProperty<Node>
+        dialogPane: ObjectProperty<Node>,
+        welcomePaneProvider: () -> WelcomePane
 ) : StackPane() {
     private val selectedWindow = SimpleObjectProperty<Node>()
-    private val welcomePane = WelcomePane(controller, primaryStage, config, settingsDialogProvider)
 
     init {
-        selectedWindow.value = welcomePane
+        selectedWindow.value = welcomePaneProvider.invoke()
         val ui = BorderPane()
         children.addAll(
                 ui.apply {
@@ -218,11 +213,12 @@ class WelcomePane(
         controller: MainContract.Controller,
         primaryStage: Stage,
         config: ClientConfig,
-        settingsDialogProvider: () -> SettingsDialog) : VBox() {
+        settingsDialogProvider: () -> SettingsDialog,
+        version: String) : VBox() {
     init {
         styleClass.add("welcome")
         children.addAll(
-                Label(tr("Welcome to DMDirc")).apply {
+                Label(tr("Welcome to DMDirc %s").format(version)).apply {
                     styleClass.add("welcome-header")
                 },
                 Label(tr("To get started you'll need to set your nickname and other settings and add a server " +
