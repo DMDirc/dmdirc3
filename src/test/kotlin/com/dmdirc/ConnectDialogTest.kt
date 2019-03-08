@@ -2,7 +2,6 @@ package com.dmdirc
 
 import io.mockk.mockk
 import io.mockk.verify
-import javafx.stage.Stage
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
