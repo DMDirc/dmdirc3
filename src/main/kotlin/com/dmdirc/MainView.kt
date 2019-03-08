@@ -225,29 +225,29 @@ class WelcomePane(
                 Label(tr("Welcome to DMDirc")).apply {
                     styleClass.add("welcome-header")
                 },
-                Label(tr("To get started you'll probably want to change the " +
-                        "default profile settings and then setup some servers, you can do this with the buttons below. " +
-                        "If you'd rather just dive in, click the Chat with us button and you'll connect to our " +
-                        "development channel with some default settings.")).apply {
+                Label(tr("To get started you'll need to set your nickname and other settings and add a server " +
+                        "or two, you can do this with the buttons below. If you'd rather just dive in, click " +
+                        "the \"Chat with us\" button and you'll connect to our development channel with " +
+                        "some default settings.")).apply {
                     styleClass.add("welcome-text")
                     isWrapText = true
                     prefWidth = 500.0
                 },
                 VBox().apply {
                     children.addAll(
-                            Button("Profile").apply {
+                            Button(tr("Profile")).apply {
                                 maxWidth = Double.MAX_VALUE
                                 setOnAction {
                                     settingsDialogProvider().show()
                                 }
                             },
-                            Button("Server list").apply {
+                            Button(tr("Server list")).apply {
                                 maxWidth = Double.MAX_VALUE
                                 setOnAction {
                                     ServerListController(controller, primaryStage, config).create()
                                 }
                             },
-                            Button("Chat with us").apply {
+                            Button(tr("Chat with us")).apply {
                                 maxWidth = Double.MAX_VALUE
                                 setOnAction {
                                     controller.joinDev()
