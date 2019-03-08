@@ -21,7 +21,6 @@ import javafx.stage.Stage
 import javafx.util.Callback
 import javafx.util.StringConverter
 
-
 class ServerContextMenu(
         private val joinDialogProvider: () -> JoinDialog,
         private val controller: MainContract.Controller
@@ -116,6 +115,7 @@ class MainView(
         val config: ClientConfig,
         private val joinDialogProvider: () -> JoinDialog,
         val settingsDialogProvider: () -> SettingsDialog,
+        val serverlistDialogProvider: () -> ServerlistDialog,
         private val primaryStage: Stage,
         titleProperty: StringProperty,
         dialogPane: ObjectProperty<Node>,
@@ -134,7 +134,7 @@ class MainView(
                                     items.addAll(
                                             MenuItem(tr("Server List")).apply {
                                                 setOnAction {
-                                                    ServerListController(controller, primaryStage, config).create()
+                                                    serverlistDialogProvider().show()
                                                 }
                                             }
                                     )
@@ -204,9 +204,8 @@ class TitleStringConverter : StringConverter<WindowModel>() {
 
 class WelcomePane(
         controller: MainContract.Controller,
-        primaryStage: Stage,
-        config: ClientConfig,
         settingsDialogProvider: () -> SettingsDialog,
+        serverlistDialogProvider: () -> ServerlistDialog,
         version: String) : VBox() {
     init {
         styleClass.add("welcome")
@@ -233,7 +232,7 @@ class WelcomePane(
                             Button(tr("Server list")).apply {
                                 maxWidth = Double.MAX_VALUE
                                 setOnAction {
-                                    ServerListController(controller, primaryStage, config).create()
+                                    serverlistDialogProvider().show()
                                 }
                             },
                             Button(tr("Chat with us")).apply {

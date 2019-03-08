@@ -17,10 +17,12 @@ import javafx.stage.Stage
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
-import org.kodein.di.bindings.subTypes
 import org.kodein.di.direct
-import org.kodein.di.generic.*
-import org.kodein.di.jvmType
+import org.kodein.di.generic.bind
+import org.kodein.di.generic.factory
+import org.kodein.di.generic.instance
+import org.kodein.di.generic.provider
+import org.kodein.di.generic.singleton
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.logging.LogManager
@@ -45,7 +47,7 @@ class MainApp : Application() {
 }
 
 private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty: StringProperty) = Kodein {
-    bind<String>("version") with singleton{ getVersion() }
+    bind<String>("version") with singleton { getVersion() }
     bind<Path>() with singleton { getConfigDirectory() }
     bind<ClientConfig>() with singleton { ClientConfig.loadFrom(instance<Path>().resolve("config.yml")) }
     bind<HostServices>() with instance(hostServices)
@@ -53,8 +55,8 @@ private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty
     bind<StringProperty>("mainViewTitle") with singleton { titleProperty }
     bind<ObjectProperty<Node>>("dialogPane") with singleton { SimpleObjectProperty<Node>() }
     bind<MainView>() with singleton {
-        MainView(instance(), instance(), provider(), provider(), instance(),
-            instance("mainViewTitle"), instance("dialogPane"), provider())
+        MainView(instance(), instance(), provider(), provider(), provider(), instance(),
+                instance("mainViewTitle"), instance("dialogPane"), provider())
     }
     bind<JoinDialog>() with provider {
         JoinDialog(instance(), instance("dialogPane"))
@@ -62,16 +64,29 @@ private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty
     bind<SettingsDialog>() with provider {
         SettingsDialog(instance(), instance("dialogPane"))
     }
+    bind<ServerlistDialog>() with provider {
+        ServerlistDialog(instance(), instance("dialogPane"))
+    }
     bind<WelcomePane>() with provider {
-        WelcomePane(instance(), instance(), instance(), provider(), instance("version"))
+        WelcomePane(instance(), provider(), provider(), instance("version"))
     }
     bind<Stage>() with instance(stage)
-    bind<ConnectionContract.Controller>() with factory { connectionDetails: ConnectionDetails -> Connection(connectionDetails, instance(), instance()) }
+
+    bind<ConnectionContract.Controller>() with factory { connectionDetails: ConnectionDetails ->
+        Connection(
+                connectionDetails,
+                instance(),
+                instance()
+        )
+    }
     bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
     bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
 
     bind<SettingsDialogContract.Controller>() with provider { SettingsDialogController(instance()) }
     bind<SettingsDialogContract.ViewModel>() with provider { SettingsDialogModel(instance(), instance()) }
+
+    bind<ServerListDialogContract.Controller>() with provider { ServerListController(instance(), instance()) }
+    bind<ServerListDialogContract.ViewModel>() with provider { ServerListModel(instance(), instance()) }
 }
 
 fun main() {
@@ -87,6 +102,7 @@ fun <K, V> Map<K, V>.observable(): ObservableMap<K, V> = FXCollections.observabl
 
 // For testing purposes: we can swap out the Platform call to something we control
 internal var runLaterProvider: (Runnable) -> Unit = Platform::runLater
+
 fun runLater(block: () -> Unit) = runLaterProvider(Runnable(block))
 
 fun <T, Y> Property<T>.bindTransform(other: Property<Y>, biFunction: (T, T) -> Y) {
