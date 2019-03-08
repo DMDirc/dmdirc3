@@ -3,12 +3,10 @@ package com.dmdirc
 import com.dmdirc.ktirc.IrcClient
 import com.dmdirc.ktirc.events.*
 import com.dmdirc.ktirc.io.CaseMapping
-import com.dmdirc.ktirc.messages.sendAction
-import com.dmdirc.ktirc.messages.sendJoin
-import com.dmdirc.ktirc.messages.sendMessage
-import com.dmdirc.ktirc.messages.sendPart
+import com.dmdirc.ktirc.messages.*
 import com.dmdirc.ktirc.model.ChannelUser
 import com.dmdirc.ktirc.model.ServerFeature
+import com.dmdirc.ktirc.model.ServerStatus
 import javafx.application.HostServices
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
@@ -132,6 +130,8 @@ class Connection(
                 } else {
                     windowModel(event.target)?.handleEvent(event)
                 }
+            } else if (event is NicknameChangeFailed && client.serverState.status < ServerStatus.Ready) {
+                client.sendNickChange(client.serverState.localNickname + (0..9).random())
             } else {
                 model.handleEvent(event)
             }
