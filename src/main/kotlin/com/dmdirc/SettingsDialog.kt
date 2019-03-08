@@ -81,7 +81,7 @@ class SettingsDialog(model: SettingsDialogContract.ViewModel, private val parent
                             GridPane().apply {
                                 styleClass.add("dialog-background")
                                 add(Label(tr("Profile settings")).apply {
-                                    styleClass.add("settings-dialog-header")
+                                    styleClass.add("dialog-header")
                                 }, 0, 0, 2, 1)
                                 add(Label(tr("Nickname: ")), 0, 1)
                                 add(TextField().apply {
