@@ -67,7 +67,6 @@ class IrcSegmentOps : SegmentOpsBase<Segment, Collection<Style>>(Segment.Empty),
             Segment.Text(it)
         }
     } ?: Segment.Empty
-
 }
 
 class IrcTextArea(linkClickHandler: (String) -> Unit) :

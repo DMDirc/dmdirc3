@@ -94,7 +94,6 @@ class ClientConfig private constructor(private val path: Path, private val confi
                 }
                 return ClientConfig(path, this)
             }
-
     }
 }
 

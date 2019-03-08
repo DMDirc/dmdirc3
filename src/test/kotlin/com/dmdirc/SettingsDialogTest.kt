@@ -1,5 +1,5 @@
 package com.dmdirc
-import com.dmdirc.*
+
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -58,5 +58,4 @@ private class SettingsModelTest {
             mockConfig.save()
         }
     }
-
 }

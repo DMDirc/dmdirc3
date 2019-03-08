@@ -177,7 +177,5 @@ class Connection(
         }
 
         override fun iterator() = HashSet(values).iterator().iterator()
-
     }
-
 }

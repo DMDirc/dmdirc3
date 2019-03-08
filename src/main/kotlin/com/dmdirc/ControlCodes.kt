@@ -69,12 +69,12 @@ object ControlCode {
      * Toggles the underline property of text.
      */
     const val Underline = '\u001f'
-
 }
 
 data class StyledSpan(val content: String, val styles: Set<Style>)
 
-private val linkRegex = Regex("(?i)(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", RegexOption.IGNORE_CASE)
+private val linkRegex =
+    Regex("(?i)(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", RegexOption.IGNORE_CASE)
 
 fun String.detectLinks() = linkRegex.replace(this, "${ControlCode.InternalLinks}$0${ControlCode.InternalLinks}")
 
@@ -83,7 +83,7 @@ fun String.convertControlCodes() = sequence {
     val buffer = StringBuilder()
     var nextColour = -1
     var nextColourLength = 0 to 0
-    var nextColourFilter: (Char) -> Boolean =  Char::isDigit
+    var nextColourFilter: (Char) -> Boolean = Char::isDigit
     val colours = arrayOf(StringBuilder(), StringBuilder())
 
     fun emitThen(block: () -> Unit) = sequence {
@@ -156,7 +156,9 @@ fun String.convertControlCodes() = sequence {
                 // We've expecting the first colour, have got enough chars, and hit a comma:
                 nextColour == 0 && colours[nextColour].length >= nextColourLength.first && it == ',' -> nextColour = 1
                 // We're expecting a colour, hit a valid char for our colour, and don't yet have enough chars:
-                nextColourFilter(it) && colours[nextColour].length < nextColourLength.second -> colours[nextColour].append(it)
+                nextColourFilter(it) && colours[nextColour].length < nextColourLength.second -> colours[nextColour].append(
+                    it
+                )
                 // We're expecting a colour but got something else:
                 else -> yieldAll(emitThen { buffer.append(it) })
             }

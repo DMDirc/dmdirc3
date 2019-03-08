@@ -17,7 +17,6 @@ import javafx.stage.Stage
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
-import org.kodein.di.bindings.subTypes
 import org.kodein.di.direct
 import org.kodein.di.generic.*
 import java.nio.file.Path

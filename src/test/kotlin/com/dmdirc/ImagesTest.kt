@@ -81,5 +81,4 @@ internal class ImagesTest {
             fakeModel.lines[3]
         )
     }
-
 }

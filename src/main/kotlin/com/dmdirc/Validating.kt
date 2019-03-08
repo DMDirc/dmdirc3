@@ -58,5 +58,4 @@ class ValidatorChain : ReadOnlyBooleanPropertyBase() {
             fireValueChangedEvent()
         }
     }
-
 }

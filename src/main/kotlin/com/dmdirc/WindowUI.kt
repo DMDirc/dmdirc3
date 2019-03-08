@@ -137,8 +137,8 @@ class WindowModel(
 
     fun addLine(timestamp: String, format: Item<String>, vararg args: String) =
         addLine(
-            sequenceOf(StyledSpan(timestamp, setOf(Style.CustomStyle("timestamp"))))
-                    + " ${config[format].format(*args)}".detectLinks().convertControlCodes()
+            sequenceOf(StyledSpan(timestamp, setOf(Style.CustomStyle("timestamp")))) +
+                " ${config[format].format(*args)}".detectLinks().convertControlCodes()
         )
 
     private fun addLine(spans: Sequence<StyledSpan>) {
@@ -157,7 +157,6 @@ class WindowModel(
 
     private val IrcEvent.timestamp: String
         get() = metadata.time.format(DateTimeFormatter.ofPattern(config[ClientSpec.Formatting.timestamp]))
-
 }
 
 class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
@@ -199,7 +198,6 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
                         textArea.appendText("\n")
                     }
                 }
-
             }
         })
     }

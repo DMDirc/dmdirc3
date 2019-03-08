@@ -16,7 +16,7 @@ fun initInternationalisation(path: Path, locale: String?) {
     I.setLanguage(Locale.forLanguageTag(locale))
 }
 
-fun ConnectionError.translated() = when(this) {
+fun ConnectionError.translated() = when (this) {
     ConnectionError.Unknown -> tr("unknown error")
     ConnectionError.UnresolvableAddress -> tr("the address could not be resolved")
     ConnectionError.ConnectionRefused -> tr("the connection was refused")

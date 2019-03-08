@@ -440,5 +440,4 @@ internal class WindowModelTest {
             ), model.lines[0]
         )
     }
-
 }

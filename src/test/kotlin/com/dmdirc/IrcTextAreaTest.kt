@@ -20,5 +20,4 @@ internal class ColourHashTest {
         assertEquals(5, "zeroCool".colourHash())
         assertEquals(7, "cerealKiller".colourHash())
     }
-
 }

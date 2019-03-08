@@ -85,5 +85,4 @@ internal class NickListModelTest {
         assertEquals("acidBurn", model.users[0])
         assertEquals("zeroCool", model.users[1])
     }
-
 }
