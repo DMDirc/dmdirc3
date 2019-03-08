@@ -1,6 +1,6 @@
 == DMDirc3
 
-// Badges badges badges badges MUSHROOM MUSHROOM
+// Badges, badges, badges, badges; MUSHROOM, MUSHROOM!
 image:https://cloud.drone.io/api/badges/DMDirc/dmdirc3/status.svg[Build status, link=https://cloud.drone.io/DMDirc/dmdirc3]
 image:https://codecov.io/gh/DMDirc/dmdirc3/branch/master/graph/badge.svg[Code coverage, link=https://codecov.io/gh/DMDirc/dmdirc3]
 image:https://d322cqt584bo4o.cloudfront.net/dmdirc/localized.svg[Translation status, link=https://crowdin.com/project/dmdirc]
@@ -85,12 +85,12 @@ to focus on writing an IRC client, instead of developing installers, configurati
 and so on. In particular we'd like to call out:
 
 * https://www.ej-technologies.com/[ej-technology] for providing an open source
-  https://www.ej-technologies.com/products/install4j/overview.html[install4j] licence, which we use for our
-  installers, launcher, and auto-updater
-* https://crowdin.com/[Crowdin] for providing an open source account, which we use for managing translations
+  https://www.ej-technologies.com/products/install4j/overview.html[install4j] licence, which we use
+  for our multi-platform installers, launchers and auto updating.
+* https://crowdin.com/[Crowdin] for providing an open source account, which we use for managing translations.
 * https://github.com/FXMisc/RichTextFX[RichTextFX] which powers our main text area, and solves one of the
   biggest headaches we had with the previous client!
 * https://github.com/uchuhimo/konf[konf] by https://github.com/uchuhimo[uchuhimo], a simple yet powerful
-  configuration system we use to save DMDirc's settings
+  configuration system we use to save DMDirc's settings.
 
 Of course there are many other projects that have helped us along the way, and we are thankful for them all.
