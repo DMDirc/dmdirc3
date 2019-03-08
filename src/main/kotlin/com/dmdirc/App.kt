@@ -65,11 +65,7 @@ private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty
     bind<WelcomePane>() with provider {
         WelcomePane(instance(), instance(), instance(), provider(), instance("version"))
     }
-
-    bind<Stage>().subTypes() with {
-        instance(stage)
-    }
-
+    bind<Stage>() with instance(stage)
     bind<ConnectionContract.Controller>() with factory { connectionDetails: ConnectionDetails -> Connection(connectionDetails, instance(), instance()) }
     bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
     bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
