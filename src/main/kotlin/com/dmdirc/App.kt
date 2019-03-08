@@ -54,10 +54,13 @@ private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty
     bind<ObjectProperty<Node>>("dialogPane") with singleton { SimpleObjectProperty<Node>() }
     bind<MainView>() with singleton {
         MainView(instance(), instance(), provider(), provider(), instance(),
-            instance("mainViewTitle"), instance("dialogPane"))
+            instance("mainViewTitle"), instance("dialogPane"), provider())
     }
     bind<JoinDialog>() with provider {
         JoinDialog(instance(), instance("dialogPane"))
+    }
+    bind<WelcomePane>() with provider {
+        WelcomePane(instance(), instance(), instance(), provider(), instance("version"))
     }
 
     bind<Stage>().subTypes() with {
