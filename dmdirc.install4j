@@ -1663,8 +1663,6 @@ file.getParent() != null || (file.getName().endsWith(".app") &amp;&amp; director
       </postUninstallScript>
     </linuxDeb>
   </mediaSets>
-  <buildIds buildAll="true">
-    <mediaSet refId="62" />
-  </buildIds>
+  <buildIds buildAll="true" />
   <buildOptions verbose="false" faster="false" disableSigning="false" disableJreBundling="false" debug="false" />
 </install4j>
