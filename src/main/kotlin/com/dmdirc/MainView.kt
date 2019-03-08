@@ -10,16 +10,7 @@ import javafx.collections.transformation.SortedList
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Node
-import javafx.scene.control.Button
-import javafx.scene.control.ContextMenu
-import javafx.scene.control.Control
-import javafx.scene.control.Label
-import javafx.scene.control.ListCell
-import javafx.scene.control.ListView
-import javafx.scene.control.Menu
-import javafx.scene.control.MenuBar
-import javafx.scene.control.MenuItem
-import javafx.scene.control.Tooltip
+import javafx.scene.control.*
 import javafx.scene.effect.GaussianBlur
 import javafx.scene.image.Image
 import javafx.scene.input.MouseButton
@@ -189,7 +180,9 @@ class MainView(
         )
         primaryStage.icons.add(Image(MainView::class.java.getResourceAsStream("/logo.png")))
         titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
-        controller.selectedWindow.addListener { _, _, newValue ->
+        controller.selectedWindow.addListener { _, oldValue, newValue ->
+            oldValue?.hasUnreadMessages?.set(false)
+            newValue?.hasUnreadMessages?.set(false)
             selectedWindow.value = newValue?.let {
                 it.connection?.children?.get(it.name.value)?.ui
             } ?: VBox()
