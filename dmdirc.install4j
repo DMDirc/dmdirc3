@@ -18,7 +18,7 @@
       <windowsPkcs11Identifier issuer="" serial="" subject="" />
     </codeSigning>
   </application>
-  <files keepModificationTimes="false" missingFilesStrategy="error" globalExcludeSuffixes="" defaultOverwriteMode="4" defaultUninstallMode="0" launcherOverwriteMode="3" defaultFileMode="644" defaultDirMode="755">
+  <files keepModificationTimes="false" missingFilesStrategy="error" globalExcludeSuffixes="" defaultOverwriteMode="1" defaultUninstallMode="2" launcherOverwriteMode="1" defaultFileMode="644" defaultDirMode="755">
     <filesets />
     <roots />
     <mountPoints>
@@ -26,10 +26,10 @@
       <mountPoint id="58" root="" location="" mode="755" />
     </mountPoints>
     <entries>
-      <dirEntry mountPoint="176" file="./translations" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="translations" excludeSuffixes="*.pot" dirMode="755" overrideDirMode="false">
+      <dirEntry mountPoint="176" file="./translations" overwriteMode="1" shared="false" fileMode="644" uninstallMode="2" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="translations" excludeSuffixes="*.pot" dirMode="755" overrideDirMode="false">
         <exclude />
       </dirEntry>
-      <fileEntry mountPoint="58" file="./build/libs/dmdirc.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="58" file="./build/libs/dmdirc.jar" overwriteMode="1" shared="false" fileMode="644" uninstallMode="2" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
     </entries>
     <components />
   </files>
