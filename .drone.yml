@@ -47,6 +47,8 @@ steps:
         from_secret: githubreleasekey
       files:
         - /drone/src/build/installer/DMDirc*
+        - /drone/src/build/installer/updates.xml
+        - /drone/src/build/installer/md5sums
         - /drone/src/build/libs/dmdircui.jar
       checksum:
         - sha256

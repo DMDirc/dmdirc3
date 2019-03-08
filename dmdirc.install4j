@@ -847,6 +847,9 @@ if (entry == null) {
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.net.DownloadFileAction">
+                          <void property="checkForMd5Sums">
+                            <boolean>true</boolean>
+                          </void>
                           <void property="targetFile">
                             <object class="java.io.File">
                               <string>${installer:updaterDownloadFile}</string>
