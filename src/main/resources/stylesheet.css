@@ -57,6 +57,18 @@
     -fx-border-color: #999999;
 }
 
+.welcome {
+    -fx-padding: 5px;
+}
+
+.welcome-header {
+    -fx-font-size: 2em;
+    -fx-font-weight: bold;
+}
+
+.welcome-text {
+    -fx-text-alignment: justify;
+}
 
 /* Supported text styles */
 .irc-bold { -fx-font-weight: bold !important; }

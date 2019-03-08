@@ -13,6 +13,7 @@ object MainContract {
         fun connect(connectionDetails: ConnectionDetails)
         fun joinChannel(channel: String)
         fun leaveChannel(channel: String)
+        fun joinDev()
     }
 }
 
@@ -20,6 +21,9 @@ class MainController(
     private val config1: ClientConfig,
     private val connectionFactory: (ConnectionDetails) -> ConnectionContract.Controller
 ) : MainContract.Controller {
+    override fun joinDev() {
+        connect(ConnectionDetails(hostname = "chat.freenode.net", port = 6667, tls = false, autoJoin = listOf("#DMDirc")))
+    }
 
     override val windows: ObservableList<WindowModel> = FXCollections.observableArrayList(WindowModel.extractor())
     override val selectedWindow = SimpleObjectProperty<WindowModel>()
