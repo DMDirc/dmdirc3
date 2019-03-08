@@ -8,9 +8,8 @@ import org.junit.jupiter.api.Test
 
 internal class ServerListControllerTest {
     private val mainController = mockk<MainContract.Controller>()
-    private val stage = mockk<Stage>()
     private val config = mockk<ClientConfig>()
-    private val controller = ServerListController(mainController, stage, config)
+    private val controller = ServerListController(mainController, config)
 
     @Test
     fun `test connect called`() {
@@ -70,7 +69,7 @@ internal class ServerListControllerTest {
                 tls = true,
                 autoconnect = false
             )
-        )
+        ).observable()
         val servers = listOf(
             ConnectionDetails(
                 hostname = "hostname1",
@@ -97,7 +96,8 @@ internal class ServerListControllerTest {
 
 internal class ServerListModelTest {
     private val controller = mockk<ServerListController>()
-    val model = ServerListModel(controller)
+    private val config = mockk<ClientConfig>()
+    val model = ServerListModel(controller, config)
 
     @Test
     fun `test connect pressed when null`() {
