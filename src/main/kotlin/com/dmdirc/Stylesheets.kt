@@ -29,10 +29,8 @@ private fun Path.watchFile(file: Path, action: () -> Unit) {
     if (!Files.isDirectory(this)) return
     watch().takeRepeat {
         val context = it.context()
-        if (context is Path) {
-            if (context == file) {
-                action.invoke()
-            }
+        if (context is Path && context.fileName == file.fileName) {
+            action.invoke()
         }
     }
 }
