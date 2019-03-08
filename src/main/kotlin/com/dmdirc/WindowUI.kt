@@ -50,7 +50,7 @@ class WindowModel(
 
     companion object {
         fun extractor(): Callback<WindowModel, Array<Observable>> {
-            return Callback { m -> arrayOf(m.title) }
+            return Callback { m -> arrayOf(m.title, m.hasUnreadMessages) }
         }
     }
 
@@ -142,6 +142,7 @@ class WindowModel(
         )
 
     private fun addLine(spans: Sequence<StyledSpan>) {
+        hasUnreadMessages.set(true)
         lines.add(spans.toList().toTypedArray())
     }
 
