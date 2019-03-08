@@ -63,7 +63,11 @@ class WindowModel(
 
     companion object {
         fun extractor(): Callback<WindowModel, Array<Observable>> {
-            return Callback { m -> arrayOf(m.title, m.hasUnreadMessages) }
+            return Callback { m ->
+                arrayOf(
+                    m.title, m.hasUnreadMessages, m?.connection?.connected ?: SimpleBooleanProperty(false)
+                )
+            }
         }
     }
 
