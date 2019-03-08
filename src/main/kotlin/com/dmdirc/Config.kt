@@ -14,10 +14,11 @@ import java.util.logging.Logger
 
 data class ConnectionDetails(
     val hostname: String,
-    val password: String,
+    val password: String = "",
     val port: Int,
     val tls: Boolean = true,
-    val autoconnect: Boolean = false
+    val autoconnect: Boolean = false,
+    val autoJoin: List<String> = emptyList()
 )
 
 object ClientSpec : ConfigSpec("") {
