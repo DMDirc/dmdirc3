@@ -91,9 +91,7 @@ class WindowModel(
             is ServerConnected -> addLine(ts, serverEvent, tr("Connected"))
             is ServerDisconnected -> addLine(ts, serverEvent, tr("Disconnected"))
             is ServerConnectionError -> addLine(
-                ts,
-                serverEvent,
-                tr("Error: %s - %s").format(event.error.translated(), event.details ?: "")
+                ts, serverEvent, tr("Error: %s - %s").format(event.error.translated(), event.details ?: "")
             )
 
             is ChannelJoined -> addLine(ts, channelEvent, tr("%s joined").format(event.formattedNickname))
@@ -135,8 +133,7 @@ class WindowModel(
     fun addLine(timestamp: String, format: Item<String>, vararg args: String) = addLine(
         sequenceOf(
             StyledSpan(
-                timestamp,
-                setOf(Style.CustomStyle("timestamp"))
+                timestamp, setOf(Style.CustomStyle("timestamp"))
             )
         ) + " ${config[format].format(*args)}".detectLinks().convertControlCodes()
     )

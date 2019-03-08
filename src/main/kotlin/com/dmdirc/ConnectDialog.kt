@@ -42,11 +42,7 @@ class ServerListController(
         ServerlistDialog(model, stage).show()
         model.servers.addAll(config[ClientSpec.servers].map {
             ConnectionDetailsEditable(
-                it.hostname,
-                it.password,
-                it.port,
-                it.tls,
-                it.autoconnect
+                it.hostname, it.password, it.port, it.tls, it.autoconnect
             )
         }.toMutableList().observable())
         if (model.servers.isNotEmpty()) {

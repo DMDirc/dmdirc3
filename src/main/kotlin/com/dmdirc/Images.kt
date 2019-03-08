@@ -33,10 +33,9 @@ fun WindowModel.addImageHandler(config: ClientConfig) {
 
 private fun Array<StyledSpan>.imageSpans() =
     this.flatMap { it.styles }.filterIsInstance(Style.Link::class.java).map { it.url }.filter {
-            it.matches(
-                Regex(
-                    ".*\\.(png|jpg|jpeg)$",
-                    RegexOption.IGNORE_CASE
-                )
+        it.matches(
+            Regex(
+                ".*\\.(png|jpg|jpeg)$", RegexOption.IGNORE_CASE
             )
-        }.map { StyledSpan("${ControlCode.InternalImages}$it", emptySet()) }.toTypedArray()
+        )
+    }.map { StyledSpan("${ControlCode.InternalImages}$it", emptySet()) }.toTypedArray()

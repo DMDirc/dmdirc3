@@ -3,56 +3,56 @@ name: default
 
 steps:
 
-  - name: Test
-    image: openjdk:11-jdk
-    commands:
-      - ./gradlew build test jacocoTestReport
-    when:
-      event:
-        exclude:
-          - tag
+    - name: Test
+      image: openjdk:11-jdk
+      commands:
+          - ./gradlew check jacocoTestReport
+      when:
+          event:
+              exclude:
+                  - tag
 
 
-  - name: Coverage
-    image: plugins/codecov
-    settings:
-      token:
-        from_secret: CODECOV_TOKEN
-      files:
-        - build/reports/jacoco/report.xml
-    when:
-      event:
-        exclude:
-          - tag
+    - name: Coverage
+      image: plugins/codecov
+      settings:
+          token:
+              from_secret: CODECOV_TOKEN
+          files:
+              - build/reports/jacoco/report.xml
+      when:
+          event:
+              exclude:
+                  - tag
 
-  - name: Installers
-    image: openjdk:11-jdk
-    commands:
-      - wget -q https://download-keycdn.ej-technologies.com/install4j/install4j_linux_7_0_9.deb
-      - dpkg -i install4j_linux_7_0_9.deb
-      - wget -q -O /opt/install4j7/jres/macosx-amd64-11.0.2.tar.gz https://download.ej-technologies.com/bundles/java9/macosx-amd64-11.0.2.tar.gz
-      - wget -q -O /opt/install4j7/jres/windows-amd64-11.0.2.tar.gz https://download.ej-technologies.com/bundles/java9/windows-amd64-11.0.2.tar.gz
-      - ./gradlew install4j
-    environment:
-      i4jlicense:
-        from_secret: install4jkey
-    when:
-      event:
-        - tag
+    - name: Installers
+      image: openjdk:11-jdk
+      commands:
+          - wget -q https://download-keycdn.ej-technologies.com/install4j/install4j_linux_7_0_9.deb
+          - dpkg -i install4j_linux_7_0_9.deb
+          - wget -q -O /opt/install4j7/jres/macosx-amd64-11.0.2.tar.gz https://download.ej-technologies.com/bundles/java9/macosx-amd64-11.0.2.tar.gz
+          - wget -q -O /opt/install4j7/jres/windows-amd64-11.0.2.tar.gz https://download.ej-technologies.com/bundles/java9/windows-amd64-11.0.2.tar.gz
+          - ./gradlew install4j
+      environment:
+          i4jlicense:
+              from_secret: install4jkey
+      when:
+          event:
+              - tag
 
-  - name: Publish
-    image: plugins/github-release
-    settings:
-      api_key:
-        from_secret: githubreleasekey
-      files:
-        - /drone/src/build/installer/DMDirc*
-        - /drone/src/build/installer/updates.xml
-        - /drone/src/build/installer/md5sums
-        - /drone/src/build/libs/dmdircui.jar
-      checksum:
-        - sha256
-      title: ${DRONE_TAG}
-    when:
-      event:
-        - tag
+    - name: Publish
+      image: plugins/github-release
+      settings:
+          api_key:
+              from_secret: githubreleasekey
+          files:
+              - /drone/src/build/installer/DMDirc*
+              - /drone/src/build/installer/updates.xml
+              - /drone/src/build/installer/md5sums
+              - /drone/src/build/libs/dmdircui.jar
+          checksum:
+              - sha256
+          title: ${DRONE_TAG}
+      when:
+          event:
+              - tag
