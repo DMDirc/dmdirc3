@@ -86,6 +86,9 @@ class NodeListCell(
             graphic = BorderPane().apply {
                 contextMenu = ServerContextMenu(joinDialogProvider, controller)
                 styleClass.add("node-${node.type.name.toLowerCase()}")
+                if (node.connection?.connected?.value == false) {
+                    styleClass.add("node-disconnected")
+                }
                 if (node.hasUnreadMessages.value) {
                     styleClass.add("node-unread")
                 }
@@ -175,11 +178,13 @@ class MainView(
         primaryStage.icons.add(Image(MainView::class.java.getResourceAsStream("/logo.png")))
         titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
         controller.selectedWindow.addListener { _, oldValue, newValue ->
-            oldValue?.hasUnreadMessages?.set(false)
-            newValue?.hasUnreadMessages?.set(false)
-            selectedWindow.value = newValue?.let {
-                it.connection?.children?.get(it.name.value)?.ui
-            } ?: VBox()
+            runLater {
+                oldValue?.hasUnreadMessages?.set(false)
+                newValue?.hasUnreadMessages?.set(false)
+                selectedWindow.value = newValue?.let {
+                    it.connection?.children?.get(it.name.value)?.ui
+                } ?: VBox()
+            }
         }
     }
 }
@@ -207,7 +212,7 @@ class WelcomePane(
             styleClass.add("welcome-header")
         }, Label(
             tr(
-                "To get started you'll need to set your nickname and other settings and add a server " + "or two, you can do this with the buttons below. If you'd rather just dive in, click " + "the \"Chat with us\" button and you'll connect to our development channel with " + "some default settings."
+                "To get started you'll need to set your nickname and other settings and add a server or two, you can do this with the buttons below. If you'd rather just dive in, click the \"Chat with us\" button and you'll connect to our development channel with some default settings."
             )
         ).apply {
             styleClass.add("welcome-text")
