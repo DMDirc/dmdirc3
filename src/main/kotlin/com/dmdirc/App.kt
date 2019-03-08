@@ -59,15 +59,15 @@ private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty
     bind<JoinDialog>() with provider {
         JoinDialog(instance(), instance("dialogPane"))
     }
+    bind<SettingsDialog>() with provider {
+        SettingsDialog(instance(), instance("dialogPane"))
+    }
     bind<WelcomePane>() with provider {
         WelcomePane(instance(), instance(), instance(), provider(), instance("version"))
     }
 
     bind<Stage>().subTypes() with {
-        when (it.jvmType) {
-            SettingsDialog::class.java -> provider { SettingsDialog(instance()) }
-            else -> instance(stage)
-        }
+        instance(stage)
     }
 
     bind<ConnectionContract.Controller>() with factory { connectionDetails: ConnectionDetails -> Connection(connectionDetails, instance(), instance()) }

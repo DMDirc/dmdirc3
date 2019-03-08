@@ -88,6 +88,18 @@
     -fx-padding: 15px 0 0 15px;
 }
 
+.settings-dialog ButtonBar {
+    -fx-padding: 15px 0 0 15px;
+}
+
+.settings-dialog GridPane {
+    -fx-vgap: 5px;
+}
+
+.settings-dialog-header {
+    -fx-font-size: 1.25em;
+}
+
 /* Supported text styles */
 .irc-bold { -fx-font-weight: bold !important; }
 .irc-italic { -fx-font-style: italic !important; }
