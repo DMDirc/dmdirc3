@@ -69,22 +69,10 @@ class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: Object
                 parent.value = null
             }
         }
+        styleClass.add("join-dialog")
         children.addAll(
             VBox().apply {
-                padding = Insets(15.0, 15.0, 15.0, 15.0)
-                border = Border(
-                    BorderStroke(
-                        Color.BLACK,
-                        BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT
-                    )
-                )
-                background = Background(
-                    BackgroundFill(
-                        Color.WHITESMOKE,
-                        CornerRadii.EMPTY,
-                        Insets.EMPTY
-                    )
-                )
+                styleClass.add("dialog-background")
                 children.addAll(
                     Label(tr("Enter channel to join: ")),
                     TextField().apply {
@@ -107,7 +95,7 @@ class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: Object
                 )
             },
             VBox().apply {
-                VBox.setVgrow(this, Priority.ALWAYS);
+                VBox.setVgrow(this, Priority.ALWAYS)
             }
         )
     }
