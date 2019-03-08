@@ -16,6 +16,20 @@
     -fx-padding: 5px 5px 5px 5px;
 }
 
+.tree-view BorderPane {
+    -fx-border-width: 0 0 0 5px;
+    -fx-border-style: solid;
+    -fx-border-color: transparent;
+}
+
+.tree-view .cell:selected BorderPane {
+    -fx-border-color: black;
+}
+
+.tree-view .node-unread {
+    -fx-border-color: #996800;
+}
+
 .tree-view .cell {
     -fx-padding: 0;
 }
@@ -31,14 +45,6 @@
 
 .tree-view .node-server:hover .node-cog, .tree-view .cell:selected .node-cog {
     visibility: visible
-}
-
-/* Hide the horizontal scrollbar in the tree-view (yuck). */
-.tree-view .scroll-bar:horizontal .increment-arrow,
-.tree-view .scroll-bar:horizontal .decrement-arrow,
-.tree-view .scroll-bar:horizontal .increment-button,
-.tree-view .scroll-bar:horizontal .decrement-button {
-    -fx-padding:0;
 }
 
 .nick-list {
