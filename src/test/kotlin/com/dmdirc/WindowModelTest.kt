@@ -1,6 +1,19 @@
 package com.dmdirc
 
-import com.dmdirc.ktirc.events.*
+import com.dmdirc.ktirc.events.ActionReceived
+import com.dmdirc.ktirc.events.ChannelJoined
+import com.dmdirc.ktirc.events.ChannelNickChanged
+import com.dmdirc.ktirc.events.ChannelParted
+import com.dmdirc.ktirc.events.ChannelQuit
+import com.dmdirc.ktirc.events.ChannelTopicChanged
+import com.dmdirc.ktirc.events.ChannelTopicDiscovered
+import com.dmdirc.ktirc.events.ChannelTopicMetadataDiscovered
+import com.dmdirc.ktirc.events.EventMetadata
+import com.dmdirc.ktirc.events.MessageReceived
+import com.dmdirc.ktirc.events.NoticeReceived
+import com.dmdirc.ktirc.events.ServerConnected
+import com.dmdirc.ktirc.events.ServerConnectionError
+import com.dmdirc.ktirc.events.ServerDisconnected
 import com.dmdirc.ktirc.model.ConnectionError
 import com.dmdirc.ktirc.model.User
 import com.jukusoft.i18n.I
@@ -12,7 +25,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.util.*
+import java.util.Locale
 
 internal class WindowModelTest {
 
@@ -178,10 +191,7 @@ internal class WindowModelTest {
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
             ChannelParted(
-                metaData,
-                User("acidBurn"),
-                "#channel",
-                "Mess with the best"
+                metaData, User("acidBurn"), "#channel", "Mess with the best"
             )
         )
         assertEquals(1, model.lines.size)
@@ -203,10 +213,7 @@ internal class WindowModelTest {
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
             MessageReceived(
-                metaData,
-                User("acidBurn"),
-                "#channel",
-                "Mess with the best"
+                metaData, User("acidBurn"), "#channel", "Mess with the best"
             )
         )
         assertEquals(1, model.lines.size)
@@ -228,10 +235,7 @@ internal class WindowModelTest {
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
             NoticeReceived(
-                metaData,
-                User("acidBurn"),
-                "#channel",
-                "Mess with the best"
+                metaData, User("acidBurn"), "#channel", "Mess with the best"
             )
         )
         assertEquals(1, model.lines.size)
@@ -375,10 +379,7 @@ internal class WindowModelTest {
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
             ChannelQuit(
-                metaData,
-                User("acidBurn"),
-                "#channel",
-                "Mess with the best"
+                metaData, User("acidBurn"), "#channel", "Mess with the best"
             )
         )
         assertEquals(1, model.lines.size)
@@ -403,8 +404,7 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- Connected", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))), StyledSpan(" -- Connected", emptySet())
             ), model.lines[0]
         )
     }

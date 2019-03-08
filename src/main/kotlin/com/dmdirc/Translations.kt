@@ -5,7 +5,7 @@ import com.jukusoft.i18n.I
 import com.jukusoft.i18n.I.tr
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.*
+import java.util.Locale
 
 fun initInternationalisation(path: Path, locale: String?) {
     if (!Files.exists(path)) {

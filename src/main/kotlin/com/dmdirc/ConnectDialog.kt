@@ -40,9 +40,15 @@ class ServerListController(
         val model = ServerListModel(this)
         this.model = model
         ServerlistDialog(model, stage).show()
-        model.servers.addAll(config[ClientSpec.servers]
-            .map { ConnectionDetailsEditable(it.hostname, it.password, it.port, it.tls, it.autoconnect) }
-            .toMutableList().observable())
+        model.servers.addAll(config[ClientSpec.servers].map {
+            ConnectionDetailsEditable(
+                it.hostname,
+                it.password,
+                it.port,
+                it.tls,
+                it.autoconnect
+            )
+        }.toMutableList().observable())
         if (model.servers.isNotEmpty()) {
             model.selected.value = model.servers.first()
         }
@@ -60,14 +66,9 @@ class ServerListController(
         model?.closeDialog()
     }
 
-    internal fun getConnectionDetails(server: ConnectionDetailsEditable) =
-        ConnectionDetails(
-            server.hostname,
-            server.password,
-            server.port,
-            server.tls,
-            server.autoconnect
-        )
+    internal fun getConnectionDetails(server: ConnectionDetailsEditable) = ConnectionDetails(
+        server.hostname, server.password, server.port, server.tls, server.autoconnect
+    )
 }
 
 class ServerListModel(private val controller: ServerListController) : ValidatingModel {
@@ -107,15 +108,11 @@ class ServerListModel(private val controller: ServerListController) : Validating
     }
 
     fun addPressed() {
-        servers.add(
-            ConnectionDetailsEditable(
-                hostname = "New Server",
-                port = 6697,
-                tls = true,
-                autoconnect = false
-            ).apply {
-                selected.value = this
-            })
+        servers.add(ConnectionDetailsEditable(
+            hostname = "New Server", port = 6697, tls = true, autoconnect = false
+        ).apply {
+            selected.value = this
+        })
     }
 
     fun connectPressed() {
@@ -206,42 +203,36 @@ class ServerlistDialog(private val model: ServerListModel, primaryStage: Stage) 
                     }, 1, 4)
                 }
                 bottom = ButtonBar().apply {
-                    buttons.addAll(
-                        Button(tr("Connect")).apply {
-                            setButtonData(this, ButtonBar.ButtonData.OK_DONE)
-                            setOnAction {
-                                model.connectPressed()
-                            }
-                        }, Button(tr("Delete")).apply {
-                            setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
-                            setOnAction {
-                                model.deletePressed()
-                            }
+                    buttons.addAll(Button(tr("Connect")).apply {
+                        setButtonData(this, ButtonBar.ButtonData.OK_DONE)
+                        setOnAction {
+                            model.connectPressed()
                         }
-                    )
+                    }, Button(tr("Delete")).apply {
+                        setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
+                        setOnAction {
+                            model.deletePressed()
+                        }
+                    })
                 }
             }
             bottom = ButtonBar().apply {
-                buttons.addAll(
-                    Button(tr("Add")).apply {
-                        setButtonData(this, ButtonBar.ButtonData.LEFT)
-                        setOnAction {
-                            model.addPressed()
-                        }
-                    },
-                    Button(tr("Save")).apply {
-                        setButtonData(this, ButtonBar.ButtonData.OK_DONE)
-                        setOnAction {
-                            model.savePressed()
-                        }
-                    },
-                    Button(tr("Cancel")).apply {
-                        setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
-                        setOnAction {
-                            model.cancelPressed()
-                        }
+                buttons.addAll(Button(tr("Add")).apply {
+                    setButtonData(this, ButtonBar.ButtonData.LEFT)
+                    setOnAction {
+                        model.addPressed()
                     }
-                )
+                }, Button(tr("Save")).apply {
+                    setButtonData(this, ButtonBar.ButtonData.OK_DONE)
+                    setOnAction {
+                        model.savePressed()
+                    }
+                }, Button(tr("Cancel")).apply {
+                    setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
+                    setOnAction {
+                        model.cancelPressed()
+                    }
+                })
             }
         })
     }

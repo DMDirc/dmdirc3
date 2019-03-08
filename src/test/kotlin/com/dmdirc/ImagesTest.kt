@@ -59,8 +59,7 @@ internal class ImagesTest {
                 StyledSpan("${ControlCode.InternalImages}$url", emptySet()),
                 StyledSpan("${ControlCode.InternalImages}$url", emptySet()),
                 StyledSpan("${ControlCode.InternalImages}$url", emptySet())
-            ),
-            fakeModel.lines[1]
+            ), fakeModel.lines[1]
         )
     }
 
@@ -68,17 +67,14 @@ internal class ImagesTest {
     fun `adds a multiple image lines when multiple lines containing image links are added in one go`() {
         every { mockConfig[ClientSpec.Display.embedImages] } returns true
         fakeModel.lines.addAll(
-            arrayOf(StyledSpan(url, setOf(Style.Link(url)))),
-            arrayOf(StyledSpan(url, setOf(Style.Link(url))))
+            arrayOf(StyledSpan(url, setOf(Style.Link(url)))), arrayOf(StyledSpan(url, setOf(Style.Link(url))))
         )
         assertEquals(4, fakeModel.lines.size)
         assertArrayEquals(
-            arrayOf(StyledSpan("${ControlCode.InternalImages}$url", emptySet())),
-            fakeModel.lines[1]
+            arrayOf(StyledSpan("${ControlCode.InternalImages}$url", emptySet())), fakeModel.lines[1]
         )
         assertArrayEquals(
-            arrayOf(StyledSpan("${ControlCode.InternalImages}$url", emptySet())),
-            fakeModel.lines[3]
+            arrayOf(StyledSpan("${ControlCode.InternalImages}$url", emptySet())), fakeModel.lines[3]
         )
     }
 }

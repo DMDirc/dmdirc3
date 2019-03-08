@@ -23,8 +23,7 @@ internal class ControlCodesTest {
 
             arguments(
                 "Crash and \u0002burn", listOf(
-                    StyledSpan("Crash and ", emptySet()),
-                    StyledSpan("burn", setOf(Style.BoldStyle))
+                    StyledSpan("Crash and ", emptySet()), StyledSpan("burn", setOf(Style.BoldStyle))
                 )
             ),
 
@@ -58,22 +57,19 @@ internal class ControlCodesTest {
 
             arguments(
                 "\u00034,5Crash and \u000fburn", listOf(
-                    StyledSpan("Crash and ", setOf(Style.ColourStyle(4, 5))),
-                    StyledSpan("burn", emptySet())
+                    StyledSpan("Crash and ", setOf(Style.ColourStyle(4, 5))), StyledSpan("burn", emptySet())
                 )
             ),
 
             arguments(
                 "\u00034,Crash and \u0003burn", listOf(
-                    StyledSpan(",Crash and ", setOf(Style.ColourStyle(4, null))),
-                    StyledSpan("burn", emptySet())
+                    StyledSpan(",Crash and ", setOf(Style.ColourStyle(4, null))), StyledSpan("burn", emptySet())
                 )
             ),
 
             arguments(
                 "\u00034,Crash and \u0004burn", listOf(
-                    StyledSpan(",Crash and ", setOf(Style.ColourStyle(4, null))),
-                    StyledSpan("burn", emptySet())
+                    StyledSpan(",Crash and ", setOf(Style.ColourStyle(4, null))), StyledSpan("burn", emptySet())
                 )
             ),
 
@@ -113,8 +109,7 @@ internal class ControlCodesTest {
 
             arguments(
                 "\u0004Crash and \u0004burn", listOf(
-                    StyledSpan("Crash and ", emptySet()),
-                    StyledSpan("burn", emptySet())
+                    StyledSpan("Crash and ", emptySet()), StyledSpan("burn", emptySet())
                 )
             ),
 
@@ -126,8 +121,7 @@ internal class ControlCodesTest {
 
             arguments(
                 "\u0017Crash and \u0017burn", listOf(
-                    StyledSpan("Crash and ", setOf(Style.Link("Crash and "))),
-                    StyledSpan("burn", emptySet())
+                    StyledSpan("Crash and ", setOf(Style.Link("Crash and "))), StyledSpan("burn", emptySet())
                 )
             ),
 
@@ -140,8 +134,7 @@ internal class ControlCodesTest {
 
             arguments(
                 "\u0019Crash\u0019 and burn", listOf(
-                    StyledSpan("Crash", setOf(Style.Nickname("Crash"))),
-                    StyledSpan(" and burn", emptySet())
+                    StyledSpan("Crash", setOf(Style.Nickname("Crash"))), StyledSpan(" and burn", emptySet())
                 )
             ),
 
@@ -159,8 +152,7 @@ internal class ControlCodesTest {
             arguments("", ""),
 
             arguments(
-                "https://google.com",
-                "${ControlCode.InternalLinks}https://google.com${ControlCode.InternalLinks}"
+                "https://google.com", "${ControlCode.InternalLinks}https://google.com${ControlCode.InternalLinks}"
             ),
 
             arguments(

@@ -24,10 +24,7 @@ class MainController(
     override fun joinDev() {
         connect(
             ConnectionDetails(
-                hostname = "chat.freenode.net",
-                port = 6667,
-                tls = false,
-                autoJoin = listOf("#DMDirc")
+                hostname = "chat.freenode.net", port = 6667, tls = false, autoJoin = listOf("#DMDirc")
             )
         )
     }

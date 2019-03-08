@@ -18,7 +18,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.direct
-import org.kodein.di.generic.*
+import org.kodein.di.generic.bind
+import org.kodein.di.generic.factory
+import org.kodein.di.generic.instance
+import org.kodein.di.generic.provider
+import org.kodein.di.generic.singleton
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.logging.LogManager
@@ -52,8 +56,14 @@ private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty
     bind<ObjectProperty<Node>>("dialogPane") with singleton { SimpleObjectProperty<Node>() }
     bind<MainView>() with singleton {
         MainView(
-            instance(), instance(), provider(), provider(), instance(),
-            instance("mainViewTitle"), instance("dialogPane"), provider()
+            instance(),
+            instance(),
+            provider(),
+            provider(),
+            instance(),
+            instance("mainViewTitle"),
+            instance("dialogPane"),
+            provider()
         )
     }
     bind<JoinDialog>() with provider {
@@ -69,9 +79,7 @@ private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty
 
     bind<ConnectionContract.Controller>() with factory { connectionDetails: ConnectionDetails ->
         Connection(
-            connectionDetails,
-            instance(),
-            instance()
+            connectionDetails, instance(), instance()
         )
     }
     bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }

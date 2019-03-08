@@ -69,12 +69,11 @@ class ClientConfig private constructor(private val path: Path, private val confi
      * If [newPath] is provided the config is saved to that path; otherwise
      * the config is saved to the path it was originally loaded from
      */
-    fun save(newPath: Path? = null) =
-        try {
-            Files.newOutputStream(newPath ?: path).use { config.toYaml.toOutputStream(it) }
-        } catch (ex: IOException) {
-            logger.log(Level.WARNING, ex) { "Unable to load config file" }
-        }
+    fun save(newPath: Path? = null) = try {
+        Files.newOutputStream(newPath ?: path).use { config.toYaml.toOutputStream(it) }
+    } catch (ex: IOException) {
+        logger.log(Level.WARNING, ex) { "Unable to load config file" }
+    }
 
     companion object {
 
@@ -85,15 +84,14 @@ class ClientConfig private constructor(private val path: Path, private val confi
          *
          * If the [path] doesn't exist or cannot be read, a default config is returned.
          */
-        fun loadFrom(path: Path): ClientConfig =
-            with(Config { addSpec(ClientSpec) }) {
-                try {
-                    return ClientConfig(path, Files.newInputStream(path).use { from.yaml.inputStream(it) })
-                } catch (ex: Exception) {
-                    logger.log(Level.WARNING, ex) { "Unable to load config file" }
-                }
-                return ClientConfig(path, this)
+        fun loadFrom(path: Path): ClientConfig = with(Config { addSpec(ClientSpec) }) {
+            try {
+                return ClientConfig(path, Files.newInputStream(path).use { from.yaml.inputStream(it) })
+            } catch (ex: Exception) {
+                logger.log(Level.WARNING, ex) { "Unable to load config file" }
             }
+            return ClientConfig(path, this)
+        }
     }
 }
 
@@ -105,9 +103,7 @@ private const val DIRECTORY_NAME = "dmdirc3"
 fun getConfigDirectory(): Path {
     val fs = FileSystems.getDefault()
     val path = fs.getConfigDirectory(
-        System.getProperty("os.name"),
-        fs.getPath(System.getProperty("user.home")),
-        System.getenv()
+        System.getProperty("os.name"), fs.getPath(System.getProperty("user.home")), System.getenv()
     )
     if (!Files.isDirectory(path)) {
         Files.createDirectories(path)
@@ -118,13 +114,12 @@ fun getConfigDirectory(): Path {
 /**
  * Gets the config directory that DMDirc should use, given the [osName], [homeDir] and [envVars].
  */
-fun FileSystem.getConfigDirectory(osName: String, homeDir: Path, envVars: Map<String, String>): Path =
-    when {
-        "DMDIRC_HOME" in envVars -> getPath(envVars["DMDIRC_HOME"])
-        osName.startsWith("Mac OS") -> resolveMacConfigDirectory(homeDir)
-        osName.startsWith("Windows") -> resolveWindowsConfigDirectory(homeDir, envVars["APPDATA"])
-        else -> resolveOtherConfigDirectory(homeDir, envVars["XDG_CONFIG_HOME"])
-    }.toAbsolutePath()
+fun FileSystem.getConfigDirectory(osName: String, homeDir: Path, envVars: Map<String, String>): Path = when {
+    "DMDIRC_HOME" in envVars -> getPath(envVars["DMDIRC_HOME"])
+    osName.startsWith("Mac OS") -> resolveMacConfigDirectory(homeDir)
+    osName.startsWith("Windows") -> resolveWindowsConfigDirectory(homeDir, envVars["APPDATA"])
+    else -> resolveOtherConfigDirectory(homeDir, envVars["XDG_CONFIG_HOME"])
+}.toAbsolutePath()
 
 /**
  * Resolves the pre-defined config directory relative to the given [homeDir] for macs.

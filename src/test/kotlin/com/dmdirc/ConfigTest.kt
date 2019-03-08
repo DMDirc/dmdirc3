@@ -2,7 +2,9 @@ package com.dmdirc
 
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.nio.file.Files
 
