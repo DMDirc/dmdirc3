@@ -2,19 +2,18 @@ package com.dmdirc
 
 import com.jukusoft.i18n.I
 import com.jukusoft.i18n.I.tr
-import javafx.beans.property.*
-import javafx.geometry.Insets
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.ObjectProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.StringProperty
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
-import javafx.scene.layout.*
-import javafx.scene.layout.BorderWidths
-import javafx.scene.layout.CornerRadii
-import javafx.scene.paint.Color
-
-
+import javafx.scene.layout.Priority
+import javafx.scene.layout.VBox
 
 object JoinDialogContract {
     interface Controller {
@@ -55,7 +54,6 @@ class JoinDialogModel(private val controller: JoinDialogContract.Controller) : J
     override fun onTextAction() = commit()
     override fun onJoinPressed() = commit()
     override fun onCancelPressed() = close()
-
 }
 
 class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: ObjectProperty<Node>) : VBox() {
@@ -70,33 +68,23 @@ class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: Object
             }
         }
         styleClass.add("join-dialog")
-        children.addAll(
-            VBox().apply {
-                styleClass.add("dialog-background")
-                children.addAll(
-                    Label(tr("Enter channel to join: ")),
-                    TextField().apply {
-                        bindRequiredTextControl(this, model.channel, model)
-                        setOnAction { model.onTextAction() }
-                    },
-                    ButtonBar().apply {
-                        buttons.addAll(
-                            Button(I.tr("Join")).apply {
-                                ButtonBar.setButtonData(this, ButtonBar.ButtonData.OK_DONE)
-                                disableProperty().bind(model.valid.not())
-                                setOnAction { model.onJoinPressed() }
-                            },
-                            Button(I.tr("Cancel")).apply {
-                                ButtonBar.setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
-                                setOnAction { model.onCancelPressed() }
-                            }
-                        )
-                    }
-                )
-            },
-            VBox().apply {
-                VBox.setVgrow(this, Priority.ALWAYS)
-            }
-        )
+        children.addAll(VBox().apply {
+            styleClass.add("dialog-background")
+            children.addAll(Label(tr("Enter channel to join: ")), TextField().apply {
+                bindRequiredTextControl(this, model.channel, model)
+                setOnAction { model.onTextAction() }
+            }, ButtonBar().apply {
+                buttons.addAll(Button(I.tr("Join")).apply {
+                    ButtonBar.setButtonData(this, ButtonBar.ButtonData.OK_DONE)
+                    disableProperty().bind(model.valid.not())
+                    setOnAction { model.onJoinPressed() }
+                }, Button(I.tr("Cancel")).apply {
+                    ButtonBar.setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
+                    setOnAction { model.onCancelPressed() }
+                })
+            })
+        }, VBox().apply {
+            VBox.setVgrow(this, Priority.ALWAYS)
+        })
     }
 }

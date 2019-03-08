@@ -1,9 +1,21 @@
 package com.dmdirc
 
 import com.dmdirc.ktirc.IrcClient
-import com.dmdirc.ktirc.events.*
+import com.dmdirc.ktirc.events.BatchReceived
+import com.dmdirc.ktirc.events.ChannelJoined
+import com.dmdirc.ktirc.events.ChannelParted
+import com.dmdirc.ktirc.events.IrcEvent
+import com.dmdirc.ktirc.events.NicknameChangeFailed
+import com.dmdirc.ktirc.events.NoticeReceived
+import com.dmdirc.ktirc.events.ServerDisconnected
+import com.dmdirc.ktirc.events.ServerReady
+import com.dmdirc.ktirc.events.TargetedEvent
 import com.dmdirc.ktirc.io.CaseMapping
-import com.dmdirc.ktirc.messages.*
+import com.dmdirc.ktirc.messages.sendAction
+import com.dmdirc.ktirc.messages.sendJoin
+import com.dmdirc.ktirc.messages.sendMessage
+import com.dmdirc.ktirc.messages.sendNickChange
+import com.dmdirc.ktirc.messages.sendPart
 import com.dmdirc.ktirc.model.ChannelUser
 import com.dmdirc.ktirc.model.ServerFeature
 import com.dmdirc.ktirc.model.ServerStatus
@@ -12,7 +24,7 @@ import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableSet
 import javafx.scene.Node
-import java.util.*
+import java.util.HashSet
 import java.util.concurrent.atomic.AtomicLong
 
 private val connectionCounter = AtomicLong(0)
@@ -41,11 +53,7 @@ class Connection(
     private val connectionId = connectionCounter.incrementAndGet().toString(16).padStart(20)
 
     private val model = WindowModel(
-        connectionDetails.hostname,
-        WindowType.SERVER,
-        this,
-        config1,
-        connectionId
+        connectionDetails.hostname, WindowType.SERVER, this, config1, connectionId
     )
 
     override val connected = SimpleBooleanProperty(false)
@@ -111,11 +119,7 @@ class Connection(
             event is ServerDisconnected -> runLater { connected.value = false }
             event is ChannelJoined && client.isLocalUser(event.user) -> runLater {
                 val model = WindowModel(
-                    event.target,
-                    WindowType.CHANNEL,
-                    this,
-                    config1,
-                    connectionId
+                    event.target, WindowType.CHANNEL, this, config1, connectionId
                 )
                 model.addImageHandler(config1)
                 children += Child(model, WindowUI(model, hostServices))
@@ -177,7 +181,5 @@ class Connection(
         }
 
         override fun iterator() = HashSet(values).iterator().iterator()
-
     }
-
 }

@@ -20,5 +20,4 @@ class NickListModel {
             users.addAll(it)
         }
     }
-
 }

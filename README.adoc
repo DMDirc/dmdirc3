@@ -48,6 +48,31 @@ so if you can please do write tests; but if you can't please send us a PR anyway
 it over the finish line together. If you have any technical questions about the project, the best way to get in touch
 with us is on irc://chat.freenode.net/dmdirc[IRC], naturally!
 
+=== Code style
+
+A code style configuration for IDEA can be found in `codestyle.xml`. To import it:
+
+* Open the settings (Ctrl+Alt+S)
+* Browse to `Editor` > `Code Style`
+* Click on the cog next to the `Scheme` dropdown
+* Select `Import Scheme` > `Intellij IDEA CodeStyle XML`
+* Select the file from this repository
+
+We run https://ktlint.github.io/[ktlint] as part of our CI tests. While IDEA should output compliant code with
+the provided settings, you can check manually with:
+
+[source,console]
+----
+$ ./gradlew lintKotlin
+----
+
+And automatically fix some problems with:
+
+[source,console]
+----
+$ ./gradlew formatKotlin
+----
+
 === Checking for updated dependencies
 
 [source,console]

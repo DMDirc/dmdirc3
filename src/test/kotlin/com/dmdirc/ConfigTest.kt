@@ -1,7 +1,10 @@
 package com.dmdirc
+
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.nio.file.Files
 
@@ -82,8 +85,8 @@ private class ConfigTest {
 
     @Test
     fun `gets config directory on other OSes with XDG_CONFIG_HOME set`() {
-        val path = fs.getConfigDirectory("Linux", fs.getPath("/users/burn"), mapOf("XDG_CONFIG_HOME" to "/users/burn/.config"))
+        val path =
+            fs.getConfigDirectory("Linux", fs.getPath("/users/burn"), mapOf("XDG_CONFIG_HOME" to "/users/burn/.config"))
         assertEquals("/users/burn/.config/dmdirc3", path.toString())
     }
-
 }

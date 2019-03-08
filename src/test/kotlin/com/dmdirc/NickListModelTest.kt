@@ -1,6 +1,11 @@
 package com.dmdirc
 
-import com.dmdirc.ktirc.events.*
+import com.dmdirc.ktirc.events.ChannelJoined
+import com.dmdirc.ktirc.events.ChannelNickChanged
+import com.dmdirc.ktirc.events.ChannelParted
+import com.dmdirc.ktirc.events.ChannelQuit
+import com.dmdirc.ktirc.events.ChannelUserKicked
+import com.dmdirc.ktirc.events.EventMetadata
 import com.dmdirc.ktirc.model.User
 import io.mockk.every
 import io.mockk.mockk
@@ -85,5 +90,4 @@ internal class NickListModelTest {
         assertEquals("acidBurn", model.users[0])
         assertEquals("zeroCool", model.users[1])
     }
-
 }

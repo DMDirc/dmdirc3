@@ -121,5 +121,4 @@ internal class MainControllerTest {
 
         assertTrue(controller.windows.isEmpty())
     }
-
 }

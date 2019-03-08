@@ -14,6 +14,7 @@ plugins {
     id("org.openjfx.javafxplugin").version("0.0.7")
     id("name.remal.check-updates") version "1.0.113"
     id("com.install4j.gradle") version "7.0.9"
+    id("org.jmailen.kotlinter") version "1.21.0"
 }
 
 install4j {

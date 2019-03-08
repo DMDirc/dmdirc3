@@ -1,6 +1,5 @@
 package com.dmdirc
 
-import com.dmdirc.ValidatorChain
 import io.mockk.mockk
 import io.mockk.verify
 import javafx.beans.property.SimpleBooleanProperty
@@ -83,5 +82,4 @@ internal class ValidatorChainTest {
 
         verify(inverse = true) { listener.changed(refEq(chain), any(), any()) }
     }
-
 }

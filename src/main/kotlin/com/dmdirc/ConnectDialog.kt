@@ -53,16 +53,16 @@ object ServerListDialogContract {
 }
 
 class ConnectionDetailsEditable(
-        var hostname: String,
-        var password: String = "",
-        var port: Int,
-        var tls: Boolean = true,
-        var autoconnect: Boolean = false
+    var hostname: String,
+    var password: String = "",
+    var port: Int,
+    var tls: Boolean = true,
+    var autoconnect: Boolean = false
 )
 
 class ServerListController(
-        private val controller: MainContract.Controller,
-        private val config: ClientConfig
+    private val controller: MainContract.Controller,
+    private val config: ClientConfig
 ) : ServerListDialogContract.Controller {
 
     override fun connect(server: ConnectionDetailsEditable) {
@@ -76,19 +76,14 @@ class ServerListController(
         config.save()
     }
 
-    internal fun getConnectionDetails(server: ConnectionDetailsEditable) =
-            ConnectionDetails(
-                    server.hostname,
-                    server.password,
-                    server.port,
-                    server.tls,
-                    server.autoconnect
-            )
+    internal fun getConnectionDetails(server: ConnectionDetailsEditable) = ConnectionDetails(
+        server.hostname, server.password, server.port, server.tls, server.autoconnect
+    )
 }
 
 class ServerListModel(
-        private val controller: ServerListDialogContract.Controller,
-        private val config: ClientConfig
+    private val controller: ServerListDialogContract.Controller,
+    private val config: ClientConfig
 ) : ServerListDialogContract.ViewModel {
     override val valid = ValidatorChain()
     override val open = SimpleBooleanProperty(true)
@@ -122,9 +117,15 @@ class ServerListModel(
     }
 
     override fun show() {
-        servers.addAll(config[ClientSpec.servers]
-                .map { ConnectionDetailsEditable(it.hostname, it.password, it.port, it.tls, it.autoconnect) }
-                .toMutableList().observable())
+        servers.addAll(config[ClientSpec.servers].map {
+            ConnectionDetailsEditable(
+                it.hostname,
+                it.password,
+                it.port,
+                it.tls,
+                it.autoconnect
+            )
+        }.toMutableList().observable())
         if (servers.isNotEmpty()) {
             selected.value = servers.first()
         }
@@ -136,10 +137,7 @@ class ServerListModel(
 
     override fun addPressed() {
         servers.add(ConnectionDetailsEditable(
-                hostname = "New Server",
-                port = 6697,
-                tls = true,
-                autoconnect = false
+            hostname = "New Server", port = 6697, tls = true, autoconnect = false
         ).apply {
             selected.value = this
         })
@@ -168,7 +166,7 @@ class ServerListModel(
 }
 
 class ConnectionDetailsListCellFactory :
-        Callback<ListView<ConnectionDetailsEditable>, ListCell<ConnectionDetailsEditable>> {
+    Callback<ListView<ConnectionDetailsEditable>, ListCell<ConnectionDetailsEditable>> {
     override fun call(param: ListView<ConnectionDetailsEditable>?): ListCell<ConnectionDetailsEditable> {
         return ConnectionDetailsListCell()
     }
@@ -182,8 +180,8 @@ class ConnectionDetailsListCell : ListCell<ConnectionDetailsEditable>() {
 }
 
 class ServerlistDialog(
-        private val model: ServerListDialogContract.ViewModel,
-        private val parent: ObjectProperty<Node>
+    private val model: ServerListDialogContract.ViewModel,
+    private val parent: ObjectProperty<Node>
 ) : VBox() {
     fun show() {
         parent.value = this
@@ -197,101 +195,91 @@ class ServerlistDialog(
             }
         }
         styleClass.add("serverlist-dialog")
-        children.addAll(
-                VBox().apply {
-                    styleClass.add("dialog-background")
-                    children.addAll(
-                            BorderPane().apply {
-                                styleClass.add("serverlist-dialog")
-                                top = Label(tr("Server List")).apply {
-                                    styleClass.add("dialog-header")
-                                }
-                                left = ListView(model.servers).apply {
-                                    cellFactory = ConnectionDetailsListCellFactory()
-                                    model.selected.addListener { _, _, newValue ->
-                                        selectionModel.select(model.servers.find { connectionDetailsEditable ->
-                                            connectionDetailsEditable == newValue
-                                        })
-                                    }
-                                    selectionModel.selectedItemProperty().addListener { _, _, newValue ->
-                                        model.selected.value = newValue
-                                    }
-                                }
-                                center = BorderPane().apply {
-                                    center = GridPane().apply {
-                                        add(Label(tr("Server Details")).apply {
-                                            styleClass.add("dialog-header")
-                                        }, 0, 0, 2, 1)
-                                        add(Label(tr("Server Name: ")), 0, 1)
-                                        add(TextField().apply {
-                                            bindRequiredTextControl(this, model.hostname, model)
-                                            disableProperty().bind(model.editEnabled.not())
-                                        }, 1, 1)
-                                        add(Label(tr("Port: ")), 0, 2)
-                                        add(Spinner<Number>(1, 65535, model.port.value).apply {
-                                            model.port.bindBidirectional(valueFactory.valueProperty())
-                                            disableProperty().bind(model.editEnabled.not())
-                                        }, 1, 2)
-                                        add(Label(tr("Password: ")), 0, 3)
-                                        add(TextField().apply {
-                                            model.password.bindBidirectional(this.textProperty())
-                                            disableProperty().bind(model.editEnabled.not())
-                                        }, 1, 3)
-                                        add(Label(tr("TLS: ")), 0, 4)
-                                        add(CheckBox().apply {
-                                            model.tls.bindBidirectional(this.selectedProperty())
-                                            disableProperty().bind(model.editEnabled.not())
-                                        }, 1, 4)
-                                        add(Label(tr("AutoConnect: ")), 0, 5)
-                                        add(CheckBox().apply {
-                                            model.autoconnect.bindBidirectional(this.selectedProperty())
-                                            disableProperty().bind(model.editEnabled.not())
-                                        }, 1, 5)
-                                    }
-                                    bottom = ButtonBar().apply {
-                                        buttons.addAll(
-                                                Button(tr("Connect")).apply {
-                                                    setButtonData(this, ButtonBar.ButtonData.OK_DONE)
-                                                    disableProperty().bind(model.editEnabled.not())
-                                                    setOnAction {
-                                                        model.connectPressed()
-                                                    }
-                                                }, Button(tr("Delete")).apply {
-                                            setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
-                                            disableProperty().bind(model.editEnabled.not())
-                                            setOnAction {
-                                                model.deletePressed()
-                                            }
-                                        }
-                                        )
-                                    }
-                                }
-                                bottom = ButtonBar().apply {
-                                    styleClass.add("serverlist-dialog-controls")
-                                    buttons.addAll(
-                                            Button(tr("Add")).apply {
-                                                setButtonData(this, ButtonBar.ButtonData.LEFT)
-                                                setOnAction {
-                                                    model.addPressed()
-                                                }
-                                            },
-                                            Button(tr("Save")).apply {
-                                                setButtonData(this, ButtonBar.ButtonData.OK_DONE)
-                                                setOnAction {
-                                                    model.savePressed()
-                                                }
-                                            },
-                                            Button(tr("Cancel")).apply {
-                                                setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
-                                                setOnAction {
-                                                    model.cancelPressed()
-                                                }
-                                            }
-                                    )
-                                }
-                            }
-                    )
+        children.addAll(VBox().apply {
+            styleClass.add("dialog-background")
+            children.addAll(BorderPane().apply {
+                styleClass.add("serverlist-dialog")
+                top = Label(tr("Server List")).apply {
+                    styleClass.add("dialog-header")
                 }
-        )
+                left = ListView(model.servers).apply {
+                    cellFactory = ConnectionDetailsListCellFactory()
+                    model.selected.addListener { _, _, newValue ->
+                        selectionModel.select(model.servers.find { connectionDetailsEditable ->
+                            connectionDetailsEditable == newValue
+                        })
+                    }
+                    selectionModel.selectedItemProperty().addListener { _, _, newValue ->
+                        model.selected.value = newValue
+                    }
+                }
+                center = BorderPane().apply {
+                    center = GridPane().apply {
+                        add(Label(tr("Server Details")).apply {
+                            styleClass.add("dialog-header")
+                        }, 0, 0, 2, 1)
+                        add(Label(tr("Server Name: ")), 0, 1)
+                        add(TextField().apply {
+                            bindRequiredTextControl(this, model.hostname, model)
+                            disableProperty().bind(model.editEnabled.not())
+                        }, 1, 1)
+                        add(Label(tr("Port: ")), 0, 2)
+                        add(Spinner<Number>(1, 65535, model.port.value).apply {
+                            model.port.bindBidirectional(valueFactory.valueProperty())
+                            disableProperty().bind(model.editEnabled.not())
+                        }, 1, 2)
+                        add(Label(tr("Password: ")), 0, 3)
+                        add(TextField().apply {
+                            model.password.bindBidirectional(this.textProperty())
+                            disableProperty().bind(model.editEnabled.not())
+                        }, 1, 3)
+                        add(Label(tr("TLS: ")), 0, 4)
+                        add(CheckBox().apply {
+                            model.tls.bindBidirectional(this.selectedProperty())
+                            disableProperty().bind(model.editEnabled.not())
+                        }, 1, 4)
+                        add(Label(tr("AutoConnect: ")), 0, 5)
+                        add(CheckBox().apply {
+                            model.autoconnect.bindBidirectional(this.selectedProperty())
+                            disableProperty().bind(model.editEnabled.not())
+                        }, 1, 5)
+                    }
+                    bottom = ButtonBar().apply {
+                        buttons.addAll(Button(tr("Connect")).apply {
+                            setButtonData(this, ButtonBar.ButtonData.OK_DONE)
+                            disableProperty().bind(model.editEnabled.not())
+                            setOnAction {
+                                model.connectPressed()
+                            }
+                        }, Button(tr("Delete")).apply {
+                            setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
+                            disableProperty().bind(model.editEnabled.not())
+                            setOnAction {
+                                model.deletePressed()
+                            }
+                        })
+                    }
+                }
+                bottom = ButtonBar().apply {
+                    styleClass.add("serverlist-dialog-controls")
+                    buttons.addAll(Button(tr("Add")).apply {
+                        setButtonData(this, ButtonBar.ButtonData.LEFT)
+                        setOnAction {
+                            model.addPressed()
+                        }
+                    }, Button(tr("Save")).apply {
+                        setButtonData(this, ButtonBar.ButtonData.OK_DONE)
+                        setOnAction {
+                            model.savePressed()
+                        }
+                    }, Button(tr("Cancel")).apply {
+                        setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
+                        setOnAction {
+                            model.cancelPressed()
+                        }
+                    })
+                }
+            })
+        })
     }
 }

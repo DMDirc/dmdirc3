@@ -2,7 +2,6 @@ package com.dmdirc
 
 import io.mockk.mockk
 import io.mockk.verify
-import javafx.stage.Stage
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -14,18 +13,10 @@ internal class ServerListControllerTest {
     @Test
     fun `test connect called`() {
         val connectionEditable = ConnectionDetailsEditable(
-            hostname = "hostname",
-            password = "password",
-            port = 1,
-            tls = false,
-            autoconnect = true
+            hostname = "hostname", password = "password", port = 1, tls = false, autoconnect = true
         )
         val connection = ConnectionDetails(
-            hostname = "hostname",
-            password = "password",
-            port = 1,
-            tls = false,
-            autoconnect = true
+            hostname = "hostname", password = "password", port = 1, tls = false, autoconnect = true
         )
         controller.connect(connectionEditable)
         verify {
@@ -36,18 +27,10 @@ internal class ServerListControllerTest {
     @Test
     fun `test converting`() {
         val connectionEditable = ConnectionDetailsEditable(
-            hostname = "hostname",
-            password = "password",
-            port = 1,
-            tls = false,
-            autoconnect = true
+            hostname = "hostname", password = "password", port = 1, tls = false, autoconnect = true
         )
         val connection = ConnectionDetails(
-            hostname = "hostname",
-            password = "password",
-            port = 1,
-            tls = false,
-            autoconnect = true
+            hostname = "hostname", password = "password", port = 1, tls = false, autoconnect = true
         )
         assertEquals(connection, controller.getConnectionDetails(connectionEditable))
     }
@@ -56,34 +39,16 @@ internal class ServerListControllerTest {
     fun `test saving serverlist`() {
         val serversEditable = listOf(
             ConnectionDetailsEditable(
-                hostname = "hostname1",
-                password = "password",
-                port = 1,
-                tls = false,
-                autoconnect = true
-            ),
-            ConnectionDetailsEditable(
-                hostname = "hostname2",
-                password = "password",
-                port = 2,
-                tls = true,
-                autoconnect = false
+                hostname = "hostname1", password = "password", port = 1, tls = false, autoconnect = true
+            ), ConnectionDetailsEditable(
+                hostname = "hostname2", password = "password", port = 2, tls = true, autoconnect = false
             )
         ).observable()
         val servers = listOf(
             ConnectionDetails(
-                hostname = "hostname1",
-                password = "password",
-                port = 1,
-                tls = false,
-                autoconnect = true
-            ),
-            ConnectionDetails(
-                hostname = "hostname2",
-                password = "password",
-                port = 2,
-                tls = true,
-                autoconnect = false
+                hostname = "hostname1", password = "password", port = 1, tls = false, autoconnect = true
+            ), ConnectionDetails(
+                hostname = "hostname2", password = "password", port = 2, tls = true, autoconnect = false
             )
         )
         controller.save(serversEditable)
@@ -110,11 +75,7 @@ internal class ServerListModelTest {
     @Test
     fun `test connect pressed when not null`() {
         model.selected.value = ConnectionDetailsEditable(
-            hostname = "hostname",
-            password = "password",
-            port = 1,
-            tls = false,
-            autoconnect = true
+            hostname = "hostname", password = "password", port = 1, tls = false, autoconnect = true
         )
         model.connectPressed()
         verify {
@@ -126,18 +87,9 @@ internal class ServerListModelTest {
     fun `test delete pressed when null`() {
         val serversEditable = listOf(
             ConnectionDetailsEditable(
-                hostname = "hostname1",
-                password = "password",
-                port = 1,
-                tls = false,
-                autoconnect = true
-            ),
-            ConnectionDetailsEditable(
-                hostname = "hostname2",
-                password = "password",
-                port = 2,
-                tls = true,
-                autoconnect = false
+                hostname = "hostname1", password = "password", port = 1, tls = false, autoconnect = true
+            ), ConnectionDetailsEditable(
+                hostname = "hostname2", password = "password", port = 2, tls = true, autoconnect = false
             )
         )
         model.servers.addAll(serversEditable)
@@ -150,18 +102,9 @@ internal class ServerListModelTest {
     fun `test delete pressed when not null`() {
         val serversEditable = listOf(
             ConnectionDetailsEditable(
-                hostname = "hostname1",
-                password = "password",
-                port = 1,
-                tls = false,
-                autoconnect = true
-            ),
-            ConnectionDetailsEditable(
-                hostname = "hostname2",
-                password = "password",
-                port = 2,
-                tls = true,
-                autoconnect = false
+                hostname = "hostname1", password = "password", port = 1, tls = false, autoconnect = true
+            ), ConnectionDetailsEditable(
+                hostname = "hostname2", password = "password", port = 2, tls = true, autoconnect = false
             )
         )
         model.servers.addAll(serversEditable)

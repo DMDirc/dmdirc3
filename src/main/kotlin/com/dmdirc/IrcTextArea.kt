@@ -8,7 +8,7 @@ import org.fxmisc.richtext.TextExt
 import org.fxmisc.richtext.model.SegmentOpsBase
 import org.fxmisc.richtext.model.StyledSegment
 import org.fxmisc.richtext.model.TextOps
-import java.util.*
+import java.util.Optional
 
 sealed class Style {
     object BoldStyle : Style()
@@ -67,12 +67,10 @@ class IrcSegmentOps : SegmentOpsBase<Segment, Collection<Style>>(Segment.Empty),
             Segment.Text(it)
         }
     } ?: Segment.Empty
-
 }
 
 class IrcTextArea(linkClickHandler: (String) -> Unit) :
-    GenericStyledArea<Collection<Style>, Segment, Collection<Style>>(
-        emptySet(),
+    GenericStyledArea<Collection<Style>, Segment, Collection<Style>>(emptySet(),
         { _, _ -> Unit },
         emptySet(),
         IrcSegmentOps(),
@@ -100,8 +98,7 @@ class IrcTextArea(linkClickHandler: (String) -> Unit) :
                     is Segment.Empty -> TextExt("There's nothing here :(").also { te -> te.styleClass.add("text") }
                 }
             }
-        }
-    ) {
+        }) {
 
     init {
         isEditable = false
