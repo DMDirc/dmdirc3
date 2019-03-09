@@ -151,7 +151,8 @@ class MainView(
     val settingsDialogProvider: () -> SettingsDialog,
     val serverlistDialogProvider: () -> ServerlistDialog,
     private val primaryStage: Stage,
-    titleProperty: StringProperty, dialogPane: ObjectProperty<Node>, welcomePaneProvider: () -> WelcomePane
+    titleProperty: StringProperty, dialogPane: ObjectProperty<Node>,
+    welcomePaneProvider: () -> WelcomePane
 ) : StackPane() {
     private val selectedWindow = SimpleObjectProperty<Node>()
 
