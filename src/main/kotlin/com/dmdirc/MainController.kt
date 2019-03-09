@@ -43,6 +43,7 @@ class MainController(
     override fun connect(connectionDetails: ConnectionDetails) {
         with(connectionFactory(connectionDetails)) {
             windows.addAll(children.map { it.model })
+            selectedWindow.value = model
             children.observable.addListener(SetChangeListener<Connection.Child> {
                 runLater {
                     when {

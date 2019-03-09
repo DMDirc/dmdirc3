@@ -33,6 +33,7 @@ object ConnectionContract {
     interface Controller {
         val children: Connection.WindowMap
         val connected: BooleanProperty
+        val model: WindowModel
         var networkName: String
         fun connect()
         fun sendMessage(channel: String, message: String)
@@ -52,7 +53,7 @@ class Connection(
 
     private val connectionId = connectionCounter.incrementAndGet().toString(16).padStart(20)
 
-    private val model = WindowModel(
+    override val model = WindowModel(
         connectionDetails.hostname, WindowType.SERVER, this, config1, connectionId
     )
 
