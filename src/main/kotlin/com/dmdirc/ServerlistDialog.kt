@@ -19,12 +19,13 @@ import javafx.scene.control.ListView
 import javafx.scene.control.TextField
 import javafx.scene.control.TextFormatter
 import javafx.scene.control.TextFormatter.Change
+import javafx.scene.control.skin.TextFieldSkin
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
+import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.util.Callback
 import javafx.util.StringConverter
-import java.lang.NumberFormatException
 import java.util.function.UnaryOperator
 import java.util.regex.Pattern
 
@@ -239,7 +240,7 @@ class ServerlistDialog(
                             disableProperty().bind(model.editEnabled.not())
                         }, 1, 2)
                         add(Label(tr("Password: ")), 0, 3)
-                        add(TextField().apply {
+                        add(PasswordTextField().apply {
                             model.password.bindBidirectional(this.textProperty())
                             disableProperty().bind(model.editEnabled.not())
                         }, 1, 3)
@@ -314,5 +315,48 @@ class IntegerFilter : UnaryOperator<Change?> {
         change
     } else {
         null
+    }
+}
+
+class PasswordTextField : HBox() {
+    private val textField = TextField()
+    private val checkBox = CheckBox()
+    private val mask = SimpleBooleanProperty(true)
+    init {
+        textField.skin = PasswordFieldSkin(textField, mask)
+        children.addAll(
+            textField,
+            checkBox
+        )
+        mask.value = true
+        checkBox.isSelected = true
+        mask.bindBidirectional(checkBox.selectedProperty())
+    }
+    fun textProperty(): StringProperty {
+        return textField.textProperty()
+    }
+}
+
+class PasswordFieldSkin(
+    private val control: TextField,
+    private val mask: SimpleBooleanProperty? = SimpleBooleanProperty(true)
+) : TextFieldSkin(control) {
+    init {
+        mask!!.addListener { _, _, _ ->
+            control.text = control.text
+        }
+
+    }
+    override fun maskText(txt: String): String {
+        if (mask?.value == true) {
+            val textField = skinnable
+            val n = textField.length
+            val passwordBuilder = StringBuilder(n)
+            for (i in 0 until n) {
+                passwordBuilder.append('\u2022')
+            }
+            return passwordBuilder.toString()
+        }
+        return super.maskText(txt)
     }
 }
