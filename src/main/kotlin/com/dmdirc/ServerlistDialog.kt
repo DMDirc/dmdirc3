@@ -359,7 +359,7 @@ class PasswordFieldSkin(
             control.text = control.text
         }
     }
-    
+
     override fun maskText(txt: String): String {
         if (mask?.value == true) {
             val textField = skinnable
