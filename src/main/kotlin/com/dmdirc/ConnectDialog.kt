@@ -55,7 +55,7 @@ object ServerListDialogContract {
     }
 }
 
-class ConnectionDetailsEditable(
+data class ConnectionDetailsEditable(
     var hostname: String,
     var password: String = "",
     var port: String,
@@ -159,6 +159,7 @@ class ServerListModel(
     }
 
     override fun savePressed() {
+        selected.value = null
         controller.save(servers)
         closeDialog()
     }

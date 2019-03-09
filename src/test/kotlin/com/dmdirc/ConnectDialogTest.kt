@@ -5,6 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import javafx.scene.control.TextFormatter.Change
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class ServerListControllerTest {
@@ -126,10 +127,115 @@ internal class ServerListModelTest {
     }
 
     @Test
+    fun `test save pressed unsaved`() {
+        val server = ConnectionDetailsEditable(
+            hostname = "New Server", port = "6697", tls = true, autoconnect = false
+        )
+        val newServer = ConnectionDetailsEditable(
+            hostname = "test", port = "6667", tls = false, autoconnect = true
+        )
+        model.servers.addAll(
+            ConnectionDetailsEditable(
+                hostname = "New Server", port = "6697", tls = true, autoconnect = false
+            )
+        )
+        model.selected.value = server
+        assertEquals(true, model.open.value)
+        assertEquals(server, model.selected.value)
+        assertEquals("New Server", model.hostname.value)
+        assertEquals("", model.password.value)
+        assertEquals("6697", model.port.value)
+        assertEquals(false, model.autoconnect.value)
+        assertEquals(true, model.tls.value)
+        model.hostname.value = "test"
+        model.port.value = "6667"
+        model.tls.value = false
+        model.autoconnect.value = true
+        model.savePressed()
+        assertEquals(false, model.open.value)
+        assertEquals(null, model.selected.value)
+        assertEquals("test", model.hostname.value)
+        assertEquals("", model.password.value)
+        assertEquals("6667", model.port.value)
+        assertEquals(true, model.autoconnect.value)
+        assertEquals(false, model.tls.value)
+        verify {
+            controller.save(any())
+        }
+    }
+
+    @Test
     fun `test close pressed`() {
         assertEquals(true, model.open.value)
         model.closeDialog()
         assertEquals(false, model.open.value)
+    }
+
+    @Test
+    fun `test add pressed when empty`() {
+        val server = ConnectionDetailsEditable(
+            hostname = "New Server", port = "6697", tls = true, autoconnect = false
+        )
+        assertTrue(model.servers.isEmpty())
+        model.addPressed()
+        assertTrue(model.servers.size == 1)
+        assertEquals(server, model.servers[0])
+        assertEquals(server, model.selected.value)
+    }
+
+    @Test
+    fun `test add pressed when not empty`() {
+        val server = ConnectionDetailsEditable(
+            hostname = "New Server", port = "6697", tls = true, autoconnect = false
+        )
+        model.servers.addAll(
+            ConnectionDetailsEditable(
+                hostname = "hostname", password = "password", port = "1", tls = false, autoconnect = true
+            )
+        )
+        assertTrue(model.servers.size == 1)
+        model.addPressed()
+        assertTrue(model.servers.size == 2)
+        assertEquals(server, model.servers[1])
+        assertEquals(server, model.selected.value)
+    }
+
+    @Test
+    fun `test cancel pressed`() {
+        assertEquals(true, model.open.value)
+        model.cancelPressed()
+        assertEquals(false, model.open.value)
+    }
+
+    @Test
+    fun `test show with servers`() {
+        val servers = listOf(
+            ConnectionDetails(
+                hostname = "hostname1", password = "password", port = 1, tls = false, autoconnect = true
+            ), ConnectionDetails(
+                hostname = "hostname2", password = "password", port = 2, tls = true, autoconnect = false
+            )
+        )
+        val serversEditable = listOf(
+            ConnectionDetailsEditable(
+                hostname = "hostname1", password = "password", port = "1", tls = false, autoconnect = true
+            ), ConnectionDetailsEditable(
+                hostname = "hostname2", password = "password", port = "2", tls = true, autoconnect = false
+            )
+        )
+        every { config[ClientSpec.servers] } returns servers
+        model.show()
+        assertEquals(serversEditable, model.servers)
+        assertEquals(serversEditable[0], model.selected.value)
+    }
+
+    @Test
+    fun `test show without servers`() {
+        val servers = emptyList<ConnectionDetails>()
+        every { config[ClientSpec.servers] } returns servers
+        model.show()
+        assertEquals(servers, model.servers)
+        assertEquals(null, model.selected.value)
     }
 }
 
