@@ -181,6 +181,10 @@ class MainView(
                 selectionModel.selectedItemProperty().addListener { _, _, newValue ->
                     controller.selectedWindow.value = newValue
                 }
+                controller.selectedWindow.addListener { _, _, newValue ->
+                    selectionModel.select(newValue)
+                }
+                selectionModel.select(controller.selectedWindow.value)
                 cellFactory = NodeListCellFactory(this, joinDialogProvider, controller)
             }
             centerProperty().bindBidirectional(selectedWindow)
