@@ -42,7 +42,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.fxmisc.flowless.VirtualizedScrollPane
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.atomic.AtomicBoolean
 
 enum class WindowType {
     ROOT, SERVER, CHANNEL
@@ -171,9 +170,8 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
     init {
         val borderPane = BorderPane().apply {
             center = VirtualizedScrollPane(textArea).apply {
-                val hbar = childrenUnmodifiable.find { node -> node is ScrollBar && node.orientation == VERTICAL }
-                if (hbar is ScrollBar) {
-                    scrollbar = hbar
+                scrollbar = childrenUnmodifiable.filterIsInstance<ScrollBar>().find {
+                    it.orientation == VERTICAL
                 }
             }
             right = ListView<String>(model.nickList.users).apply {
@@ -211,7 +209,7 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
                     }
                 }
             }
-            if (autoscroll || scrollVisible != (scrollbar?.isVisible == true)) {
+            if (autoscroll || scrollVisible != scrollbar?.isVisible) {
                 scrollbar?.valueProperty()?.value = scrollbar?.max
             }
         })
