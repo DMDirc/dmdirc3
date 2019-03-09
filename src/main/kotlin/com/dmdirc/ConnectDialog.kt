@@ -227,7 +227,12 @@ class ServerlistDialog(
                             disableProperty().bind(model.editEnabled.not())
                         }, 1, 1)
                         add(Label(tr("Port: ")), 0, 2)
-                        add(IntTextField().apply {
+                        add(TextField().apply {
+                            textFormatter = TextFormatter(
+                                PortIntegerStringConvert(),
+                                6667,
+                                IntegerFilter()
+                            )
                             isEditable = true
                             bindRequiredTextControl(this,  model.port, model)
                             disableProperty().bind(model.editEnabled.not())
@@ -288,26 +293,25 @@ class ServerlistDialog(
     }
 }
 
-class IntTextField : TextField() {
-    init {
-        textFormatter = TextFormatter(
-            PortIntegerStringConvert(),
-            6667,
-            IntegerFilter()
-        )
-    }
-}
-
 class PortIntegerStringConvert : StringConverter<Int>() {
-    override fun toString(value: Int?) = value.toString()
+    override fun toString(value: Int?) = value?.toString() ?: "6667"
     override fun fromString(value: String?) = try {
-        (value ?: "").toInt()
+        val num = (value ?: "").toInt()
+        when {
+            num <= 0 -> 1
+            num >= 65535 -> 65535
+            else -> num
+        }
     } catch (e: NumberFormatException) {
         6667
     }
 }
 
 class IntegerFilter : UnaryOperator<Change?> {
-    private val digitPattern = Pattern.compile("\\d*");
-    override fun apply(change: Change?) = if (digitPattern.matcher(change?.text).matches()) change else null
+    private val digitPattern = Pattern.compile("\\d*")
+    override fun apply(change: Change?) = if (digitPattern.matcher(change?.text).matches()) {
+        change
+    } else {
+        null
+    }
 }
