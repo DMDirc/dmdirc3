@@ -29,12 +29,18 @@ import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import javafx.util.Callback
 import javafx.util.StringConverter
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class ServerContextMenu(
     private val joinDialogProvider: () -> JoinDialog,
     private val controller: MainContract.Controller
 ) : ContextMenu() {
     init {
+        val connection = controller.selectedWindow.value?.connection
+        val connected = connection?.connected?.value ?: false
+        val recon = if (connected) tr("Reconnect") else tr("Connect")
         items.addAll(MenuItem(tr("Join Channel")).apply {
             setOnAction {
                 joinDialogProvider().show()
@@ -42,7 +48,28 @@ class ServerContextMenu(
             disableProperty().bind(controller.selectedWindow.isNull)
         }, MenuItem(tr("Disconnect")).apply {
             setOnAction {
-                controller.selectedWindow.value?.connection?.disconnect()
+                connection?.disconnect()
+            }
+        }, MenuItem(recon).apply {
+            setOnAction {
+                GlobalScope.launch {
+                    if (connected) {
+                        connection?.disconnect()
+                    }
+                }
+                // Pause a little and connect later giving server time to disconnect
+                // Probably don't need to do this if ktirc issue #14 is fixed
+                GlobalScope.launch {
+                    delay(1000)
+                    connection?.connect()
+                }
+            }
+        }, MenuItem(tr("Close")).apply {
+            setOnAction {
+                if (connected) {
+                    connection?.disconnect()
+                }
+                connection?.children?.clear()
             }
         })
     }
