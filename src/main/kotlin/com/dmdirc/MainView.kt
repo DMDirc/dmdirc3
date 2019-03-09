@@ -57,8 +57,8 @@ class ServerContextMenu(
                         connection?.disconnect()
                     }
                 }
-                //Pause a little and connect later giving server time to disconnect
-                //Probably don't need to do this if ktirc issue #14 is fixed
+                // Pause a little and connect later giving server time to disconnect
+                // Probably don't need to do this if ktirc issue #14 is fixed
                 GlobalScope.launch {
                     delay(1000)
                     connection?.connect()
