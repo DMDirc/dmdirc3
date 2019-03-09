@@ -108,10 +108,10 @@ class Connection(
         when {
             event is BatchReceived -> event.events.forEach(this::handleEvent)
             event is ServerReady -> {
-                connected.value = true
-                networkName = client.serverState.features[ServerFeature.Network] ?: ""
                 connectionDetails.autoJoin.forEach { joinChannel(it) }
                 runLater {
+                    connected.value = true
+                    networkName = client.serverState.features[ServerFeature.Network] ?: ""
                     model.name.value = client.serverState.serverName
                     model.title.value = "${model.name.value} [${model.connection?.networkName ?: ""}]"
                 }
