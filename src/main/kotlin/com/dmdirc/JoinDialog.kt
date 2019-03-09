@@ -58,8 +58,12 @@ class JoinDialogModel(private val controller: JoinDialogContract.Controller) : J
 }
 
 class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: ObjectProperty<Node>) : VBox() {
+    private val textfield = TextField()
     fun show() {
         parent.value = this
+        runLater {
+            textfield.requestFocus()
+        }
     }
 
     init {
@@ -74,7 +78,7 @@ class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: Object
                 styleClass.add("dialog-background")
                 children.addAll(Label(tr("Join Channel")).apply {
                     styleClass.add("dialog-header")
-                }, Label(tr("Enter channel name: ")), TextField().apply {
+                }, Label(tr("Enter channel name: ")), textfield.apply {
                     bindRequiredTextControl(this, model.channel, model)
                     setOnAction { model.onTextAction() }
                 }, ButtonBar().apply {
