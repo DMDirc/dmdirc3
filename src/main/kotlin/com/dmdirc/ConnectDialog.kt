@@ -235,7 +235,7 @@ class ServerlistDialog(
                                 IntegerFilter()
                             )
                             isEditable = true
-                            bindRequiredTextControl(this,  model.port, model)
+                            bindRequiredTextControl(this, model.port, model)
                             disableProperty().bind(model.editEnabled.not())
                         }, 1, 2)
                         add(Label(tr("Password: ")), 0, 3)
