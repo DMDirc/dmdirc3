@@ -2,10 +2,8 @@ package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
 import javafx.beans.property.BooleanProperty
-import javafx.beans.property.IntegerProperty
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
@@ -18,12 +16,17 @@ import javafx.scene.control.CheckBox
 import javafx.scene.control.Label
 import javafx.scene.control.ListCell
 import javafx.scene.control.ListView
-import javafx.scene.control.Spinner
 import javafx.scene.control.TextField
+import javafx.scene.control.TextFormatter
+import javafx.scene.control.TextFormatter.Change
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
 import javafx.util.Callback
+import javafx.util.StringConverter
+import java.lang.NumberFormatException
+import java.util.function.UnaryOperator
+import java.util.regex.Pattern
 
 object ServerListDialogContract {
     interface Controller {
@@ -46,7 +49,7 @@ object ServerListDialogContract {
         val hostname: StringProperty
         val password: StringProperty
         val editEnabled: BooleanProperty
-        val port: IntegerProperty
+        val port: StringProperty
         val tls: BooleanProperty
         val autoconnect: BooleanProperty
     }
@@ -55,7 +58,7 @@ object ServerListDialogContract {
 class ConnectionDetailsEditable(
     var hostname: String,
     var password: String = "",
-    var port: Int,
+    var port: String,
     var tls: Boolean = true,
     var autoconnect: Boolean = false
 )
@@ -77,7 +80,7 @@ class ServerListController(
     }
 
     internal fun getConnectionDetails(server: ConnectionDetailsEditable) = ConnectionDetails(
-        server.hostname, server.password, server.port, server.tls, server.autoconnect
+        server.hostname, server.password, server.port.toInt(), server.tls, server.autoconnect
     )
 }
 
@@ -91,7 +94,7 @@ class ServerListModel(
     override val selected = SimpleObjectProperty<ConnectionDetailsEditable>()
     override val hostname = SimpleStringProperty()
     override val password = SimpleStringProperty()
-    override val port = SimpleIntegerProperty()
+    override val port = SimpleStringProperty()
     override val tls = SimpleBooleanProperty()
     override val autoconnect = SimpleBooleanProperty()
     override val editEnabled = SimpleBooleanProperty()
@@ -102,7 +105,7 @@ class ServerListModel(
                 oldValue.autoconnect = autoconnect.value ?: true
                 oldValue.hostname = hostname.value ?: ""
                 oldValue.password = password.value ?: ""
-                oldValue.port = port.value ?: 6667
+                oldValue.port = port.value ?: "6667"
                 oldValue.tls = tls.value ?: true
             }
             if (newValue != null) {
@@ -121,7 +124,7 @@ class ServerListModel(
             ConnectionDetailsEditable(
                 it.hostname,
                 it.password,
-                it.port,
+                it.port.toString(),
                 it.tls,
                 it.autoconnect
             )
@@ -137,7 +140,7 @@ class ServerListModel(
 
     override fun addPressed() {
         servers.add(ConnectionDetailsEditable(
-            hostname = "New Server", port = 6697, tls = true, autoconnect = false
+            hostname = "New Server", port = "6697", tls = true, autoconnect = false
         ).apply {
             selected.value = this
         })
@@ -224,8 +227,9 @@ class ServerlistDialog(
                             disableProperty().bind(model.editEnabled.not())
                         }, 1, 1)
                         add(Label(tr("Port: ")), 0, 2)
-                        add(Spinner<Number>(1, 65535, model.port.value).apply {
-                            model.port.bindBidirectional(valueFactory.valueProperty())
+                        add(IntTextField().apply {
+                            isEditable = true
+                            bindRequiredTextControl(this,  model.port, model)
                             disableProperty().bind(model.editEnabled.not())
                         }, 1, 2)
                         add(Label(tr("Password: ")), 0, 3)
@@ -282,4 +286,28 @@ class ServerlistDialog(
             })
         })
     }
+}
+
+class IntTextField : TextField() {
+    init {
+        textFormatter = TextFormatter(
+            PortIntegerStringConvert(),
+            6667,
+            IntegerFilter()
+        )
+    }
+}
+
+class PortIntegerStringConvert : StringConverter<Int>() {
+    override fun toString(value: Int?) = value.toString()
+    override fun fromString(value: String?) = try {
+        (value ?: "").toInt()
+    } catch (e: NumberFormatException) {
+        6667
+    }
+}
+
+class IntegerFilter : UnaryOperator<Change?> {
+    private val digitPattern = Pattern.compile("\\d*");
+    override fun apply(change: Change?) = if (digitPattern.matcher(change?.text).matches()) change else null
 }
