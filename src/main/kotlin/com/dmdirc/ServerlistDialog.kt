@@ -1,6 +1,9 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EYE
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EYE_SLASH
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleBooleanProperty
@@ -8,6 +11,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.ObservableList
+import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
@@ -320,17 +324,26 @@ class IntegerFilter : UnaryOperator<Change?> {
 
 class PasswordTextField : HBox() {
     private val textField = TextField()
-    private val checkBox = CheckBox()
+    private val checkBox = FontAwesomeIconView(EYE, "1.5em").apply {
+        setOnMouseClicked {
+            val current = mask.value
+            if (current) {
+                setIcon(EYE_SLASH)
+            } else {
+                setIcon(EYE)
+            }
+            mask.value = !current
+        }
+    }
     private val mask = SimpleBooleanProperty(true)
     init {
+        alignment = Pos.CENTER_LEFT
         textField.skin = PasswordFieldSkin(textField, mask)
         children.addAll(
             textField,
             checkBox
         )
         mask.value = true
-        checkBox.isSelected = true
-        mask.bindBidirectional(checkBox.selectedProperty())
     }
     fun textProperty(): StringProperty {
         return textField.textProperty()
