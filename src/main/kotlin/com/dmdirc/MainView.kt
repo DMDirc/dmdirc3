@@ -29,12 +29,17 @@ import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import javafx.util.Callback
 import javafx.util.StringConverter
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class ServerContextMenu(
-    private val joinDialogProvider: () -> JoinDialog,
-    private val controller: MainContract.Controller
+    private val joinDialogProvider: () -> JoinDialog, private val controller: MainContract.Controller
 ) : ContextMenu() {
     init {
+        val connection = controller.selectedWindow.value?.connection
+        val connected = connection?.connected?.value ?: false
+        val recon = if (connected) tr("Reconnect") else tr("Connect")
         items.addAll(MenuItem(tr("Join Channel")).apply {
             setOnAction {
                 joinDialogProvider().show()
@@ -42,9 +47,31 @@ class ServerContextMenu(
             disableProperty().bind(controller.selectedWindow.isNull)
         }, MenuItem(tr("Disconnect")).apply {
             setOnAction {
-                controller.selectedWindow.value?.connection?.disconnect()
+                connection?.disconnect()
             }
-        })
+        }, MenuItem(recon).apply {
+            setOnAction {
+                GlobalScope.launch {
+                    if (connected) {
+                        connection?.disconnect()
+                    }
+                }
+                //Pause a little and connect later giving server time to disconnect
+                //Probably don't need to do this if ktirc issue #14 is fixed
+                GlobalScope.launch {
+                    delay(1000)
+                    connection?.connect()
+                }
+            }
+        }, MenuItem(tr("Close")).apply {
+            setOnAction {
+                if (connected) {
+                    connection?.disconnect()
+                }
+                connection?.children?.clear()
+            }
+        }
+        )
     }
 }
 
@@ -61,8 +88,7 @@ class ChannelContextMenu(
 }
 
 class NodeListCellFactory(
-    private val list: ListView<WindowModel>,
-    private val joinDialogProvider: () -> JoinDialog,
+    private val list: ListView<WindowModel>, private val joinDialogProvider: () -> JoinDialog,
     private val controller: MainContract.Controller
 ) : Callback<ListView<WindowModel>, ListCell<WindowModel>> {
     override fun call(param: ListView<WindowModel>?): ListCell<WindowModel> {
@@ -71,8 +97,7 @@ class NodeListCellFactory(
 }
 
 class NodeListCell(
-    list: ListView<WindowModel>,
-    private val joinDialogProvider: () -> JoinDialog,
+    list: ListView<WindowModel>, private val joinDialogProvider: () -> JoinDialog,
     private val controller: MainContract.Controller
 ) : ListCell<WindowModel>() {
     init {
@@ -118,15 +143,10 @@ class NodeListCell(
 }
 
 class MainView(
-    private val controller: MainContract.Controller,
-    val config: ClientConfig,
-    private val joinDialogProvider: () -> JoinDialog,
-    val settingsDialogProvider: () -> SettingsDialog,
-    val serverlistDialogProvider: () -> ServerlistDialog,
-    private val primaryStage: Stage,
-    titleProperty: StringProperty,
-    dialogPane: ObjectProperty<Node>,
-    welcomePaneProvider: () -> WelcomePane
+    private val controller: MainContract.Controller, val config: ClientConfig,
+    private val joinDialogProvider: () -> JoinDialog, val settingsDialogProvider: () -> SettingsDialog,
+    val serverlistDialogProvider: () -> ServerlistDialog, private val primaryStage: Stage,
+    titleProperty: StringProperty, dialogPane: ObjectProperty<Node>, welcomePaneProvider: () -> WelcomePane
 ) : StackPane() {
     private val selectedWindow = SimpleObjectProperty<Node>()
 
@@ -201,10 +221,8 @@ class TitleStringConverter : StringConverter<WindowModel>() {
 }
 
 class WelcomePane(
-    controller: MainContract.Controller,
-    settingsDialogProvider: () -> SettingsDialog,
-    serverlistDialogProvider: () -> ServerlistDialog,
-    version: String
+    controller: MainContract.Controller, settingsDialogProvider: () -> SettingsDialog,
+    serverlistDialogProvider: () -> ServerlistDialog, version: String
 ) : VBox() {
     init {
         styleClass.add("welcome")

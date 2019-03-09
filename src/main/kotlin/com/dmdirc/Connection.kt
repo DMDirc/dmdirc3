@@ -152,7 +152,6 @@ class Connection(
 
     override fun disconnect() {
         client.disconnect()
-        children.clear()
     }
 
     data class Child(val model: WindowModel, val ui: Node)
