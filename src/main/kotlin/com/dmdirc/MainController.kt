@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import com.dmdirc.WindowType.SERVER
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
@@ -42,7 +43,14 @@ class MainController(
 
     override fun connect(connectionDetails: ConnectionDetails) {
         with(connectionFactory(connectionDetails)) {
-            windows.addAll(children.map { it.model })
+            windows.addAll(children.map {
+                if (it.model.type == SERVER) {
+                    runLater {
+                        selectedWindow.value = it.model
+                    }
+                }
+                it.model
+            })
             children.observable.addListener(SetChangeListener<Connection.Child> {
                 runLater {
                     when {
