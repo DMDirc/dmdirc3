@@ -31,7 +31,9 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.ListChangeListener
+import javafx.geometry.Orientation.VERTICAL
 import javafx.scene.control.ListView
+import javafx.scene.control.ScrollBar
 import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.BorderPane
@@ -40,6 +42,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.fxmisc.flowless.VirtualizedScrollPane
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.atomic.AtomicBoolean
 
 enum class WindowType {
     ROOT, SERVER, CHANNEL
@@ -162,11 +165,17 @@ class WindowModel(
 
 class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
 
+    internal var scrollbar: ScrollBar? = null
     private val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
 
     init {
         val borderPane = BorderPane().apply {
-            center = VirtualizedScrollPane(textArea)
+            center = VirtualizedScrollPane(textArea).apply {
+                val hbar = childrenUnmodifiable.find { node -> node is ScrollBar && node.orientation == VERTICAL }
+                if (hbar is ScrollBar) {
+                    scrollbar = hbar
+                }
+            }
             right = ListView<String>(model.nickList.users).apply {
                 styleClass.add("nick-list")
                 prefWidth = 148.0
@@ -187,6 +196,8 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
         }
         children.add(borderPane)
         model.lines.addListener(ListChangeListener { change ->
+            val scrollVisible = scrollbar?.isVisible ?: false
+            val autoscroll = scrollbar?.value == scrollbar?.max
             // TODO: Support ops other than just appending lines (editing, deleting, inserting earlier, etc).
             while (change.next()) {
                 if (change.wasAdded()) {
@@ -199,6 +210,9 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
                         textArea.appendText("\n")
                     }
                 }
+            }
+            if (autoscroll || scrollVisible != (scrollbar?.isVisible == true)) {
+                scrollbar?.valueProperty()?.value = scrollbar?.max
             }
         })
     }
