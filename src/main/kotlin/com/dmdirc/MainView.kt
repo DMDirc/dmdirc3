@@ -34,7 +34,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ServerContextMenu(
-    private val joinDialogProvider: () -> JoinDialog, private val controller: MainContract.Controller
+    private val joinDialogProvider: () -> JoinDialog,
+    private val controller: MainContract.Controller
 ) : ContextMenu() {
     init {
         val connection = controller.selectedWindow.value?.connection
@@ -70,8 +71,7 @@ class ServerContextMenu(
                 }
                 connection?.children?.clear()
             }
-        }
-        )
+        })
     }
 }
 
@@ -88,7 +88,8 @@ class ChannelContextMenu(
 }
 
 class NodeListCellFactory(
-    private val list: ListView<WindowModel>, private val joinDialogProvider: () -> JoinDialog,
+    private val list: ListView<WindowModel>,
+    private val joinDialogProvider: () -> JoinDialog,
     private val controller: MainContract.Controller
 ) : Callback<ListView<WindowModel>, ListCell<WindowModel>> {
     override fun call(param: ListView<WindowModel>?): ListCell<WindowModel> {
@@ -97,7 +98,8 @@ class NodeListCellFactory(
 }
 
 class NodeListCell(
-    list: ListView<WindowModel>, private val joinDialogProvider: () -> JoinDialog,
+    list: ListView<WindowModel>,
+    private val joinDialogProvider: () -> JoinDialog,
     private val controller: MainContract.Controller
 ) : ListCell<WindowModel>() {
     init {
@@ -143,9 +145,12 @@ class NodeListCell(
 }
 
 class MainView(
-    private val controller: MainContract.Controller, val config: ClientConfig,
-    private val joinDialogProvider: () -> JoinDialog, val settingsDialogProvider: () -> SettingsDialog,
-    val serverlistDialogProvider: () -> ServerlistDialog, private val primaryStage: Stage,
+    private val controller: MainContract.Controller,
+    val config: ClientConfig,
+    private val joinDialogProvider: () -> JoinDialog,
+    val settingsDialogProvider: () -> SettingsDialog,
+    val serverlistDialogProvider: () -> ServerlistDialog,
+    private val primaryStage: Stage,
     titleProperty: StringProperty, dialogPane: ObjectProperty<Node>, welcomePaneProvider: () -> WelcomePane
 ) : StackPane() {
     private val selectedWindow = SimpleObjectProperty<Node>()
@@ -221,8 +226,10 @@ class TitleStringConverter : StringConverter<WindowModel>() {
 }
 
 class WelcomePane(
-    controller: MainContract.Controller, settingsDialogProvider: () -> SettingsDialog,
-    serverlistDialogProvider: () -> ServerlistDialog, version: String
+    controller: MainContract.Controller,
+    settingsDialogProvider: () -> SettingsDialog,
+    serverlistDialogProvider: () -> ServerlistDialog,
+    version: String
 ) : VBox() {
     init {
         styleClass.add("welcome")
