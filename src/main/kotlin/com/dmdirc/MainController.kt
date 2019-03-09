@@ -1,6 +1,5 @@
 package com.dmdirc
 
-import com.dmdirc.WindowType.SERVER
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
