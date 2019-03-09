@@ -1,6 +1,9 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EYE
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EYE_SLASH
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleBooleanProperty
@@ -8,6 +11,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.ObservableList
+import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
@@ -19,12 +23,13 @@ import javafx.scene.control.ListView
 import javafx.scene.control.TextField
 import javafx.scene.control.TextFormatter
 import javafx.scene.control.TextFormatter.Change
+import javafx.scene.control.skin.TextFieldSkin
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
+import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.util.Callback
 import javafx.util.StringConverter
-import java.lang.NumberFormatException
 import java.util.function.UnaryOperator
 import java.util.regex.Pattern
 
@@ -239,7 +244,7 @@ class ServerlistDialog(
                             disableProperty().bind(model.editEnabled.not())
                         }, 1, 2)
                         add(Label(tr("Password: ")), 0, 3)
-                        add(TextField().apply {
+                        add(PasswordTextField().apply {
                             model.password.bindBidirectional(this.textProperty())
                             disableProperty().bind(model.editEnabled.not())
                         }, 1, 3)
@@ -314,5 +319,57 @@ class IntegerFilter : UnaryOperator<Change?> {
         change
     } else {
         null
+    }
+}
+
+class PasswordTextField : HBox() {
+    private val textField = TextField()
+    private val checkBox = FontAwesomeIconView(EYE, "1.5em").apply {
+        setOnMouseClicked {
+            val current = mask.value
+            if (current) {
+                setIcon(EYE_SLASH)
+            } else {
+                setIcon(EYE)
+            }
+            mask.value = !current
+        }
+    }
+    private val mask = SimpleBooleanProperty(true)
+    init {
+        alignment = Pos.CENTER_LEFT
+        textField.skin = PasswordFieldSkin(textField, mask)
+        children.addAll(
+            textField,
+            checkBox
+        )
+        mask.value = true
+    }
+    fun textProperty(): StringProperty {
+        return textField.textProperty()
+    }
+}
+
+class PasswordFieldSkin(
+    private val control: TextField,
+    private val mask: SimpleBooleanProperty? = SimpleBooleanProperty(true)
+) : TextFieldSkin(control) {
+    init {
+        mask!!.addListener { _, _, _ ->
+            control.text = control.text
+        }
+    }
+
+    override fun maskText(txt: String): String {
+        if (mask?.value == true) {
+            val textField = skinnable
+            val n = textField.length
+            val passwordBuilder = StringBuilder(n)
+            for (i in 0 until n) {
+                passwordBuilder.append('\u2022')
+            }
+            return passwordBuilder.toString()
+        }
+        return super.maskText(txt)
     }
 }
