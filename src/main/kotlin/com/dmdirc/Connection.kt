@@ -82,8 +82,11 @@ class Connection(
         }
     }
 
-    override fun connect() {
+    init {
         client.onEvent(this::handleEvent)
+    }
+
+    override fun connect() {
         client.connect()
     }
 
