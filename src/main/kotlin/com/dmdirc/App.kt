@@ -49,7 +49,17 @@ class MainApp : Application() {
 private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty: StringProperty) = Kodein {
     bind<String>("version") with singleton { getVersion() }
     bind<Path>() with singleton { getConfigDirectory() }
-    bind<ClientConfig>() with singleton { ClientConfig.loadFrom(instance<Path>().resolve(if (getVersion() == "dev") "config-dev.yml" else "config.yml")) }
+    bind<ClientConfig>() with singleton {
+        ClientConfig.loadFrom(
+            if (getVersion() == "dev") {
+                instance<Path>()
+                    .resolve("dev")
+                    .resolve("config.yml")
+            } else {
+                instance<Path>().resolve("config.yml")
+            }
+        )
+    }
     bind<HostServices>() with instance(hostServices)
     bind<MainContract.Controller>() with singleton { MainController(instance(), factory()) }
     bind<StringProperty>("mainViewTitle") with singleton { titleProperty }
