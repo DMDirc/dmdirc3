@@ -259,21 +259,6 @@ class ServerlistDialog(
                             disableProperty().bind(model.editEnabled.not())
                         }, 1, 5)
                     }
-                    bottom = ButtonBar().apply {
-                        buttons.addAll(Button(tr("Connect")).apply {
-                            setButtonData(this, ButtonBar.ButtonData.OK_DONE)
-                            disableProperty().bind(model.editEnabled.not())
-                            setOnAction {
-                                model.connectPressed()
-                            }
-                        }, Button(tr("Delete")).apply {
-                            setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
-                            disableProperty().bind(model.editEnabled.not())
-                            setOnAction {
-                                model.deletePressed()
-                            }
-                        })
-                    }
                 }
                 bottom = ButtonBar().apply {
                     styleClass.add("serverlist-dialog-controls")
@@ -281,6 +266,18 @@ class ServerlistDialog(
                         setButtonData(this, ButtonBar.ButtonData.LEFT)
                         setOnAction {
                             model.addPressed()
+                        }
+                    }, Button(tr("Delete")).apply {
+                        setButtonData(this, ButtonBar.ButtonData.LEFT)
+                        disableProperty().bind(model.editEnabled.not())
+                        setOnAction {
+                            model.deletePressed()
+                        }
+                    }, Button(tr("Connect")).apply {
+                        setButtonData(this, ButtonBar.ButtonData.LEFT)
+                        disableProperty().bind(model.editEnabled.not())
+                        setOnAction {
+                            model.connectPressed()
                         }
                     }, Button(tr("Save")).apply {
                         setButtonData(this, ButtonBar.ButtonData.OK_DONE)
