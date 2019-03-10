@@ -125,7 +125,7 @@ class Connection(
                 if (!children.contains(event.target)) {
                     val model = WindowModel(event.target, WindowType.CHANNEL, this, config1, connectionId)
                     model.addImageHandler(config1)
-                    children += Child(model, WindowUI(model,hostServices)
+                    children += Child(model, WindowUI(model, hostServices)
                     )
                 }
             }
