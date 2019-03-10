@@ -174,9 +174,11 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
                     it.orientation == VERTICAL
                 }
             }
-            right = ListView<String>(model.nickList.users).apply {
-                styleClass.add("nick-list")
-                prefWidth = 148.0
+            if (!model.isConnection) {
+                right = ListView<String>(model.nickList.users).apply {
+                    styleClass.add("nick-list")
+                    prefWidth = 148.0
+                }
             }
             bottom = TextField().apply {
                 model.inputField.bindBidirectional(this.textProperty())
