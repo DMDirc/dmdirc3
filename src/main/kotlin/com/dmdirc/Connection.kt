@@ -122,7 +122,7 @@ class Connection(
             }
             event is ServerDisconnected -> runLater { connected.value = false }
             event is ChannelJoined && client.isLocalUser(event.user) -> runLater {
-                if (children.none { it.model.name.value == event.target }) {
+                if (!children.contains(event.target)) {
                     val model = WindowModel(event.target, WindowType.CHANNEL, this, config1, connectionId)
                     model.addImageHandler(config1)
                     children += Child(model, WindowUI(model,hostServices)
