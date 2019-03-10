@@ -25,18 +25,10 @@ issues, or irc://chat.freenode.net/dmdirc[join us on freenode].
 
 === Roadmap features
 
-Here are some of the things we plan to add to DMDirc, in no particular order:
-
-* Support for automatically submitting long text to pastebins/gists
-  https://github.com/DMDirc/dmdirc3/issues/112[(#112)]
-* Inline previews for videos, pastebins, etc
-  https://github.com/DMDirc/dmdirc3/issues/127[(#127)]
-* Theming support via custom stylesheets
-  https://github.com/DMDirc/dmdirc3/issues/106[(#106)]
-* Highlights and notifications
-  https://github.com/DMDirc/dmdirc3/issues/103[(#103)]
-* SASL authentication on servers that support it
-  https://github.com/DMDirc/dmdirc3/issues/47[(#47)]
+To see what we have planned, have a look at our https://github.com/DMDirc/dmdirc3/issues?q=is%3Aissue+is%3Aopen[issues]
+list. To help inform our decision on what to do next, please leave a thumbs up (+1) reaction on issues you want the
+most. You can view issues sorted by their +1 reactions
+https://github.com/DMDirc/dmdirc3/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc[here].
 
 == Development information
 
