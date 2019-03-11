@@ -6,7 +6,6 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
-import javafx.collections.transformation.SortedList
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Node
@@ -173,7 +172,7 @@ class MainView(
                     })
                 })
             }
-            left = ListView(SortedList(controller.windows, compareBy { it.sortKey })).apply {
+            left = ListView(controller.windows).apply {
                 styleClass.add("tree-view")
                 selectionModel.selectedItemProperty().addListener { _, _, newValue ->
                     controller.selectedWindow.value = newValue

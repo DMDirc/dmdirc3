@@ -42,12 +42,12 @@ class MainController(
 
     override fun connect(connectionDetails: ConnectionDetails) {
         with(connectionFactory(connectionDetails)) {
-            windows.addAll(children.map { it.model })
+            windows.insertSorted(children.map { it.model })
             selectedWindow.value = model
             children.observable.addListener(SetChangeListener<Connection.Child> {
                 runLater {
                     when {
-                        it.wasAdded() -> windows.add(it.elementAdded.model)
+                        it.wasAdded() -> windows.insertSorted(it.elementAdded.model)
                         it.wasRemoved() -> windows.remove(it.elementRemoved.model)
                     }
                 }
@@ -63,4 +63,12 @@ class MainController(
     override fun leaveChannel(channel: String) {
         selectedWindow.value.connection?.leaveChannel(channel)
     }
+}
+
+fun ObservableList<WindowModel>.insertSorted(model: WindowModel) = indexOfFirst { it.sortKey > model.sortKey }.let {
+    add(if (it == -1) size else it, model)
+}
+
+fun ObservableList<WindowModel>.insertSorted(models: Collection<WindowModel>) {
+    models.forEach { insertSorted(it) }
 }
