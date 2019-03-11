@@ -38,6 +38,7 @@ internal class WindowModelTest {
         I.init(File("translations"), Locale.ENGLISH, "messages")
         I.setLanguage(Locale.forLanguageTag("en-GB"))
         every { metaData.time } returns TestConstants.time
+        runLaterProvider = { it.run() }
     }
 
     @Test
