@@ -34,6 +34,7 @@ class IrcSegmentOps : SegmentOpsBase<Segment, Collection<Style>>(Segment.Empty),
 
     override fun realGetText(seg: Segment?) = when (seg) {
         is Segment.Text -> seg.content
+        is Segment.Image -> " "
         else -> ""
     }
 
