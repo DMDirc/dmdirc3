@@ -81,7 +81,9 @@ class WindowModel(
             } else {
                 connection?.sendMessage(name.value, text)
             }
-            inputField.value = ""
+            runLater {
+                inputField.value = ""
+            }
         }
     }
 
