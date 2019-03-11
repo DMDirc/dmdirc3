@@ -95,7 +95,8 @@ class ClientConfig private constructor(private val path: Path, private val confi
     }
 }
 
-private fun getDirectoryName() = if (getVersion() == "dev") "dmdirc3-dev" else "dmdirc3"
+val directoryName: String
+    get() = if (getVersion() == "dev") "dmdirc3-dev" else "dmdirc3"
 
 /**
  * Gets the config directory that DMDirc should use.
@@ -125,16 +126,16 @@ fun FileSystem.getConfigDirectory(osName: String, homeDir: Path, envVars: Map<St
  * Resolves the pre-defined config directory relative to the given [homeDir] for macs.
  */
 private fun resolveMacConfigDirectory(homeDir: Path) =
-    homeDir.resolve("Library").resolve("Preferences").resolve(getDirectoryName())
+    homeDir.resolve("Library").resolve("Preferences").resolve(directoryName)
 
 /**
  * Resolves the config directory for Windows, relative to either the [homeDir] or the [appDataDir] if available.
  */
 private fun FileSystem.resolveWindowsConfigDirectory(homeDir: Path, appDataDir: String?) =
     if (appDataDir.isNullOrEmpty()) {
-        homeDir.resolve(getDirectoryName())
+        homeDir.resolve(directoryName)
     } else {
-        getPath(appDataDir, getDirectoryName())
+        getPath(appDataDir, directoryName)
     }
 
 /**
@@ -142,7 +143,7 @@ private fun FileSystem.resolveWindowsConfigDirectory(homeDir: Path, appDataDir: 
  */
 private fun FileSystem.resolveOtherConfigDirectory(homeDir: Path, xdgConfigHome: String?) =
     if (xdgConfigHome.isNullOrEmpty()) {
-        homeDir.resolve(".${getDirectoryName()}")
+        homeDir.resolve(".$directoryName")
     } else {
-        getPath(xdgConfigHome, getDirectoryName())
+        getPath(xdgConfigHome, directoryName)
     }
