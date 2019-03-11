@@ -2,6 +2,8 @@ package com.dmdirc
 
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
+import io.mockk.every
+import io.mockk.mockkStatic
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -62,31 +64,63 @@ private class ConfigTest {
     @Test
     fun `gets config directory on Mac`() {
         val path = fs.getConfigDirectory("Mac OS X", fs.getPath("/users/burn"), emptyMap())
-        assertEquals("/users/burn/Library/Preferences/dmdirc3", path.toString())
+        assertEquals("/users/burn/Library/Preferences/dmdirc3-dev", path.toString())
     }
 
     @Test
     fun `gets config directory on Windows with AppData set`() {
         val path = fs.getConfigDirectory("Windows 10", fs.getPath("/users/burn"), mapOf("APPDATA" to "/appdata"))
-        assertEquals("/appdata/dmdirc3", path.toString())
+        assertEquals("/appdata/dmdirc3-dev", path.toString())
     }
 
     @Test
     fun `gets config directory on Windows with AppData not set`() {
         val path = fs.getConfigDirectory("Windows 10", fs.getPath("/users/burn"), emptyMap())
-        assertEquals("/users/burn/dmdirc3", path.toString())
+        assertEquals("/users/burn/dmdirc3-dev", path.toString())
     }
 
     @Test
     fun `gets config directory on other OSes with XDG_CONFIG_HOME not set`() {
         val path = fs.getConfigDirectory("Linux", fs.getPath("/users/burn"), emptyMap())
-        assertEquals("/users/burn/.dmdirc3", path.toString())
+        assertEquals("/users/burn/.dmdirc3-dev", path.toString())
     }
 
     @Test
     fun `gets config directory on other OSes with XDG_CONFIG_HOME set`() {
         val path =
             fs.getConfigDirectory("Linux", fs.getPath("/users/burn"), mapOf("XDG_CONFIG_HOME" to "/users/burn/.config"))
-        assertEquals("/users/burn/.config/dmdirc3", path.toString())
+        assertEquals("/users/burn/.config/dmdirc3-dev", path.toString())
+    }
+
+    @Test
+    fun `gets config directory with dev version`() {
+        mockkStatic("com.dmdirc.LauncherKt") {
+            every { getVersion() } returns "dev"
+            val path = fs.getConfigDirectory(
+                "Windows 10",
+                fs.getPath("/users/burn"),
+                emptyMap()
+            )
+            assertEquals(
+                "/users/burn/dmdirc3-dev",
+                path.toString()
+            )
+        }
+    }
+
+    @Test
+    fun `gets config directory with normal version`() {
+        mockkStatic("com.dmdirc.LauncherKt") {
+            every { getVersion() } returns "19-03-01"
+            val path = fs.getConfigDirectory(
+                "Windows 10",
+                fs.getPath("/users/burn"),
+                emptyMap()
+            )
+            assertEquals(
+                "/users/burn/dmdirc3",
+                path.toString()
+            )
+        }
     }
 }
