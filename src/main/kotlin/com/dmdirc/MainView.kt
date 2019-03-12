@@ -44,7 +44,7 @@ class ServerContextMenu(
             setOnAction {
                 joinDialogProvider().show()
             }
-            disableProperty().bind(controller.selectedWindow.isNull)
+            disableProperty().bind(controller.selectedWindow.isNull())
         }, MenuItem(tr("Disconnect")).apply {
             visibleProperty().bind(connection?.connected)
             setOnAction {
@@ -206,8 +206,8 @@ class MainView(
         titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
         controller.selectedWindow.addListener { _, oldValue, newValue ->
             runLater {
-                oldValue?.hasUnreadMessages?.set(false)
-                newValue?.hasUnreadMessages?.set(false)
+                oldValue?.hasUnreadMessages?.value = false
+                newValue?.hasUnreadMessages?.value = false
                 selectedWindow.value = newValue?.let {
                     it.connection?.children?.get(it.name.value)?.ui
                 } ?: VBox()

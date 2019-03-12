@@ -5,12 +5,18 @@ import io.mockk.mockk
 import io.mockk.verify
 import javafx.beans.property.SimpleBooleanProperty
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 private class SettingsModelTest {
 
     private val mockController = mockk<SettingsDialogContract.Controller>()
     private val mockConfig = mockk<ClientConfig>()
+
+    @BeforeEach
+    fun setup() {
+        PlatformWrappers.fxThreadTester = { true }
+    }
 
     @Test
     fun `defaults profile fields to values from config`() {

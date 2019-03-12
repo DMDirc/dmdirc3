@@ -4,8 +4,8 @@ import com.jukusoft.i18n.I.tr
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EYE
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EYE_SLASH
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
-import javafx.beans.property.BooleanProperty
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -48,15 +48,15 @@ object ServerListDialogContract {
         fun closeDialog()
         fun show()
 
-        val open: BooleanProperty
+        val open: Property<Boolean>
         val servers: ObservableList<ConnectionDetailsEditable>
-        val selected: ObjectProperty<ConnectionDetailsEditable>
-        val hostname: StringProperty
-        val password: StringProperty
-        val editEnabled: BooleanProperty
-        val port: StringProperty
-        val tls: BooleanProperty
-        val autoconnect: BooleanProperty
+        val selected: Property<ConnectionDetailsEditable>
+        val hostname: Property<String>
+        val password: Property<String>
+        val editEnabled: Property<Boolean>
+        val port: Property<String>
+        val tls: Property<Boolean>
+        val autoconnect: Property<Boolean>
     }
 }
 
@@ -94,15 +94,15 @@ class ServerListModel(
     private val config: ClientConfig
 ) : ServerListDialogContract.ViewModel {
     override val valid = ValidatorChain()
-    override val open = SimpleBooleanProperty(true)
+    override val open = SimpleBooleanProperty(true).threadAsserting()
     override val servers = emptyList<ConnectionDetailsEditable>().toMutableList().observable()
-    override val selected = SimpleObjectProperty<ConnectionDetailsEditable>()
-    override val hostname = SimpleStringProperty()
-    override val password = SimpleStringProperty()
-    override val port = SimpleStringProperty()
-    override val tls = SimpleBooleanProperty()
-    override val autoconnect = SimpleBooleanProperty()
-    override val editEnabled = SimpleBooleanProperty()
+    override val selected = SimpleObjectProperty<ConnectionDetailsEditable>().threadAsserting()
+    override val hostname = SimpleStringProperty().threadAsserting()
+    override val password = SimpleStringProperty().threadAsserting()
+    override val port = SimpleStringProperty().threadAsserting()
+    override val tls = SimpleBooleanProperty().threadAsserting()
+    override val autoconnect = SimpleBooleanProperty().threadAsserting()
+    override val editEnabled = SimpleBooleanProperty().threadAsserting()
 
     init {
         selected.addListener { _, oldValue, newValue ->

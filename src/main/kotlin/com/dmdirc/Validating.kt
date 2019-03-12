@@ -1,8 +1,8 @@
 package com.dmdirc
 
 import javafx.beans.binding.BooleanExpression
+import javafx.beans.property.Property
 import javafx.beans.property.ReadOnlyBooleanPropertyBase
-import javafx.beans.property.StringProperty
 import javafx.beans.value.ChangeListener
 import javafx.scene.control.TextField
 import javafx.scene.control.TextInputControl
@@ -13,11 +13,11 @@ import org.controlsfx.validation.decoration.StyleClassValidationDecoration
 
 val requiredValidator: Validator<TextField> = Validator.createEmptyValidator<TextField>("Required")
 
-fun bindRequiredTextControl(c: TextInputControl, p: StringProperty, m: ValidatingModel) {
+fun bindRequiredTextControl(c: TextInputControl, p: Property<String>, m: ValidatingModel) {
     bindTextControl(c, p, requiredValidator, m)
 }
 
-fun bindTextControl(c: TextInputControl, p: StringProperty, v: Validator<TextField>, m: ValidatingModel) {
+fun bindTextControl(c: TextInputControl, p: Property<String>, v: Validator<TextField>, m: ValidatingModel) {
     val validationSupport = ValidationSupport()
     validationSupport.validationDecorator = StyleClassValidationDecoration("validation-error", "validation-warning")
     validationSupport.registerValidator(c, v)

@@ -6,6 +6,7 @@ import io.mockk.verify
 import javafx.scene.control.TextFormatter.Change
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class ServerListControllerTest {
@@ -66,6 +67,11 @@ internal class ServerListModelTest {
     private val controller = mockk<ServerListController>()
     private val config = mockk<ClientConfig>()
     private val model = ServerListModel(controller, config)
+
+    @BeforeEach
+    fun setup() {
+        PlatformWrappers.fxThreadTester = { true }
+    }
 
     @Test
     fun `test connect pressed when null`() {

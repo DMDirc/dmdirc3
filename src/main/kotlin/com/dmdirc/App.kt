@@ -3,15 +3,9 @@ package com.dmdirc
 import com.bugsnag.Bugsnag
 import javafx.application.Application
 import javafx.application.HostServices
-import javafx.application.Platform
 import javafx.beans.property.ObjectProperty
-import javafx.beans.property.Property
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
-import javafx.collections.ObservableMap
-import javafx.collections.ObservableSet
 import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.stage.Stage
@@ -107,21 +101,4 @@ private fun createKodein(
 fun main() {
     LogManager.getLogManager().readConfiguration(MainApp::class.java.getResourceAsStream("/logs.properties"))
     Application.launch(MainApp::class.java)
-}
-
-fun <T> List<T>.observable(): ObservableList<T> = FXCollections.observableList(this)
-fun <T> Set<T>.observable(): ObservableSet<T> = FXCollections.observableSet(this)
-fun <T> ObservableSet<T>.synchronized(): ObservableSet<T> = FXCollections.synchronizedObservableSet(this)
-fun <T> ObservableSet<T>.readOnly(): ObservableSet<T> = FXCollections.unmodifiableObservableSet(this)
-fun <K, V> Map<K, V>.observable(): ObservableMap<K, V> = FXCollections.observableMap(this)
-
-// For testing purposes: we can swap out the Platform call to something we control
-internal var runLaterProvider: (Runnable) -> Unit = Platform::runLater
-
-fun runLater(block: () -> Unit) = runLaterProvider(Runnable(block))
-
-fun <T, Y> Property<T>.bindTransform(other: Property<Y>, biFunction: (T, T) -> Y) {
-    addListener { _, oldValue, newValue ->
-        other.value = biFunction(oldValue, newValue)
-    }
 }

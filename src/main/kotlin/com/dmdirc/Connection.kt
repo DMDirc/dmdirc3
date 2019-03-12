@@ -20,7 +20,7 @@ import com.dmdirc.ktirc.model.ChannelUser
 import com.dmdirc.ktirc.model.ServerFeature
 import com.dmdirc.ktirc.model.ServerStatus
 import javafx.application.HostServices
-import javafx.beans.property.BooleanProperty
+import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableSet
 import javafx.scene.Node
@@ -32,7 +32,7 @@ private val connectionCounter = AtomicLong(0)
 object ConnectionContract {
     interface Controller {
         val children: Connection.WindowMap
-        val connected: BooleanProperty
+        val connected: Property<Boolean>
         val model: WindowModel
         var networkName: String
         fun connect()
@@ -57,7 +57,7 @@ class Connection(
         connectionDetails.hostname, WindowType.SERVER, this, config1, connectionId
     )
 
-    override val connected = SimpleBooleanProperty(false)
+    override val connected = SimpleBooleanProperty(false).threadAsserting()
 
     override val children = WindowMap { client.caseMapping }.apply {
         this += Child(model, WindowUI(model, hostServices))
