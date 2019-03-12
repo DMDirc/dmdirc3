@@ -35,10 +35,10 @@ class MainApp : Application() {
             minHeight = 600.0
             scene = Scene(kodein.direct.instance<MainView>())
             show()
-            scene.focusOwnerProperty().addListener { observable, oldValue, newValue ->
+            scene.focusOwnerProperty().addListener { _, _, _ ->
                     val selectedWindow = kodein.direct.instance<MainContract.Controller>().selectedWindow.value
                     val uiNode = selectedWindow.connection?.children?.get(selectedWindow.name.value)?.ui
-                    if (uiNode is WindowUI) {
+                    if (uiNode is WindowUI && kodein.direct.instance<ObjectProperty<Node>>("dialogPane").value?.visibleProperty()?.value != true) {
                         uiNode.inputField.requestFocus()
                     }
             }
@@ -92,7 +92,7 @@ private fun createKodein(
 
     bind<ConnectionContract.Controller>() with factory { connectionDetails: ConnectionDetails ->
         Connection(
-            connectionDetails, instance(), instance()
+            connectionDetails, instance(), instance(), instance("dialogPane")
         )
     }
     bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
