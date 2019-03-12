@@ -39,7 +39,7 @@ class MainApp : Application() {
             show()
             scene.focusOwnerProperty().addListener { _, _, _ ->
                     val selectedWindow = controller.selectedWindow.value
-                    val uiNode = selectedWindow.connection?.children?.get(selectedWindow.name.value)?.ui
+                    val uiNode = selectedWindow?.connection?.children?.get(selectedWindow.name.value)?.ui
                     if (uiNode is WindowUI && dialogPane.value?.visibleProperty()?.value != true) {
                         uiNode.inputField.requestFocus()
                     }
