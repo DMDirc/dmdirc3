@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import com.dmdirc.MessageFlags.Message
 import com.dmdirc.ktirc.events.ActionReceived
 import com.dmdirc.ktirc.events.ChannelJoined
 import com.dmdirc.ktirc.events.ChannelNickChanged
@@ -107,7 +108,7 @@ internal class WindowModelTest {
     fun `formats and adds lines with timestamp`() {
         val model = WindowModel("name", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.message] } returns "nick=%s message=%s"
-        model.addLine("12:34:56", ClientSpec.Formatting.message, "n123", "m456")
+        model.addLine("12:34:56", setOf(Message), arrayOf("n123", "m456"))
 
         assertEquals(1, model.lines.size)
         assertArrayEquals(
@@ -122,7 +123,7 @@ internal class WindowModelTest {
     fun `parses control codes when adding lines`() {
         val model = WindowModel("name", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.message] } returns "nick=%s message=%s"
-        model.addLine("12:34:56", ClientSpec.Formatting.message, "n123", "\u0002m456")
+        model.addLine("12:34:56", setOf(Message), arrayOf("n123", "\u0002m456"))
 
         assertEquals(1, model.lines.size)
         assertArrayEquals(
@@ -138,7 +139,7 @@ internal class WindowModelTest {
     fun `detects links when adding lines`() {
         val model = WindowModel("name", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.message] } returns "nick=%s message=%s"
-        model.addLine("12:34:56", ClientSpec.Formatting.message, "n123", "https://www.dmdirc.com/")
+        model.addLine("12:34:56", setOf(Message), arrayOf("n123", "https://www.dmdirc.com/"))
 
         assertEquals(1, model.lines.size)
         assertArrayEquals(
@@ -152,7 +153,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays join events`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(ChannelJoined(metaData, User("acidBurn"), "#channel"))
@@ -170,7 +171,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays part events without reasons`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(ChannelParted(metaData, User("acidBurn"), "#channel"))
@@ -188,7 +189,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays part events with reasons`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
@@ -210,7 +211,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays message events`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.message] } returns "<%s> %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
@@ -232,7 +233,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays notice events`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.notice] } returns "-%s- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
@@ -254,7 +255,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays action events`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.action] } returns "* %s %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(ActionReceived(metaData, User("acidBurn"), "#channel", "hacks"))
@@ -272,7 +273,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays nick changes`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(ChannelNickChanged(metaData, User("zeroCool"), "#channel", "crashOverride"))
@@ -291,7 +292,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays topic changes`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(ChannelTopicChanged(metaData, User("acidBurn"), "#channel", "Mess with the best"))
@@ -309,7 +310,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays empty topic discovered`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(ChannelTopicDiscovered(metaData, "#channel", null))
@@ -325,7 +326,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays topic discovered`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(ChannelTopicDiscovered(metaData, "#channel", "Mess with the best"))
@@ -341,7 +342,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays topic metadata`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(ChannelTopicMetadataDiscovered(metaData, "#channel", User("acidBurn"), TestConstants.time))
@@ -358,7 +359,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays quit events without reasons`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(ChannelQuit(metaData, User("acidBurn"), "#channel"))
@@ -376,7 +377,7 @@ internal class WindowModelTest {
 
     @Test
     fun `displays quit events with reasons`() {
-        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        val model = WindowModel("#channel", WindowType.CHANNEL, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
