@@ -62,6 +62,7 @@ dependencies {
     implementation("de.jensd:fontawesomefx-fontawesome:4.7.0-11")
     implementation("de.jensd:fontawesomefx-commons:11.0")
     implementation("de.jensd:fontawesomefx-controls:11.0")
+    implementation("com.bugsnag:bugsnag:3.4.4")
     
     compileOnly("com.install4j:install4j-runtime:7.0.9")
 
