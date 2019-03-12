@@ -1,6 +1,5 @@
 package com.dmdirc
 
-import com.bugsnag.Bugsnag
 import com.dmdirc.PlatformWrappers.fxThreadTester
 import com.dmdirc.PlatformWrappers.runLaterProvider
 import javafx.application.Platform
@@ -30,14 +29,14 @@ fun <T, Y> Property<T>.bindTransform(other: Property<Y>, biFunction: (T, T) -> Y
 
 fun runLater(block: () -> Unit) = runLaterProvider(Runnable(block))
 
-fun assertOnFxThread(bugsnag: Bugsnag? = null) {
+fun assertOnFxThread(errorReporter: ErrorReporter? = null) {
     if (!fxThreadTester()) {
         val stackTrace = Throwable().stackTrace
         val method = stackTrace[1].methodName
         val exception =
             WrongThreadException("Function $method must be called on the FX thread. Current thread: ${Thread.currentThread().name}")
         exception.stackTrace = stackTrace.sliceArray(2 until stackTrace.size)
-        (bugsnag ?: kodein.direct.instance()).notify(exception)
+        (errorReporter ?: kodein.direct.instance()).notify(exception)
     }
 }
 
