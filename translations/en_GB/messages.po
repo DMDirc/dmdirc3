@@ -10,138 +10,182 @@ msgstr ""
 "Last-Translator: chameth <crowdin@vacso.co.uk>\n"
 "Language-Team: English, United Kingdom\n"
 "Language: en_GB\n"
-"PO-Revision-Date: 2019-03-04 16:19\n"
+"PO-Revision-Date: 2019-03-12 00:16\n"
 
-#: src/main/kotlin/com/dmdirc/WindowUI.kt:65
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:120
+msgid "%s has changed the topic to: %s"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:117
+msgid "%s is now known as %s"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:105
 msgid "%s joined"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/WindowUI.kt:70
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:107
 msgid "%s left"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/WindowUI.kt:72
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:108
 msgid "%s left (%s)"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/WindowUI.kt:78
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:111
 msgid "%s quit"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/WindowUI.kt:80
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:112
 msgid "%s quit (%s)"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:172
+#: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:265
+msgid "Add"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:256
 msgid "AutoConnect: "
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:201
-#: src/main/kotlin/com/dmdirc/JoinDialog.kt:83
+#: src/main/kotlin/com/dmdirc/JoinDialog.kt:89
+#: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:287
 msgid "Cancel"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/MainView.kt:101
-#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:101
+#: src/main/kotlin/com/dmdirc/MainView.kt:259
+msgid "Chat with us"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/MainView.kt:63
+#: src/main/kotlin/com/dmdirc/MainView.kt:78
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:103
 msgid "Close"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:179
+#: src/main/kotlin/com/dmdirc/MainView.kt:42
+#: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:276
 msgid "Connect"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/WindowUI.kt:58
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:99
 msgid "Connected"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/MainView.kt:129
+#: src/main/kotlin/com/dmdirc/MainView.kt:224
 msgid "DMDirc"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/MainView.kt:130
+#: src/main/kotlin/com/dmdirc/MainView.kt:225
 msgid "DMDirc: %s"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/MainView.kt:131
+#: src/main/kotlin/com/dmdirc/MainView.kt:226
 msgid "DMDirc: %s | %s"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:184
+#: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:270
 msgid "Delete"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/WindowUI.kt:60
+#: src/main/kotlin/com/dmdirc/MainView.kt:48
+msgid "Disconnect"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:100
 msgid "Disconnected"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/WindowUI.kt:62
+#: src/main/kotlin/com/dmdirc/JoinDialog.kt:81
+msgid "Enter channel name: "
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:102
 msgid "Error: %s - %s"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/MainView.kt:58
-msgid "File"
-msgstr ""
-
-#: src/main/kotlin/com/dmdirc/MainView.kt:67
+#: src/main/kotlin/com/dmdirc/MainView.kt:161
 msgid "IRC"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/JoinDialog.kt:78
+#: src/main/kotlin/com/dmdirc/JoinDialog.kt:85
 msgid "Join"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/MainView.kt:74
+#: src/main/kotlin/com/dmdirc/JoinDialog.kt:79
+#: src/main/kotlin/com/dmdirc/MainView.kt:43
 msgid "Join Channel"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:79
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:84
 msgid "Nickname: "
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:164
+#: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:246
 msgid "Password: "
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:160
+#: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:235
 msgid "Port: "
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:78
+#: src/main/kotlin/com/dmdirc/MainView.kt:249
 msgid "Profile"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/MainView.kt:60
-msgid "Quit"
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:81
+msgid "Profile settings"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:83
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:88
 msgid "Realname: "
 msgstr "Real name: "
 
-#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:195
-#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:93
+#: src/main/kotlin/com/dmdirc/MainView.kt:42
+msgid "Reconnect"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:282
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:97
 msgid "Save"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/MainView.kt:69
+#: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:227
+msgid "Server Details"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/MainView.kt:162
+#: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:211
 msgid "Server List"
 msgstr "Server list"
 
-#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:156
+#: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:230
 msgid "Server Name: "
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/MainView.kt:82
-#: src/main/kotlin/com/dmdirc/MainView.kt:84
+#: src/main/kotlin/com/dmdirc/MainView.kt:254
+msgid "Server list"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/MainView.kt:167
+#: src/main/kotlin/com/dmdirc/MainView.kt:168
 msgid "Settings"
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/ConnectDialog.kt:168
+#: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:251
 msgid "TLS: "
 msgstr ""
 
-#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:87
+#: src/main/kotlin/com/dmdirc/MainView.kt:242
+msgid "To get started you'll need to set your nickname and other settings and add a server or two, you can do this with the buttons below. If you'd rather just dive in, click the \"Chat with us\" button and you'll connect to our development channel with some default settings."
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/SettingsDialog.kt:92
 msgid "Username: "
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/MainView.kt:238
+msgid "Welcome to DMDirc %s"
 msgstr ""
 
 #: src/main/kotlin/com/dmdirc/Translations.kt:21
@@ -154,6 +198,18 @@ msgstr ""
 
 #: src/main/kotlin/com/dmdirc/Translations.kt:23
 msgid "the server's certificate was not valid"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:125
+msgid "the topic is: %s"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:123
+msgid "there is no topic set"
+msgstr ""
+
+#: src/main/kotlin/com/dmdirc/WindowUI.kt:128
+msgid "topic was set at %s on %s by %s"
 msgstr ""
 
 #: src/main/kotlin/com/dmdirc/Translations.kt:20
