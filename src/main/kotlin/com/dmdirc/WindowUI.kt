@@ -5,6 +5,12 @@ import com.dmdirc.ClientSpec.Formatting.channelEvent
 import com.dmdirc.ClientSpec.Formatting.message
 import com.dmdirc.ClientSpec.Formatting.notice
 import com.dmdirc.ClientSpec.Formatting.serverEvent
+import com.dmdirc.MessageFlags.Action
+import com.dmdirc.MessageFlags.ChannelEvent
+import com.dmdirc.MessageFlags.Message
+import com.dmdirc.MessageFlags.Notice
+import com.dmdirc.MessageFlags.ServerEvent
+import com.dmdirc.WindowType.CHANNEL
 import com.dmdirc.ktirc.events.ActionReceived
 import com.dmdirc.ktirc.events.ChannelJoined
 import com.dmdirc.ktirc.events.ChannelMembershipAdjustment
@@ -87,67 +93,60 @@ class WindowModel(
     }
 
     fun handleEvent(event: IrcEvent) {
-        displayEvent(event)
-
         if (event is ChannelMembershipAdjustment) nickList.handleEvent(event)
+        event.displayableText?.let { addLine(event.timestamp, event.flags(), it) }
     }
 
-    private fun displayEvent(event: IrcEvent) {
-        val ts = event.timestamp
-        when (event) {
-            is ServerConnected -> addLine(ts, serverEvent, tr("Connected"))
-            is ServerDisconnected -> addLine(ts, serverEvent, tr("Disconnected"))
-            is ServerConnectionError -> addLine(
-                ts, serverEvent, tr("Error: %s - %s").format(event.error.translated(), event.details ?: "")
-            )
+    private fun IrcEvent.flags() = sequence {
+        yield(if (type == CHANNEL) ChannelEvent else ServerEvent)
 
-            is ChannelJoined -> addLine(ts, channelEvent, tr("%s joined").format(event.formattedNickname))
-            is ChannelParted -> addLine(
-                ts, channelEvent, if (event.reason.isEmpty()) tr("%s left").format(event.formattedNickname)
-                else tr("%s left (%s)").format(event.formattedNickname, event.reason)
-            )
-            is ChannelQuit -> addLine(
-                ts, channelEvent, if (event.reason.isEmpty()) tr("%s quit").format(event.formattedNickname)
-                else tr("%s quit (%s)").format(event.formattedNickname, event.reason)
-            )
-            is ChannelNickChanged -> addLine(
-                ts,
-                channelEvent,
-                tr("%s is now known as %s").format(event.formattedNickname, event.newNick.formattedNickname)
-            )
-            is ChannelTopicChanged -> addLine(
-                ts, channelEvent, tr("%s has changed the topic to: %s").format(event.formattedNickname, event.topic)
-            )
-            is ChannelTopicDiscovered -> if (event.topic.isNullOrEmpty()) {
-                addLine(ts, channelEvent, tr("there is no topic set"))
-            } else {
-                addLine(ts, channelEvent, tr("the topic is: %s").format(event.topic))
-            }
-            is ChannelTopicMetadataDiscovered -> addLine(
-                ts, channelEvent, tr("topic was set at %s on %s by %s").format(
-                    event.setTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")),
-                    event.setTime.format(DateTimeFormatter.ofPattern("cccc, d LLLL yyyy")),
-                    event.user.formattedNickname
+        when (this@flags) {
+            is MessageReceived -> yield(Message)
+            is ActionReceived -> yield(Action)
+            is NoticeReceived -> yield(Notice)
+        }
+    }.toSet()
+
+    private val IrcEvent.displayableText: Array<String>?
+        get() = when (this) {
+            is ServerConnected -> arrayOf(tr("Connected"))
+            is ServerDisconnected -> arrayOf(tr("Disconnected"))
+            is ServerConnectionError -> arrayOf(tr("Error: %s - %s").format(error.translated(), details ?: ""))
+            is ChannelJoined -> arrayOf(tr("%s joined").format(formattedNickname))
+            is ChannelParted -> if (reason.isEmpty()) arrayOf(tr("%s left").format(formattedNickname))
+            else arrayOf(tr("%s left (%s)").format(formattedNickname, reason))
+            is ChannelQuit -> if (reason.isEmpty()) arrayOf(tr("%s quit").format(formattedNickname))
+            else arrayOf(tr("%s quit (%s)").format(formattedNickname, reason))
+            is ChannelNickChanged -> arrayOf(
+                tr("%s is now known as %s").format(
+                    formattedNickname, newNick.formattedNickname
                 )
             )
-
-            is MessageReceived -> addLine(ts, message, event.user.formattedNickname, event.message)
-            is NoticeReceived -> addLine(ts, notice, event.user.formattedNickname, event.message)
-            is ActionReceived -> addLine(ts, action, event.user.formattedNickname, event.action)
-        }
-    }
-
-    fun addLine(timestamp: String, format: Item<String>, vararg args: String) = addLine(
-        sequenceOf(
-            StyledSpan(
-                timestamp, setOf(Style.CustomStyle("timestamp"))
+            is ChannelTopicChanged -> arrayOf(tr("%s has changed the topic to: %s").format(formattedNickname, topic))
+            is ChannelTopicDiscovered -> if (topic.isNullOrEmpty()) {
+                arrayOf(tr("there is no topic set"))
+            } else {
+                arrayOf(tr("the topic is: %s").format(topic))
+            }
+            is ChannelTopicMetadataDiscovered -> arrayOf(
+                tr("topic was set at %s on %s by %s").format(
+                    setTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")),
+                    setTime.format(DateTimeFormatter.ofPattern("cccc, d LLLL yyyy")),
+                    user.formattedNickname
+                )
             )
-        ) + " ${config[format].format(*args)}".detectLinks().convertControlCodes()
-    )
+            is MessageReceived -> arrayOf(user.formattedNickname, message)
+            is NoticeReceived -> arrayOf(user.formattedNickname, message)
+            is ActionReceived -> arrayOf(user.formattedNickname, action)
+            else -> null
+        }
 
-    private fun addLine(spans: Sequence<StyledSpan>) {
+    fun addLine(timestamp: String, flags: Set<MessageFlags>, args: Array<String>) {
+        val message = " ${config[MessageFlags.formatter(flags)].format(*args)}"
+        val spans = message.detectLinks().convertControlCodes().toMutableList()
+        spans.add(0, StyledSpan(timestamp, setOf(Style.CustomStyle("timestamp"))))
         hasUnreadMessages.value = true
-        lines.add(spans.toList().toTypedArray())
+        lines.add(spans.toTypedArray())
     }
 
     private val SourcedEvent.formattedNickname: String
@@ -161,6 +160,20 @@ class WindowModel(
 
     private val IrcEvent.timestamp: String
         get() = metadata.time.format(DateTimeFormatter.ofPattern(config[ClientSpec.Formatting.timestamp]))
+}
+
+enum class MessageFlags {
+    ServerEvent, ChannelEvent, Self, Message, Action, Notice, Highlight;
+
+    companion object {
+        fun formatter(flags: Set<MessageFlags>): Item<String> = when {
+            Message in flags -> message
+            Action in flags -> action
+            Notice in flags -> notice
+            ChannelEvent in flags -> channelEvent
+            else -> serverEvent
+        }
+    }
 }
 
 class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
