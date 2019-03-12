@@ -14,7 +14,7 @@ internal class ImagesTest {
 
     private val mockConfig = mockk<ClientConfig>()
 
-    private val fakeModel = WindowModel("", WindowType.CHANNEL, null, mockConfig, null)
+    private val fakeModel = WindowModel("", WindowType.CHANNEL, null, IrcEventMapper(mockk()), mockConfig, null)
 
     @BeforeEach
     fun setup() {
