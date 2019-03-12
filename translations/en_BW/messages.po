@@ -10,15 +10,15 @@ msgstr ""
 "Last-Translator: chameth <crowdin@vacso.co.uk>\n"
 "Language-Team: Backwards\n"
 "Language: en_BW\n"
-"PO-Revision-Date: 2019-03-12 00:16\n"
+"PO-Revision-Date: 2019-03-12 00:42\n"
 
 #: src/main/kotlin/com/dmdirc/WindowUI.kt:120
 msgid "%s has changed the topic to: %s"
-msgstr ""
+msgstr "%s sah degnahc eht cipot ot: %s"
 
 #: src/main/kotlin/com/dmdirc/WindowUI.kt:117
 msgid "%s is now known as %s"
-msgstr ""
+msgstr "%s si won nwonk sa %s"
 
 #: src/main/kotlin/com/dmdirc/WindowUI.kt:105
 msgid "%s joined"
@@ -42,7 +42,7 @@ msgstr "%s tiuq (%s)"
 
 #: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:265
 msgid "Add"
-msgstr ""
+msgstr "Dda"
 
 #: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:256
 msgid "AutoConnect: "
@@ -55,7 +55,7 @@ msgstr "Lecnac"
 
 #: src/main/kotlin/com/dmdirc/MainView.kt:259
 msgid "Chat with us"
-msgstr ""
+msgstr "Su htiw tahc"
 
 #: src/main/kotlin/com/dmdirc/MainView.kt:63
 #: src/main/kotlin/com/dmdirc/MainView.kt:78
@@ -90,7 +90,7 @@ msgstr "Eteled"
 
 #: src/main/kotlin/com/dmdirc/MainView.kt:48
 msgid "Disconnect"
-msgstr ""
+msgstr "Tcennocsid"
 
 #: src/main/kotlin/com/dmdirc/WindowUI.kt:100
 msgid "Disconnected"
@@ -98,7 +98,7 @@ msgstr "Detcennocsid"
 
 #: src/main/kotlin/com/dmdirc/JoinDialog.kt:81
 msgid "Enter channel name: "
-msgstr ""
+msgstr "Eman lennahc retne: "
 
 #: src/main/kotlin/com/dmdirc/WindowUI.kt:102
 msgid "Error: %s - %s"
@@ -135,7 +135,7 @@ msgstr "Eliforp"
 
 #: src/main/kotlin/com/dmdirc/SettingsDialog.kt:81
 msgid "Profile settings"
-msgstr ""
+msgstr "Sgnittes eliforp"
 
 #: src/main/kotlin/com/dmdirc/SettingsDialog.kt:88
 msgid "Realname: "
@@ -143,7 +143,7 @@ msgstr "Emanlaer: "
 
 #: src/main/kotlin/com/dmdirc/MainView.kt:42
 msgid "Reconnect"
-msgstr ""
+msgstr "Tcennocer"
 
 #: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:282
 #: src/main/kotlin/com/dmdirc/SettingsDialog.kt:97
@@ -152,7 +152,7 @@ msgstr "Evas"
 
 #: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:227
 msgid "Server Details"
-msgstr ""
+msgstr "Sliated revres"
 
 #: src/main/kotlin/com/dmdirc/MainView.kt:162
 #: src/main/kotlin/com/dmdirc/ServerlistDialog.kt:211
@@ -165,7 +165,7 @@ msgstr "Eman revres: "
 
 #: src/main/kotlin/com/dmdirc/MainView.kt:254
 msgid "Server list"
-msgstr ""
+msgstr "Tsil revres"
 
 #: src/main/kotlin/com/dmdirc/MainView.kt:167
 #: src/main/kotlin/com/dmdirc/MainView.kt:168
@@ -178,7 +178,7 @@ msgstr "SLT: "
 
 #: src/main/kotlin/com/dmdirc/MainView.kt:242
 msgid "To get started you'll need to set your nickname and other settings and add a server or two, you can do this with the buttons below. If you'd rather just dive in, click the \"Chat with us\" button and you'll connect to our development channel with some default settings."
-msgstr ""
+msgstr "Sgnittes tluafed emos htiw lennahc tnempoleved ruo ot tcennoc ll'uoy dna nottub \"Su htiw tahc\" eht kcilc, ni evid tsuj rehtar d'uoy fI. woleb snottub eht htiw siht od nac uoy, owt ro revres a dda dna sgnittes rehto dna emankcin ruoy tes ot deen ll'uoy detrats teg ot."
 
 #: src/main/kotlin/com/dmdirc/SettingsDialog.kt:92
 msgid "Username: "
@@ -186,7 +186,7 @@ msgstr "Emanresu: "
 
 #: src/main/kotlin/com/dmdirc/MainView.kt:238
 msgid "Welcome to DMDirc %s"
-msgstr ""
+msgstr "Emoclew ot CRIdmd %s"
 
 #: src/main/kotlin/com/dmdirc/Translations.kt:21
 msgid "the address could not be resolved"
@@ -202,15 +202,15 @@ msgstr "dilav ton saw etacfitrec s'revres eht"
 
 #: src/main/kotlin/com/dmdirc/WindowUI.kt:125
 msgid "the topic is: %s"
-msgstr ""
+msgstr "eht cipot si: %s"
 
 #: src/main/kotlin/com/dmdirc/WindowUI.kt:123
 msgid "there is no topic set"
-msgstr ""
+msgstr "ereht si on cipot tes"
 
 #: src/main/kotlin/com/dmdirc/WindowUI.kt:128
 msgid "topic was set at %s on %s by %s"
-msgstr ""
+msgstr "cipot saw tes ta %s no %s yb %s"
 
 #: src/main/kotlin/com/dmdirc/Translations.kt:20
 msgid "unknown error"
