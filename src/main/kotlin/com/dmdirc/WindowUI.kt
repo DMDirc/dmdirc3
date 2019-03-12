@@ -26,10 +26,9 @@ import com.jukusoft.i18n.I.tr
 import com.uchuhimo.konf.Item
 import javafx.application.HostServices
 import javafx.beans.Observable
-import javafx.beans.property.BooleanProperty
+import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.beans.property.StringProperty
 import javafx.collections.ListChangeListener
 import javafx.geometry.Orientation.VERTICAL
 import javafx.scene.control.ListView
@@ -54,14 +53,14 @@ class WindowModel(
     private val config: ClientConfig,
     connectionId: String?
 ) {
-    val name: StringProperty = SimpleStringProperty(initialName)
-    val title: StringProperty = SimpleStringProperty(initialName)
-    val hasUnreadMessages: BooleanProperty = SimpleBooleanProperty(false)
+    val name: Property<String> = SimpleStringProperty(initialName).threadAsserting()
+    val title: Property<String> = SimpleStringProperty(initialName).threadAsserting()
+    val hasUnreadMessages: Property<Boolean> = SimpleBooleanProperty(false).threadAsserting()
     val nickList = NickListModel()
     val isConnection = type == WindowType.SERVER
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else initialName.toLowerCase()}"
     val lines = mutableListOf<Array<StyledSpan>>().observable()
-    val inputField: StringProperty = SimpleStringProperty("")
+    val inputField: Property<String> = SimpleStringProperty("").threadAsserting()
 
     companion object {
         fun extractor(): Callback<WindowModel, Array<Observable>> {
@@ -147,7 +146,7 @@ class WindowModel(
     )
 
     private fun addLine(spans: Sequence<StyledSpan>) {
-        hasUnreadMessages.set(true)
+        hasUnreadMessages.value = true
         lines.add(spans.toList().toTypedArray())
     }
 
@@ -166,7 +165,7 @@ class WindowModel(
 
 class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
 
-    internal var scrollbar: ScrollBar? = null
+    private var scrollbar: ScrollBar? = null
     private val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
 
     init {

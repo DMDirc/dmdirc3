@@ -2,11 +2,10 @@ package com.dmdirc
 
 import com.jukusoft.i18n.I
 import com.jukusoft.i18n.I.tr
-import javafx.beans.property.BooleanProperty
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.beans.property.StringProperty
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
@@ -22,8 +21,8 @@ object JoinDialogContract {
     }
 
     interface ViewModel : ValidatingModel {
-        val open: BooleanProperty
-        val channel: StringProperty
+        val open: Property<Boolean>
+        val channel: Property<String>
         fun onTextAction()
         fun onJoinPressed()
         fun onCancelPressed()
@@ -38,8 +37,8 @@ class JoinDialogController(private val controller: MainContract.Controller) : Jo
 
 class JoinDialogModel(private val controller: JoinDialogContract.Controller) : JoinDialogContract.ViewModel {
 
-    override val open = SimpleBooleanProperty(true)
-    override val channel = SimpleStringProperty()
+    override val open = SimpleBooleanProperty(true).threadAsserting()
+    override val channel = SimpleStringProperty().threadAsserting()
     override val valid = ValidatorChain()
 
     private fun commit() {
@@ -50,7 +49,9 @@ class JoinDialogModel(private val controller: JoinDialogContract.Controller) : J
         close()
     }
 
-    private fun close() = open.set(false)
+    private fun close() {
+        open.value = false
+    }
 
     override fun onTextAction() = commit()
     override fun onJoinPressed() = commit()

@@ -1,11 +1,10 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
-import javafx.beans.property.BooleanProperty
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.beans.property.StringProperty
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
@@ -23,10 +22,10 @@ object SettingsDialogContract {
     }
 
     interface ViewModel : ValidatingModel {
-        val open: BooleanProperty
-        val nickname: StringProperty
-        val realname: StringProperty
-        val username: StringProperty
+        val open: Property<Boolean>
+        val nickname: Property<String>
+        val realname: Property<String>
+        val username: Property<String>
         fun onSavePressed()
         fun onCancelPressed()
     }
@@ -45,10 +44,10 @@ class SettingsDialogController(private val config: ClientConfig) : SettingsDialo
 class SettingsDialogModel(private val controller: SettingsDialogContract.Controller, config: ClientConfig) :
     SettingsDialogContract.ViewModel {
     override val valid = ValidatorChain()
-    override val open = SimpleBooleanProperty(true)
-    override val nickname = SimpleStringProperty(config[ClientSpec.DefaultProfile.nickname])
-    override val realname = SimpleStringProperty(config[ClientSpec.DefaultProfile.realname])
-    override val username = SimpleStringProperty(config[ClientSpec.DefaultProfile.username])
+    override val open = SimpleBooleanProperty(true).threadAsserting()
+    override val nickname = SimpleStringProperty(config[ClientSpec.DefaultProfile.nickname]).threadAsserting()
+    override val realname = SimpleStringProperty(config[ClientSpec.DefaultProfile.realname]).threadAsserting()
+    override val username = SimpleStringProperty(config[ClientSpec.DefaultProfile.username]).threadAsserting()
 
     override fun onSavePressed() {
         if (!valid.value) {
@@ -60,7 +59,9 @@ class SettingsDialogModel(private val controller: SettingsDialogContract.Control
 
     override fun onCancelPressed() = close()
 
-    private fun close() = open.set(false)
+    private fun close() {
+        open.value = false
+    }
 }
 
 class SettingsDialog(model: SettingsDialogContract.ViewModel, private val parent: ObjectProperty<Node>) : VBox() {

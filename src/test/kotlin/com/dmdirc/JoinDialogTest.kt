@@ -5,6 +5,7 @@ import io.mockk.verify
 import javafx.beans.property.SimpleBooleanProperty
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class JoinDialogControllerTest {
@@ -28,6 +29,11 @@ internal class JoinDialogModelTest {
     private val falseValidator = SimpleBooleanProperty(false)
     private val model = JoinDialogModel(mockController)
 
+    @BeforeEach
+    fun setup() {
+        PlatformWrappers.fxThreadTester = { true }
+    }
+
     @Test
     fun `defaults to dialog being open`() {
         assertTrue(model.open.value)
@@ -42,7 +48,7 @@ internal class JoinDialogModelTest {
     @Test
     fun `joins when valid and join pressed`() {
         model.valid.addValidator(truthValidator)
-        model.channel.set("#dmdirc")
+        model.channel.value = "#dmdirc"
         model.onJoinPressed()
         verify {
             mockController.join("#dmdirc")
@@ -52,7 +58,7 @@ internal class JoinDialogModelTest {
     @Test
     fun `closes when valid and join pressed`() {
         model.valid.addValidator(truthValidator)
-        model.channel.set("#dmdirc")
+        model.channel.value = "#dmdirc"
         model.onJoinPressed()
         assertFalse(model.open.value)
     }
@@ -60,7 +66,7 @@ internal class JoinDialogModelTest {
     @Test
     fun `joins when valid and text submitted`() {
         model.valid.addValidator(truthValidator)
-        model.channel.set("#dmdirc")
+        model.channel.value = "#dmdirc"
         model.onTextAction()
         verify {
             mockController.join("#dmdirc")
@@ -70,7 +76,7 @@ internal class JoinDialogModelTest {
     @Test
     fun `closes when valid and text submitted`() {
         model.valid.addValidator(truthValidator)
-        model.channel.set("#dmdirc")
+        model.channel.value = "#dmdirc"
         model.onTextAction()
         assertFalse(model.open.value)
     }

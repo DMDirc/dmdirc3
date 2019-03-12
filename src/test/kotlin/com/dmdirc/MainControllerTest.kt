@@ -30,7 +30,8 @@ internal class MainControllerTest {
 
     @BeforeEach
     fun setup() {
-        runLaterProvider = { it.run() }
+        PlatformWrappers.runLaterProvider = { it.run() }
+        PlatformWrappers.fxThreadTester = { true }
     }
 
     @Test

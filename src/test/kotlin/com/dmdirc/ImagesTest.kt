@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import com.dmdirc.PlatformWrappers.runLaterProvider
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertArrayEquals
