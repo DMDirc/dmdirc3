@@ -38,8 +38,8 @@ class MainApp : Application() {
             scene = Scene(kodein.direct.instance<MainView>())
             show()
             scene.focusOwnerProperty().addListener { _, _, _ ->
-                    val selectedWindow = controller.selectedWindow.value
-                    val uiNode = selectedWindow?.connection?.children?.get(selectedWindow.name.value)?.ui
+                    val selectedWindowValue = controller.selectedWindow.value
+                    val uiNode = selectedWindowValue?.connection?.children?.get(selectedWindowValue.name.value)?.ui
                     if (uiNode is WindowUI && dialogPane.value?.visibleProperty()?.value != true) {
                         uiNode.inputField.requestFocus()
                     }
