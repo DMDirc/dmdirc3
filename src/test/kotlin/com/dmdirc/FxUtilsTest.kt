@@ -50,5 +50,4 @@ internal class FxUtilsTest {
             mockBugsnag.notify(any<Throwable>())
         }
     }
-
 }
