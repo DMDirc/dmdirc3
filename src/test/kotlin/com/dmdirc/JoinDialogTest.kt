@@ -1,8 +1,5 @@
 package com.dmdirc
-import com.dmdirc.JoinDialogContract
-import com.dmdirc.JoinDialogController
-import com.dmdirc.JoinDialogModel
-import com.dmdirc.MainContract
+
 import io.mockk.mockk
 import io.mockk.verify
 import javafx.beans.property.SimpleBooleanProperty
@@ -22,7 +19,6 @@ internal class JoinDialogControllerTest {
             mockMainController.joinChannel("#test123")
         }
     }
-
 }
 
 internal class JoinDialogModelTest {
@@ -61,7 +57,6 @@ internal class JoinDialogModelTest {
         assertFalse(model.open.value)
     }
 
-
     @Test
     fun `joins when valid and text submitted`() {
         model.valid.addValidator(truthValidator)
@@ -99,5 +94,4 @@ internal class JoinDialogModelTest {
             mockController.join(any())
         }
     }
-
 }

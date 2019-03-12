@@ -1,19 +1,30 @@
 package com.dmdirc
 
 import com.dmdirc.ktirc.IrcClient
-import com.dmdirc.ktirc.events.*
+import com.dmdirc.ktirc.events.BatchReceived
+import com.dmdirc.ktirc.events.ChannelJoined
+import com.dmdirc.ktirc.events.ChannelParted
+import com.dmdirc.ktirc.events.IrcEvent
+import com.dmdirc.ktirc.events.NicknameChangeFailed
+import com.dmdirc.ktirc.events.NoticeReceived
+import com.dmdirc.ktirc.events.ServerDisconnected
+import com.dmdirc.ktirc.events.ServerReady
+import com.dmdirc.ktirc.events.TargetedEvent
 import com.dmdirc.ktirc.io.CaseMapping
+import com.dmdirc.ktirc.messages.sendAction
 import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
+import com.dmdirc.ktirc.messages.sendNickChange
 import com.dmdirc.ktirc.messages.sendPart
 import com.dmdirc.ktirc.model.ChannelUser
 import com.dmdirc.ktirc.model.ServerFeature
+import com.dmdirc.ktirc.model.ServerStatus
 import javafx.application.HostServices
+import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableSet
 import javafx.scene.Node
-import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.HashSet
 import java.util.concurrent.atomic.AtomicLong
 
 private val connectionCounter = AtomicLong(0)
@@ -21,9 +32,12 @@ private val connectionCounter = AtomicLong(0)
 object ConnectionContract {
     interface Controller {
         val children: Connection.WindowMap
+        val connected: BooleanProperty
+        val model: WindowModel
         var networkName: String
         fun connect()
-        fun sendMessage(channel: String, name: String)
+        fun sendMessage(channel: String, message: String)
+        fun sendAction(channel: String, action: String)
         fun joinChannel(channel: String)
         fun leaveChannel(channel: String)
         fun getUsers(channel: String): Iterable<ChannelUser>
@@ -39,15 +53,11 @@ class Connection(
 
     private val connectionId = connectionCounter.incrementAndGet().toString(16).padStart(20)
 
-    private val model = WindowModel(
-        connectionDetails.hostname,
-        WindowType.SERVER,
-        this,
-        config1,
-        connectionId
+    override val model = WindowModel(
+        connectionDetails.hostname, WindowType.SERVER, this, config1, connectionId
     )
 
-    private val connected = SimpleBooleanProperty(false)
+    override val connected = SimpleBooleanProperty(false)
 
     override val children = WindowMap { client.caseMapping }.apply {
         this += Child(model, WindowUI(model, hostServices))
@@ -72,13 +82,20 @@ class Connection(
         }
     }
 
-    override fun connect() {
+    init {
         client.onEvent(this::handleEvent)
+    }
+
+    override fun connect() {
         client.connect()
     }
 
-    override fun sendMessage(channel: String, name: String) {
-        client.sendMessage(channel, name)
+    override fun sendMessage(channel: String, message: String) {
+        client.sendMessage(channel, message)
+    }
+
+    override fun sendAction(channel: String, action: String) {
+        client.sendAction(channel, action)
     }
 
     override fun joinChannel(channel: String) {
@@ -95,41 +112,51 @@ class Connection(
         when {
             event is BatchReceived -> event.events.forEach(this::handleEvent)
             event is ServerReady -> {
-                connected.value = true
-                networkName = client.serverState.features[ServerFeature.Network] ?: ""
-                model.name = client.serverState.serverName
+                connectionDetails.autoJoin.forEach { joinChannel(it) }
+                runLater {
+                    connected.value = true
+                    networkName = client.serverState.features[ServerFeature.Network] ?: ""
+                    model.name.value = client.serverState.serverName
+                    model.title.value = "${model.name.value} [${model.connection?.networkName ?: ""}]"
+                }
             }
             event is ServerDisconnected -> runLater { connected.value = false }
             event is ChannelJoined && client.isLocalUser(event.user) -> runLater {
-                val model = WindowModel(
-                    event.target,
-                    WindowType.CHANNEL,
-                    this,
-                    config1,
-                    connectionId
-                )
-                model.addImageHandler(config1)
-                children += Child(model, WindowUI(model, hostServices))
+                if (!children.contains(event.target)) {
+                    val model = WindowModel(event.target, WindowType.CHANNEL, this, config1, connectionId)
+                    model.addImageHandler(config1)
+                    children += Child(model, WindowUI(model, hostServices)
+                    )
+                }
             }
             event is ChannelParted && client.isLocalUser(event.user) -> runLater { children -= event.target }
         }
 
-        if (event is TargetedEvent) {
-            // TODO: Handle events that are targetted to us (private messages etc)
-            runLater { windowModel(event.target)?.handleEvent(event) }
-        } else {
-            runLater { model.handleEvent(event) }
+        runLater {
+            if (event is TargetedEvent) {
+                if (client.isLocalUser(event.target) || event.target == "*") {
+                    handleOwnEvent(event)
+                } else {
+                    windowModel(event.target)?.handleEvent(event)
+                }
+            } else if (event is NicknameChangeFailed && client.serverState.status < ServerStatus.Ready) {
+                client.sendNickChange(client.serverState.localNickname + (0..9).random())
+            } else {
+                model.handleEvent(event)
+            }
         }
     }
 
-    private val IrcEvent.timestamp: String
-        get() = metadata.time.format(DateTimeFormatter.ofPattern(config1[ClientSpec.Formatting.timestamp]))
+    private fun handleOwnEvent(event: TargetedEvent) {
+        when (event) {
+            is NoticeReceived -> model.handleEvent(event)
+        }
+    }
 
     private fun windowModel(windowName: String) = children[windowName]?.model
 
     override fun disconnect() {
         client.disconnect()
-        children.clear()
     }
 
     data class Child(val model: WindowModel, val ui: Node)
@@ -140,7 +167,7 @@ class Connection(
         val observable: ObservableSet<Child> = values.readOnly()
 
         operator fun get(name: String) = synchronized(values) {
-            values.find { caseMappingProvider().areEquivalent(it.model.name, name) }
+            values.find { caseMappingProvider().areEquivalent(it.model.name.value, name) }
         }
 
         operator fun plusAssign(value: Child): Unit = synchronized(values) {
@@ -148,7 +175,7 @@ class Connection(
         }
 
         operator fun minusAssign(name: String): Unit = synchronized(values) {
-            values.removeIf { caseMappingProvider().areEquivalent(it.model.name, name) }
+            values.removeIf { caseMappingProvider().areEquivalent(it.model.name.value, name) }
         }
 
         operator fun contains(name: String) = get(name) != null
@@ -158,7 +185,5 @@ class Connection(
         }
 
         override fun iterator() = HashSet(values).iterator().iterator()
-
     }
-
 }

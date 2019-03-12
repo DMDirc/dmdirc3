@@ -13,12 +13,15 @@ import org.junit.jupiter.api.Test
 internal class MainControllerTest {
 
     private val factory = mockk<(ConnectionDetails) -> ConnectionContract.Controller>()
+    private val mockModel = mockk<WindowModel>()
 
     private val mockServer1 = mockk<ConnectionContract.Controller> {
         every { children } returns Connection.WindowMap { CaseMapping.Rfc }
+        every { model } returns mockModel
     }
     private val mockServer2 = mockk<ConnectionContract.Controller> {
         every { children } returns Connection.WindowMap { CaseMapping.Rfc }
+        every { model } returns mockModel
     }
 
     private val emptyConfig = mockk<ClientConfig> {
@@ -121,5 +124,4 @@ internal class MainControllerTest {
 
         assertTrue(controller.windows.isEmpty())
     }
-
 }

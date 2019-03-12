@@ -5,7 +5,7 @@ import com.jukusoft.i18n.I
 import com.jukusoft.i18n.I.tr
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.*
+import java.util.Locale
 
 fun initInternationalisation(path: Path, locale: String?) {
     if (!Files.exists(path)) {
@@ -16,7 +16,7 @@ fun initInternationalisation(path: Path, locale: String?) {
     I.setLanguage(Locale.forLanguageTag(locale))
 }
 
-fun ConnectionError.translated() = when(this) {
+fun ConnectionError.translated() = when (this) {
     ConnectionError.Unknown -> tr("unknown error")
     ConnectionError.UnresolvableAddress -> tr("the address could not be resolved")
     ConnectionError.ConnectionRefused -> tr("the connection was refused")

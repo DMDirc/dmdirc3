@@ -1,6 +1,19 @@
 package com.dmdirc
 
-import com.dmdirc.ktirc.events.*
+import com.dmdirc.ktirc.events.ActionReceived
+import com.dmdirc.ktirc.events.ChannelJoined
+import com.dmdirc.ktirc.events.ChannelNickChanged
+import com.dmdirc.ktirc.events.ChannelParted
+import com.dmdirc.ktirc.events.ChannelQuit
+import com.dmdirc.ktirc.events.ChannelTopicChanged
+import com.dmdirc.ktirc.events.ChannelTopicDiscovered
+import com.dmdirc.ktirc.events.ChannelTopicMetadataDiscovered
+import com.dmdirc.ktirc.events.EventMetadata
+import com.dmdirc.ktirc.events.MessageReceived
+import com.dmdirc.ktirc.events.NoticeReceived
+import com.dmdirc.ktirc.events.ServerConnected
+import com.dmdirc.ktirc.events.ServerConnectionError
+import com.dmdirc.ktirc.events.ServerDisconnected
 import com.dmdirc.ktirc.model.ConnectionError
 import com.dmdirc.ktirc.model.User
 import com.jukusoft.i18n.I
@@ -12,17 +25,20 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.util.*
+import java.util.Locale
 
 internal class WindowModelTest {
 
     private val mockConnection = mockk<ConnectionContract.Controller>()
     private val mockConfig = mockk<ClientConfig>()
+    private val metaData = mockk<EventMetadata>()
 
     @BeforeEach
     fun setup() {
         I.init(File("translations"), Locale.ENGLISH, "messages")
         I.setLanguage(Locale.forLanguageTag("en-GB"))
+        every { metaData.time } returns TestConstants.time
+        runLaterProvider = { it.run() }
     }
 
     @Test
@@ -65,6 +81,16 @@ internal class WindowModelTest {
         model.handleInput()
         verify {
             mockConnection.sendMessage("name", "Mess with the best")
+        }
+    }
+
+    @Test
+    fun `sends actions to controller when input is prefixed with me`() {
+        val model = WindowModel("name", WindowType.ROOT, mockConnection, mockk(), null)
+        model.inputField.value = "/me hacks the planet"
+        model.handleInput()
+        verify {
+            mockConnection.sendAction("name", "hacks the planet")
         }
     }
 
@@ -128,14 +154,14 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ChannelJoined(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
+        model.handleEvent(ChannelJoined(metaData, User("acidBurn"), "#channel"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" joined", emptySet())
             ), model.lines[0]
         )
@@ -146,14 +172,14 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ChannelParted(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
+        model.handleEvent(ChannelParted(metaData, User("acidBurn"), "#channel"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" left", emptySet())
             ), model.lines[0]
         )
@@ -166,10 +192,7 @@ internal class WindowModelTest {
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
             ChannelParted(
-                EventMetadata(TestConstants.time),
-                User("acidBurn"),
-                "#channel",
-                "Mess with the best"
+                metaData, User("acidBurn"), "#channel", "Mess with the best"
             )
         )
         assertEquals(1, model.lines.size)
@@ -178,7 +201,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" left (Mess with the best)", emptySet())
             ), model.lines[0]
         )
@@ -191,10 +214,7 @@ internal class WindowModelTest {
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
             MessageReceived(
-                EventMetadata(TestConstants.time),
-                User("acidBurn"),
-                "#channel",
-                "Mess with the best"
+                metaData, User("acidBurn"), "#channel", "Mess with the best"
             )
         )
         assertEquals(1, model.lines.size)
@@ -203,8 +223,30 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" <", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan("> Mess with the best", emptySet())
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays notice events`() {
+        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.notice] } returns "-%s- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(
+            NoticeReceived(
+                metaData, User("acidBurn"), "#channel", "Mess with the best"
+            )
+        )
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -", emptySet()),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
+                StyledSpan("- Mess with the best", emptySet())
             ), model.lines[0]
         )
     }
@@ -214,15 +256,101 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.action] } returns "* %s %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ActionReceived(EventMetadata(TestConstants.time), User("acidBurn"), "#channel", "hacks"))
+        model.handleEvent(ActionReceived(metaData, User("acidBurn"), "#channel", "hacks"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" * ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" hacks", emptySet())
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays nick changes`() {
+        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ChannelNickChanged(metaData, User("zeroCool"), "#channel", "crashOverride"))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- ", emptySet()),
+                StyledSpan("zeroCool", setOf(Style.Nickname("zeroCool"))),
+                StyledSpan(" is now known as ", emptySet()),
+                StyledSpan("crashOverride", setOf(Style.Nickname("crashOverride")))
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays topic changes`() {
+        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ChannelTopicChanged(metaData, User("acidBurn"), "#channel", "Mess with the best"))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- ", emptySet()),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
+                StyledSpan(" has changed the topic to: Mess with the best", emptySet())
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays empty topic discovered`() {
+        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ChannelTopicDiscovered(metaData, "#channel", null))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- there is no topic set", emptySet())
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays topic discovered`() {
+        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ChannelTopicDiscovered(metaData, "#channel", "Mess with the best"))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- the topic is: Mess with the best", emptySet())
+            ), model.lines[0]
+        )
+    }
+
+    @Test
+    fun `displays topic metadata`() {
+        val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
+        every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
+        every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
+        model.handleEvent(ChannelTopicMetadataDiscovered(metaData, "#channel", User("acidBurn"), TestConstants.time))
+        assertEquals(1, model.lines.size)
+
+        assertArrayEquals(
+            arrayOf(
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
+                StyledSpan(" -- topic was set at 09:00:00 on Friday, 15 September 1995 by ", emptySet()),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn")))
             ), model.lines[0]
         )
     }
@@ -232,14 +360,14 @@ internal class WindowModelTest {
         val model = WindowModel("#channel", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.channelEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ChannelQuit(EventMetadata(TestConstants.time), User("acidBurn"), "#channel"))
+        model.handleEvent(ChannelQuit(metaData, User("acidBurn"), "#channel"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" quit", emptySet())
             ), model.lines[0]
         )
@@ -252,10 +380,7 @@ internal class WindowModelTest {
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
         model.handleEvent(
             ChannelQuit(
-                EventMetadata(TestConstants.time),
-                User("acidBurn"),
-                "#channel",
-                "Mess with the best"
+                metaData, User("acidBurn"), "#channel", "Mess with the best"
             )
         )
         assertEquals(1, model.lines.size)
@@ -264,7 +389,7 @@ internal class WindowModelTest {
             arrayOf(
                 StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
                 StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.CustomStyle("irc-nickname"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
                 StyledSpan(" quit (Mess with the best)", emptySet())
             ), model.lines[0]
         )
@@ -275,13 +400,12 @@ internal class WindowModelTest {
         val model = WindowModel("server", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.serverEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ServerConnected(EventMetadata(TestConstants.time)))
+        model.handleEvent(ServerConnected(metaData))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- Connected", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))), StyledSpan(" -- Connected", emptySet())
             ), model.lines[0]
         )
     }
@@ -291,7 +415,7 @@ internal class WindowModelTest {
         val model = WindowModel("server", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.serverEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ServerDisconnected(EventMetadata(TestConstants.time)))
+        model.handleEvent(ServerDisconnected(metaData))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -307,7 +431,7 @@ internal class WindowModelTest {
         val model = WindowModel("server", WindowType.ROOT, mockConnection, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.serverEvent] } returns "-- %s"
         every { mockConfig[ClientSpec.Formatting.timestamp] } returns "HH:mm:ss"
-        model.handleEvent(ServerConnectionError(EventMetadata(TestConstants.time), ConnectionError.BadTlsCertificate, "details"))
+        model.handleEvent(ServerConnectionError(metaData, ConnectionError.BadTlsCertificate, "details"))
         assertEquals(1, model.lines.size)
 
         assertArrayEquals(
@@ -317,5 +441,4 @@ internal class WindowModelTest {
             ), model.lines[0]
         )
     }
-
 }

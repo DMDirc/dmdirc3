@@ -1,0 +1,113 @@
+== DMDirc3
+
+// Badges, badges, badges, badges; MUSHROOM, MUSHROOM!
+image:https://cloud.drone.io/api/badges/DMDirc/dmdirc3/status.svg[Build status, link=https://cloud.drone.io/DMDirc/dmdirc3]
+image:https://codecov.io/gh/DMDirc/dmdirc3/branch/master/graph/badge.svg[Code coverage, link=https://codecov.io/gh/DMDirc/dmdirc3]
+image:https://d322cqt584bo4o.cloudfront.net/dmdirc/localized.svg[Translation status, link=https://crowdin.com/project/dmdirc]
+image:https://img.shields.io/badge/License-MIT-blue.svg[Licence: MIT, link=https://opensource.org/licenses/MIT]
+
+DMDirc3 is a free and open source desktop IRC client. It is currently in an early stage of development, and is usable
+but lacking many features of a more mature client.
+
+DMDirc3 is a rewrite of the https://github.com/DMDirc/DMDirc[DMDirc client], using more a more modern language (Kotlin),
+UI toolkit (JavaFX), and building on the lessons we learnt from maintaining a client for over 10 years.
+
+To get started, check out the https://github.com/DMDirc/dmdirc3/releases[releases page] to find an installer for
+your platform. We do not currently have any documentation for the client, but as it's relatively basic we hope most
+users will be able to find their way around. We'd love to hear your feedback on DMDirc -- please feel free to raise
+issues, or irc://chat.freenode.net/dmdirc[join us on freenode].
+
+=== Current features
+
+* Automatically connect to multiple servers when launching DMDirc
+* Inline previews for image links
+* Automatic update checking, downloading, and installation
+
+=== Roadmap features
+
+To see what we have planned, have a look at our https://github.com/DMDirc/dmdirc3/issues?q=is%3Aissue+is%3Aopen[issues]
+list. To help inform our decision on what to do next, please leave a thumbs up (+1) reaction on issues you want the
+most. You can view issues sorted by their +1 reactions
+https://github.com/DMDirc/dmdirc3/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc[here].
+
+== Development information
+
+=== Contributing
+
+Please feel free to raise issues or submit pull requests. All pull requests will be ran through our continuous
+integration pipeline and the code coverage will be reported on the PR. We are striving to get better coverage
+so if you can please do write tests; but if you can't please send us a PR anyway and we'll see if we can carry
+it over the finish line together. If you have any technical questions about the project, the best way to get in touch
+with us is on irc://chat.freenode.net/dmdirc[IRC], naturally!
+
+=== Code style
+
+A code style configuration for IDEA can be found in `codestyle.xml`. To import it:
+
+* Open the settings (Ctrl+Alt+S)
+* Browse to `Editor` > `Code Style`
+* Click on the cog next to the `Scheme` dropdown
+* Select `Import Scheme` > `Intellij IDEA CodeStyle XML`
+* Select the file from this repository
+
+We run https://ktlint.github.io/[ktlint] as part of our CI tests. While IDEA should output compliant code with
+the provided settings, you can check manually with:
+
+[source,console]
+----
+$ ./gradlew lintKotlin
+----
+
+And automatically fix some problems with:
+
+[source,console]
+----
+$ ./gradlew formatKotlin
+----
+
+=== Checking for updated dependencies
+
+[source,console]
+----
+$ ./gradlew checkUpdates
+----
+
+=== Updating translation files
+
+We use GNU gettext to extract translatable strings from the source code. All text strings in the client must be
+wrapped in a call to the static functions in `com.jukusoft.i18n.I`, e.g.:
+
+[source,kotlin]
+----
+import com.jukusoft.i18n.I.tr
+
+MenuItem(tr("Join Channel"))
+----
+
+We then periodically extract the strings into a POT file (we will automate this at some point):
+
+[source,console]
+----
+$ find src/main/kotlin -name '*.kt' > FILES
+$ xgettext --keyword=tr --language=java --add-comments --sort-output --omit-header -s -o translations/messages.pot --files-from=FILES
+----
+
+Crowdin will detect the changes and update the translation console. When the translated files change, Crowdin will
+automatically submit a pull request with the new versions.
+
+== Third party software and services
+
+Like many open source projects, DMDirc3 relies on numerous third-party libraries and services. This allows us
+to focus on writing an IRC client, instead of developing installers, configuration formats, translation workflows,
+and so on. In particular we'd like to call out:
+
+* https://www.ej-technologies.com/[ej-technology] for providing an open source
+  https://www.ej-technologies.com/products/install4j/overview.html[install4j] licence, which we use
+  for our multi-platform installers, launchers and auto updating.
+* https://crowdin.com/[Crowdin] for providing an open source account, which we use for managing translations.
+* https://github.com/FXMisc/RichTextFX[RichTextFX] which powers our main text area, and solves one of the
+  biggest headaches we had with the previous client!
+* https://github.com/uchuhimo/konf[konf] by https://github.com/uchuhimo[uchuhimo], a simple yet powerful
+  configuration system we use to save DMDirc's settings.
+
+Of course there are many other projects that have helped us along the way, and we are thankful for them all.

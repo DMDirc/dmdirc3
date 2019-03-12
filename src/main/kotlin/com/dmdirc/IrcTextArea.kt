@@ -1,6 +1,7 @@
 package com.dmdirc
 
 import javafx.scene.Node
+import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.Pane
 import org.fxmisc.richtext.GenericStyledArea
@@ -8,7 +9,7 @@ import org.fxmisc.richtext.TextExt
 import org.fxmisc.richtext.model.SegmentOpsBase
 import org.fxmisc.richtext.model.StyledSegment
 import org.fxmisc.richtext.model.TextOps
-import java.util.*
+import java.util.Optional
 
 sealed class Style {
     object BoldStyle : Style()
@@ -20,6 +21,7 @@ sealed class Style {
     data class ColourStyle(val foreground: Int, val background: Int?) : Style()
     data class HexColourStyle(val foreground: String, val background: String?) : Style()
     data class Link(var url: String) : Style()
+    data class Nickname(var nick: String) : Style()
 }
 
 sealed class Segment {
@@ -32,6 +34,7 @@ class IrcSegmentOps : SegmentOpsBase<Segment, Collection<Style>>(Segment.Empty),
 
     override fun realGetText(seg: Segment?) = when (seg) {
         is Segment.Text -> seg.content
+        is Segment.Image -> " "
         else -> ""
     }
 
@@ -66,12 +69,10 @@ class IrcSegmentOps : SegmentOpsBase<Segment, Collection<Style>>(Segment.Empty),
             Segment.Text(it)
         }
     } ?: Segment.Empty
-
 }
 
 class IrcTextArea(linkClickHandler: (String) -> Unit) :
-    GenericStyledArea<Collection<Style>, Segment, Collection<Style>>(
-        emptySet(),
+    GenericStyledArea<Collection<Style>, Segment, Collection<Style>>(emptySet(),
         { _, _ -> Unit },
         emptySet(),
         IrcSegmentOps(),
@@ -83,7 +84,7 @@ class IrcTextArea(linkClickHandler: (String) -> Unit) :
                         te.styleClass.add("text")
                         applyStyles(te, ss.style, linkClickHandler)
                     }
-                    is Segment.Image -> with(ImageView(seg.url)) {
+                    is Segment.Image -> with(ImageView(Image(seg.url, true))) {
                         // We can't seem to set the width/height in CSS :(
                         fitWidth = 250.0
                         fitHeight = 250.0
@@ -99,8 +100,7 @@ class IrcTextArea(linkClickHandler: (String) -> Unit) :
                     is Segment.Empty -> TextExt("There's nothing here :(").also { te -> te.styleClass.add("text") }
                 }
             }
-        }
-    ) {
+        }) {
 
     init {
         isEditable = false
@@ -129,6 +129,7 @@ private fun applyStyles(node: Node, styles: Collection<Style>, linkClickHandler:
                 node.styleClass.add("irc-link")
                 node.setOnMouseClicked { linkClickHandler(style.url) }
             }
+            is Style.Nickname -> node.styleClass.addAll("irc-nickname", "irc-nickname-${style.nick.colourHash()}")
         }
     }
 }
@@ -138,3 +139,8 @@ private fun Node.addInlineStyle(newStyle: String) = if (style.isEmpty()) {
 } else {
     style += ";$newStyle"
 }
+
+/**
+ * Calculates a "colour hash", a number in the range 0-7 that is used to assign a pseudo-random colour to the string.
+ */
+internal fun String.colourHash() = fold(0) { i, c -> i + c.toInt() } % 8

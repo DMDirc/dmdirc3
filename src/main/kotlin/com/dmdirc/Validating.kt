@@ -9,6 +9,7 @@ import javafx.scene.control.TextInputControl
 import kotlinx.atomicfu.atomic
 import org.controlsfx.validation.ValidationSupport
 import org.controlsfx.validation.Validator
+import org.controlsfx.validation.decoration.StyleClassValidationDecoration
 
 val requiredValidator: Validator<TextField> = Validator.createEmptyValidator<TextField>("Required")
 
@@ -18,6 +19,7 @@ fun bindRequiredTextControl(c: TextInputControl, p: StringProperty, m: Validatin
 
 fun bindTextControl(c: TextInputControl, p: StringProperty, v: Validator<TextField>, m: ValidatingModel) {
     val validationSupport = ValidationSupport()
+    validationSupport.validationDecorator = StyleClassValidationDecoration("validation-error", "validation-warning")
     validationSupport.registerValidator(c, v)
     m.valid.addValidator(validationSupport.invalidProperty().not())
     c.textProperty().set(p.value)
@@ -58,5 +60,4 @@ class ValidatorChain : ReadOnlyBooleanPropertyBase() {
             fireValueChangedEvent()
         }
     }
-
 }

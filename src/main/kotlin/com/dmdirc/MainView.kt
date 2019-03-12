@@ -1,51 +1,141 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
+import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
-import javafx.collections.transformation.SortedList
+import javafx.event.EventHandler
+import javafx.geometry.Pos
 import javafx.scene.Node
-import javafx.scene.control.*
+import javafx.scene.control.Button
+import javafx.scene.control.ContextMenu
+import javafx.scene.control.Control
+import javafx.scene.control.Label
+import javafx.scene.control.ListCell
+import javafx.scene.control.ListView
+import javafx.scene.control.Menu
+import javafx.scene.control.MenuBar
+import javafx.scene.control.MenuItem
+import javafx.scene.control.Tooltip
+import javafx.scene.effect.GaussianBlur
 import javafx.scene.image.Image
+import javafx.scene.input.MouseButton
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import javafx.util.Callback
 import javafx.util.StringConverter
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-class NodeListCellFactory(private val list: ListView<WindowModel>) : Callback<ListView<WindowModel>, ListCell<WindowModel>> {
-    override fun call(param: ListView<WindowModel>?): ListCell<WindowModel> {
-        return NodeListCell(list)
+class ServerContextMenu(
+    private val joinDialogProvider: () -> JoinDialog,
+    private val controller: MainContract.Controller
+) : ContextMenu() {
+    init {
+        val connection = controller.selectedWindow.value?.connection
+        val connected = connection?.connected?.value ?: false
+        val recon = if (connected) tr("Reconnect") else tr("Connect")
+        items.addAll(MenuItem(tr("Join Channel")).apply {
+            setOnAction {
+                joinDialogProvider().show()
+            }
+            disableProperty().bind(controller.selectedWindow.isNull)
+        }, MenuItem(tr("Disconnect")).apply {
+            visibleProperty().bind(connection?.connected)
+            setOnAction {
+                connection?.disconnect()
+            }
+        }, MenuItem(recon).apply {
+            setOnAction {
+                GlobalScope.launch {
+                    if (connected) {
+                        connection?.disconnect()
+                    }
+                    delay(500)
+                    connection?.connect()
+                }
+            }
+        }, MenuItem(tr("Close")).apply {
+            setOnAction {
+                if (connected) {
+                    connection?.disconnect()
+                }
+                connection?.children?.clear()
+            }
+        })
     }
 }
 
-class NodeListCell(list: ListView<WindowModel>) : ListCell<WindowModel>() {
+class ChannelContextMenu(
+    private val controller: MainContract.Controller
+) : ContextMenu() {
     init {
-        prefWidthProperty().bind(list.widthProperty())
+        items.add(MenuItem(tr("Close")).apply {
+            setOnAction {
+                controller.leaveChannel(controller.selectedWindow.value.name.value)
+            }
+        })
+    }
+}
+
+class NodeListCellFactory(
+    private val list: ListView<WindowModel>,
+    private val joinDialogProvider: () -> JoinDialog,
+    private val controller: MainContract.Controller
+) : Callback<ListView<WindowModel>, ListCell<WindowModel>> {
+    override fun call(param: ListView<WindowModel>?): ListCell<WindowModel> {
+        return NodeListCell(list, joinDialogProvider, controller)
+    }
+}
+
+class NodeListCell(
+    list: ListView<WindowModel>,
+    private val joinDialogProvider: () -> JoinDialog,
+    private val controller: MainContract.Controller
+) : ListCell<WindowModel>() {
+    init {
+        prefWidthProperty().bind(list.widthProperty().subtract(5))
         maxWidth = Control.USE_PREF_SIZE
     }
+
     override fun updateItem(node: WindowModel?, empty: Boolean) {
         super.updateItem(node, empty)
         if (node != null && !empty) {
-            styleClass.removeIf { s ->
-                s.startsWith("node-")
+            graphic = BorderPane().apply {
+                contextMenu = ServerContextMenu(joinDialogProvider, controller)
+                styleClass.add("node-${node.type.name.toLowerCase()}")
+                if (node.connection?.connected?.value == false) {
+                    styleClass.add("node-disconnected")
+                }
+                if (node.hasUnreadMessages.value) {
+                    styleClass.add("node-unread")
+                }
+                if (node.type == WindowType.SERVER) {
+                    right = Label().apply {
+                        styleClass.add("node-cog")
+                        graphic = FontAwesomeIconView(FontAwesomeIcon.COG)
+                        contextMenu = ServerContextMenu(joinDialogProvider, controller)
+                        // TODO: This needs to work cross platform as expected
+                        onMouseClicked = EventHandler {
+                            if (it.button == MouseButton.PRIMARY) {
+                                contextMenu.show(graphic, it.screenX, it.screenY)
+                            }
+                        }
+                    }
+                } else {
+                    contextMenu = ChannelContextMenu(controller)
+                }
+                left = Label(node.title.value)
             }
-            styleClass.add("node-${node.type.name.toLowerCase()}")
-            text = when (node.type) {
-                WindowType.SERVER -> "${node.name} [${node.connection?.networkName ?: ""}]"
-                else -> node.name
-            }
-            tooltip = Tooltip(when (node.type) {
-                WindowType.SERVER -> "${node.name} [${node.connection?.networkName ?: ""}]"
-                else -> node.name
-            })
+            tooltip = Tooltip(node.title.value)
         }
         if (empty) {
-            text = ""
             graphic = null
-            styleClass.removeIf { s ->
-                s.startsWith("node-")
-            }
         }
     }
 }
@@ -53,78 +143,75 @@ class NodeListCell(list: ListView<WindowModel>) : ListCell<WindowModel>() {
 class MainView(
     private val controller: MainContract.Controller,
     val config: ClientConfig,
-    val joinDialogProvider: () -> JoinDialog,
+    private val joinDialogProvider: () -> JoinDialog,
     val settingsDialogProvider: () -> SettingsDialog,
+    val serverlistDialogProvider: () -> ServerlistDialog,
     private val primaryStage: Stage,
-    titleProperty: StringProperty
-) : BorderPane() {
+    titleProperty: StringProperty,
+    dialogPane: ObjectProperty<Node>,
+    welcomePaneProvider: () -> WelcomePane
+) : StackPane() {
     private val selectedWindow = SimpleObjectProperty<Node>()
 
     init {
-        top = MenuBar().apply {
-            menus.addAll(
-                Menu(tr("File")).apply {
-                    items.add(
-                        MenuItem(tr("Quit")).apply {
-                            setOnAction {
-                                primaryStage.close()
-                            }
-                        }
-                    )
-                },
-                Menu(tr("IRC")).apply {
-                    items.addAll(
-                        MenuItem(tr("Server List")).apply {
-                            setOnAction {
-                                ServerListController(controller, primaryStage, config).create()
-                            }
-                        },
-                        MenuItem(tr("Join Channel")).apply {
-                            setOnAction {
-                                joinDialogProvider().show()
-                            }
-                            disableProperty().bind(controller.selectedWindow.isNull)
-                        }
-                    )
-                },
-                Menu(tr("Settings")).apply {
-                    items.add(
-                        MenuItem(tr("Settings")).apply {
-                            setOnAction {
-                                settingsDialogProvider().show()
-                            }
-                        }
-                    )
-                }
-            )
-        }
-        left = ListView(SortedList(controller.windows, compareBy { it.sortKey })).apply {
-            styleClass.add("tree-view")
-            selectionModel.selectedItemProperty().addListener { _, _, newValue ->
-                controller.selectedWindow.value = newValue
-            }
-            cellFactory = NodeListCellFactory(this)
-            contextMenu = ContextMenu().apply {
-                items.addAll(
-                    MenuItem(tr("Close")).apply {
+        selectedWindow.value = welcomePaneProvider.invoke()
+        val ui = BorderPane()
+        children.addAll(ui.apply {
+            top = MenuBar().apply {
+                menus.addAll(Menu(tr("IRC")).apply {
+                    items.addAll(MenuItem(tr("Server List")).apply {
                         setOnAction {
-                            if (controller.selectedWindow.value.isConnection) {
-                                controller.selectedWindow.value.connection?.disconnect()
-                            } else {
-                                controller.leaveChannel(controller.selectedWindow.value.name)
-                            }
+                            serverlistDialogProvider().show()
                         }
-                    }
-                )
+                    })
+                }, Menu(tr("Settings")).apply {
+                    items.add(MenuItem(tr("Settings")).apply {
+                        setOnAction {
+                            settingsDialogProvider().show()
+                        }
+                    })
+                })
             }
-        }
-        centerProperty().bindBidirectional(selectedWindow)
+            left = ListView(controller.windows).apply {
+                styleClass.add("tree-view")
+                selectionModel.selectedItemProperty().addListener { _, _, newValue ->
+                    controller.selectedWindow.value = newValue
+                }
+                controller.selectedWindow.addListener { _, _, newValue ->
+                    selectionModel.select(newValue)
+                }
+                selectionModel.select(controller.selectedWindow.value)
+                cellFactory = NodeListCellFactory(this, joinDialogProvider, controller)
+            }
+            centerProperty().bindBidirectional(selectedWindow)
+        }, BorderPane().apply {
+            top = VBox().apply { minHeightProperty().bind(primaryStage.heightProperty().multiply(0.1)) }
+            bottom = VBox().apply { minHeightProperty().bind(primaryStage.heightProperty().multiply(0.1)) }
+            left = VBox().apply { minWidthProperty().bind(primaryStage.widthProperty().multiply(0.1)) }
+            right = VBox().apply { minWidthProperty().bind(primaryStage.widthProperty().multiply(0.1)) }
+            centerProperty().bindBidirectional(dialogPane)
+            isVisible = false
+            centerProperty().addListener { _, _, newValue ->
+                isVisible = newValue != null
+            }
+            visibleProperty().bindTransform(ui.effectProperty()) { _, b ->
+                if (b == true) {
+                    GaussianBlur(5.0)
+                } else {
+                    null
+                }
+            }
+        })
         primaryStage.icons.add(Image(MainView::class.java.getResourceAsStream("/logo.png")))
         titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
-        controller.selectedWindow.addListener { _, _, newValue ->
-            selectedWindow.value = newValue?.let {
-                it.connection?.children?.get(it.name)?.ui
-            } ?: VBox()
+        controller.selectedWindow.addListener { _, oldValue, newValue ->
+            runLater {
+                oldValue?.hasUnreadMessages?.set(false)
+                newValue?.hasUnreadMessages?.set(false)
+                selectedWindow.value = newValue?.let {
+                    it.connection?.children?.get(it.name.value)?.ui
+                } ?: VBox()
+            }
         }
     }
 }
@@ -136,7 +223,51 @@ class TitleStringConverter : StringConverter<WindowModel>() {
     override fun toString(window: WindowModel?): String = when {
         window == null -> tr("DMDirc")
         window.isConnection -> tr("DMDirc: %s").format(window.connection?.networkName ?: "")
-        else -> tr("DMDirc: %s | %s").format(window.name, window.connection?.networkName ?: "")
+        else -> tr("DMDirc: %s | %s").format(window.name.value, window.connection?.networkName ?: "")
     }
+}
 
+class WelcomePane(
+    controller: MainContract.Controller,
+    settingsDialogProvider: () -> SettingsDialog,
+    serverlistDialogProvider: () -> ServerlistDialog,
+    version: String
+) : VBox() {
+    init {
+        styleClass.add("welcome")
+        children.addAll(Label(tr("Welcome to DMDirc %s").format(version)).apply {
+            styleClass.add("welcome-header")
+        }, Label(
+            tr(
+                "To get started you'll need to set your nickname and other settings and add a server or two, you can do this with the buttons below. If you'd rather just dive in, click the \"Chat with us\" button and you'll connect to our development channel with some default settings."
+            )
+        ).apply {
+            styleClass.add("welcome-text")
+            isWrapText = true
+            prefWidth = 500.0
+        }, VBox().apply {
+            children.addAll(Button(tr("Profile")).apply {
+                maxWidth = Double.MAX_VALUE
+                setOnAction {
+                    settingsDialogProvider().show()
+                }
+            }, Button(tr("Server list")).apply {
+                maxWidth = Double.MAX_VALUE
+                setOnAction {
+                    serverlistDialogProvider().show()
+                }
+            }, Button(tr("Chat with us")).apply {
+                maxWidth = Double.MAX_VALUE
+                setOnAction {
+                    controller.joinDev()
+                }
+            })
+            alignment = Pos.CENTER
+            spacing = 5.0
+            minWidth = 150.0
+            maxWidth = 150.0
+        })
+        spacing = 5.0
+        alignment = Pos.CENTER
+    }
 }

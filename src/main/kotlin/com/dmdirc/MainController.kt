@@ -2,6 +2,7 @@ package com.dmdirc
 
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.collections.SetChangeListener
 
@@ -12,6 +13,7 @@ object MainContract {
         fun connect(connectionDetails: ConnectionDetails)
         fun joinChannel(channel: String)
         fun leaveChannel(channel: String)
+        fun joinDev()
     }
 }
 
@@ -19,8 +21,15 @@ class MainController(
     private val config1: ClientConfig,
     private val connectionFactory: (ConnectionDetails) -> ConnectionContract.Controller
 ) : MainContract.Controller {
+    override fun joinDev() {
+        connect(
+            ConnectionDetails(
+                hostname = "chat.freenode.net", port = 6667, tls = false, autoJoin = listOf("#DMDirc")
+            )
+        )
+    }
 
-    override val windows = emptyList<WindowModel>().toMutableList().observable()
+    override val windows: ObservableList<WindowModel> = FXCollections.observableArrayList(WindowModel.extractor())
     override val selectedWindow = SimpleObjectProperty<WindowModel>()
 
     init {
@@ -33,11 +42,12 @@ class MainController(
 
     override fun connect(connectionDetails: ConnectionDetails) {
         with(connectionFactory(connectionDetails)) {
-            windows.addAll(children.map { it.model })
+            windows.insertSorted(children.map { it.model })
+            selectedWindow.value = model
             children.observable.addListener(SetChangeListener<Connection.Child> {
                 runLater {
                     when {
-                        it.wasAdded() -> windows.add(it.elementAdded.model)
+                        it.wasAdded() -> windows.insertSorted(it.elementAdded.model)
                         it.wasRemoved() -> windows.remove(it.elementRemoved.model)
                     }
                 }
@@ -53,5 +63,12 @@ class MainController(
     override fun leaveChannel(channel: String) {
         selectedWindow.value.connection?.leaveChannel(channel)
     }
+}
 
+fun ObservableList<WindowModel>.insertSorted(model: WindowModel) = indexOfFirst { it.sortKey > model.sortKey }.let {
+    add(if (it == -1) size else it, model)
+}
+
+fun ObservableList<WindowModel>.insertSorted(models: Collection<WindowModel>) {
+    models.forEach { insertSorted(it) }
 }

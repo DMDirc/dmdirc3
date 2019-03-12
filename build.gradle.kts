@@ -1,7 +1,10 @@
+
+import com.install4j.gradle.Install4jTask
+import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "com.dmdirc"
-version = "0.1-SNAPSHOT"
+version = ""
 val mainClass = "com.dmdirc.AppKt"
 
 plugins {
@@ -10,6 +13,17 @@ plugins {
     kotlin("jvm").version("1.3.21")
     id("org.openjfx.javafxplugin").version("0.0.7")
     id("name.remal.check-updates") version "1.0.113"
+    id("com.install4j.gradle") version "7.0.9"
+    id("org.jmailen.kotlinter") version "1.21.0"
+}
+
+install4j {
+    installDir = when {
+        OperatingSystem.current().isLinux -> File("/opt/install4j7/")
+        OperatingSystem.current().isWindows -> File("C:\\Program Files\\install4j7")
+        else -> File("/opt/install4j7/") //TODO: Figure out where it installs on OS X
+    }
+    license = System.getenv("i4jlicense")
 }
 
 jacoco {
@@ -19,6 +33,7 @@ jacoco {
 repositories {
     mavenCentral()
     jcenter()
+    maven("https://maven.ej-technologies.com/repository")
     mavenLocal()
 }
 java {
@@ -37,11 +52,19 @@ application {
 dependencies {
     implementation("org.controlsfx:controlsfx:9.0.0")
     implementation("org.fxmisc.richtext:richtextfx:0.9.3")
-    implementation("com.dmdirc:ktirc:0.10.3")
-    implementation("com.uchuhimo:konf:0.13.1")
+    implementation("com.dmdirc:ktirc:1.0.1")
+    implementation("com.uchuhimo:konf:0.13.1") {
+        exclude(group = "com.moandjiezana.toml")
+        exclude(group = "org.eclipse.jgit")
+    }
     implementation("org.kodein.di:kodein-di-generic-jvm:6.1.0")
     implementation("com.jukusoft:easy-i18n-gettext:1.2.0")
     implementation("de.jensd:fontawesomefx-fontawesome:4.7.0-11")
+    implementation("de.jensd:fontawesomefx-commons:11.0")
+    implementation("de.jensd:fontawesomefx-controls:11.0")
+    implementation("com.bugsnag:bugsnag:3.4.4")
+    
+    compileOnly("com.install4j:install4j-runtime:7.0.9")
 
     runtime("org.openjfx:javafx-graphics:$javafx.version:win")
     runtime("org.openjfx:javafx-graphics:$javafx.version:linux")
@@ -64,6 +87,12 @@ configurations.all {
 
 tasks {
 
+    withType<Install4jTask> {
+        dependsOn("jar")
+        projectFile = "dmdirc.install4j"
+        release = System.getenv("DRONE_TAG") ?: "0.1-SNAPSHOT"
+    }
+
     withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "1.8"
     }
@@ -83,7 +112,17 @@ tasks {
         manifest.attributes.apply {
             put("Main-Class", mainClass)
         }
-        from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+        from(configurations.runtimeClasspath.get().map {
+            if (it.isDirectory) {
+                it
+            } else {
+                zipTree(it).matching {
+                    exclude("META-INF/*.SF")
+                    exclude("META-INF/*.DSA")
+                    exclude("META-INF/*.RSA")
+                }
+            }
+        })
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 

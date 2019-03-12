@@ -5,6 +5,8 @@ import com.uchuhimo.konf.ConfigSpec
 import com.uchuhimo.konf.Item
 import com.uchuhimo.konf.source.yaml.toYaml
 import java.io.IOException
+import java.nio.file.FileSystem
+import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.logging.Level
@@ -12,10 +14,11 @@ import java.util.logging.Logger
 
 data class ConnectionDetails(
     val hostname: String,
-    val password: String,
+    val password: String = "",
     val port: Int,
     val tls: Boolean = true,
-    val autoconnect: Boolean = false
+    val autoconnect: Boolean = false,
+    val autoJoin: List<String> = emptyList()
 )
 
 object ClientSpec : ConfigSpec("") {
@@ -34,6 +37,7 @@ object ClientSpec : ConfigSpec("") {
         val serverEvent by optional("** %s")
         val message by optional("<%s> %s")
         val action by optional("* %s %s")
+        val notice by optional("-%s- %s")
     }
 
     object Display : ConfigSpec() {
@@ -65,12 +69,11 @@ class ClientConfig private constructor(private val path: Path, private val confi
      * If [newPath] is provided the config is saved to that path; otherwise
      * the config is saved to the path it was originally loaded from
      */
-    fun save(newPath: Path? = null) =
-        try {
-            Files.newOutputStream(newPath ?: path).use { config.toYaml.toOutputStream(it) }
-        } catch (ex: IOException) {
-            logger.log(Level.WARNING, ex) { "Unable to load config file" }
-        }
+    fun save(newPath: Path? = null) = try {
+        Files.newOutputStream(newPath ?: path).use { config.toYaml.toOutputStream(it) }
+    } catch (ex: IOException) {
+        logger.log(Level.WARNING, ex) { "Unable to load config file" }
+    }
 
     companion object {
 
@@ -81,16 +84,66 @@ class ClientConfig private constructor(private val path: Path, private val confi
          *
          * If the [path] doesn't exist or cannot be read, a default config is returned.
          */
-        fun loadFrom(path: Path): ClientConfig =
-            with(Config { addSpec(ClientSpec) }) {
-                try {
-                    return ClientConfig(path, Files.newInputStream(path).use { from.yaml.inputStream(it) })
-                } catch (ex: Exception) {
-                    logger.log(Level.WARNING, ex) { "Unable to load config file" }
-                }
-                return ClientConfig(path, this)
+        fun loadFrom(path: Path): ClientConfig = with(Config { addSpec(ClientSpec) }) {
+            try {
+                return ClientConfig(path, Files.newInputStream(path).use { from.yaml.inputStream(it) })
+            } catch (ex: Exception) {
+                logger.log(Level.WARNING, ex) { "Unable to load config file" }
             }
-
+            return ClientConfig(path, this)
+        }
     }
 }
 
+val directoryName: String
+    get() = if (getVersion() == "dev") "dmdirc3-dev" else "dmdirc3"
+
+/**
+ * Gets the config directory that DMDirc should use.
+ */
+fun getConfigDirectory(): Path {
+    val fs = FileSystems.getDefault()
+    val path = fs.getConfigDirectory(
+        System.getProperty("os.name"), fs.getPath(System.getProperty("user.home")), System.getenv()
+    )
+    if (!Files.isDirectory(path)) {
+        Files.createDirectories(path)
+    }
+    return path
+}
+
+/**
+ * Gets the config directory that DMDirc should use, given the [osName], [homeDir] and [envVars].
+ */
+fun FileSystem.getConfigDirectory(osName: String, homeDir: Path, envVars: Map<String, String>): Path = when {
+    "DMDIRC_HOME" in envVars -> getPath(envVars["DMDIRC_HOME"])
+    osName.startsWith("Mac OS") -> resolveMacConfigDirectory(homeDir)
+    osName.startsWith("Windows") -> resolveWindowsConfigDirectory(homeDir, envVars["APPDATA"])
+    else -> resolveOtherConfigDirectory(homeDir, envVars["XDG_CONFIG_HOME"])
+}.toAbsolutePath()
+
+/**
+ * Resolves the pre-defined config directory relative to the given [homeDir] for macs.
+ */
+private fun resolveMacConfigDirectory(homeDir: Path) =
+    homeDir.resolve("Library").resolve("Preferences").resolve(directoryName)
+
+/**
+ * Resolves the config directory for Windows, relative to either the [homeDir] or the [appDataDir] if available.
+ */
+private fun FileSystem.resolveWindowsConfigDirectory(homeDir: Path, appDataDir: String?) =
+    if (appDataDir.isNullOrEmpty()) {
+        homeDir.resolve(directoryName)
+    } else {
+        getPath(appDataDir, directoryName)
+    }
+
+/**
+ * Resolves the config directory relative to the [homeDir] or [xdgConfigHome] if available.
+ */
+private fun FileSystem.resolveOtherConfigDirectory(homeDir: Path, xdgConfigHome: String?) =
+    if (xdgConfigHome.isNullOrEmpty()) {
+        homeDir.resolve(".$directoryName")
+    } else {
+        getPath(xdgConfigHome, directoryName)
+    }
