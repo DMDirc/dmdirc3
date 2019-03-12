@@ -1,5 +1,6 @@
 package com.dmdirc
 
+import com.bugsnag.Bugsnag
 import javafx.application.Application
 import javafx.application.HostServices
 import javafx.application.Platform
@@ -31,7 +32,8 @@ internal lateinit var kodein: Kodein
 
 class MainApp : Application() {
     override fun start(stage: Stage) {
-        kodein = createKodein(stage, hostServices, stage.titleProperty())
+        val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5")
+        kodein = createKodein(stage, hostServices, stage.titleProperty(), bugsnag)
         val config by kodein.instance<ClientConfig>()
         initInternationalisation(Paths.get("translations"), config[ClientSpec.language])
         with(stage) {
@@ -46,7 +48,13 @@ class MainApp : Application() {
     }
 }
 
-private fun createKodein(stage: Stage, hostServices: HostServices, titleProperty: StringProperty) = Kodein {
+private fun createKodein(
+    stage: Stage,
+    hostServices: HostServices,
+    titleProperty: StringProperty,
+    bugsnag: Bugsnag
+) = Kodein {
+    bind<Bugsnag>() with singleton { bugsnag.apply { setAppVersion(instance("version")) } }
     bind<String>("version") with singleton { getVersion() }
     bind<Path>() with singleton { getConfigDirectory() }
     bind<ClientConfig>() with singleton { ClientConfig.loadFrom(instance<Path>().resolve("config.yml")) }
