@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.direct
 import org.kodein.di.generic.bind
+import org.kodein.di.generic.eagerSingleton
 import org.kodein.di.generic.factory
 import org.kodein.di.generic.instance
 import org.kodein.di.generic.provider
@@ -26,8 +27,7 @@ internal lateinit var kodein: Kodein
 
 class MainApp : Application() {
     override fun start(stage: Stage) {
-        val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5")
-        kodein = createKodein(stage, hostServices, stage.titleProperty(), bugsnag)
+        kodein = createKodein(stage, hostServices, stage.titleProperty())
         val config by kodein.instance<ClientConfig>()
         initInternationalisation(Paths.get("translations"), config[ClientSpec.language])
         with(stage) {
@@ -42,13 +42,35 @@ class MainApp : Application() {
     }
 }
 
+interface ErrorReporter {
+    fun notify(throwable: Throwable)
+}
+
+class BugsnagErrorReporter(version: String) : ErrorReporter {
+    private val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5").apply { setAppVersion(version) }
+    override fun notify(throwable: Throwable) {
+        bugsnag.notify(throwable)
+    }
+}
+
+class StderrErrorReporter : ErrorReporter {
+    override fun notify(throwable: Throwable) {
+        throwable.printStackTrace(System.err)
+    }
+}
+
 private fun createKodein(
     stage: Stage,
     hostServices: HostServices,
-    titleProperty: StringProperty,
-    bugsnag: Bugsnag
+    titleProperty: StringProperty
 ) = Kodein {
-    bind<Bugsnag>() with singleton { bugsnag.apply { setAppVersion(instance("version")) } }
+    bind<ErrorReporter>() with eagerSingleton {
+        if (instance<ClientConfig>()[ClientSpec.sendBugReports]) {
+            BugsnagErrorReporter(instance("version"))
+        } else {
+            StderrErrorReporter()
+        }
+    }
     bind<String>("version") with singleton { getVersion() }
     bind<Path>() with singleton { getConfigDirectory() }
     bind<ClientConfig>() with singleton { ClientConfig.loadFrom(instance<Path>().resolve("config.yml")) }

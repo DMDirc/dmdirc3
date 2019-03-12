@@ -24,6 +24,7 @@ data class ConnectionDetails(
 object ClientSpec : ConfigSpec("") {
     val servers by optional(listOf<ConnectionDetails>())
     val language by optional("en-GB")
+    val sendBugReports by optional(true)
 
     object DefaultProfile : ConfigSpec() {
         val nickname by optional("")
