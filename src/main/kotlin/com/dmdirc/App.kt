@@ -29,6 +29,8 @@ class MainApp : Application() {
         val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5")
         kodein = createKodein(stage, hostServices, stage.titleProperty(), bugsnag)
         val config by kodein.instance<ClientConfig>()
+        val dialogPane = kodein.direct.instance<ObjectProperty<Node>>("dialogPane")
+        val controller = kodein.direct.instance<MainContract.Controller>()
         initInternationalisation(Paths.get("translations"), config[ClientSpec.language])
         with(stage) {
             minWidth = 800.0
@@ -36,9 +38,9 @@ class MainApp : Application() {
             scene = Scene(kodein.direct.instance<MainView>())
             show()
             scene.focusOwnerProperty().addListener { _, _, _ ->
-                    val selectedWindow = kodein.direct.instance<MainContract.Controller>().selectedWindow.value
+                    val selectedWindow = controller.selectedWindow.value
                     val uiNode = selectedWindow.connection?.children?.get(selectedWindow.name.value)?.ui
-                    if (uiNode is WindowUI && kodein.direct.instance<ObjectProperty<Node>>("dialogPane").value?.visibleProperty()?.value != true) {
+                    if (uiNode is WindowUI && dialogPane.value?.visibleProperty()?.value != true) {
                         uiNode.inputField.requestFocus()
                     }
             }
