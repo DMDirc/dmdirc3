@@ -35,6 +35,13 @@ class MainApp : Application() {
             minHeight = 600.0
             scene = Scene(kodein.direct.instance<MainView>())
             show()
+            scene.focusOwnerProperty().addListener { observable, oldValue, newValue ->
+                    val selectedWindow = kodein.direct.instance<MainContract.Controller>().selectedWindow.value
+                    val uiNode = selectedWindow.connection?.children?.get(selectedWindow.name.value)?.ui
+                    if (uiNode is WindowUI) {
+                        uiNode.inputField.requestFocus()
+                    }
+            }
         }
         GlobalScope.launch {
             installStyles(stage.scene, kodein.direct.instance<Path>().resolve("stylesheet.css"))

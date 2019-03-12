@@ -180,10 +180,13 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
 
     private var scrollbar: ScrollBar? = null
     private val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
+    val inputField = TextField()
 
     init {
         val borderPane = BorderPane().apply {
-            center = VirtualizedScrollPane(textArea).apply {
+            center = VirtualizedScrollPane(textArea.apply {
+                isFocusTraversable = false
+            }).apply {
                 scrollbar = childrenUnmodifiable.filterIsInstance<ScrollBar>().find {
                     it.orientation == VERTICAL
                 }
@@ -194,7 +197,7 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
                     prefWidth = 148.0
                 }
             }
-            bottom = TextField().apply {
+            bottom = inputField.apply {
                 model.inputField.bindBidirectional(this.textProperty())
                 styleClass.add("input-field")
                 setOnAction {
@@ -229,5 +232,10 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
                 scrollbar?.valueProperty()?.value = scrollbar?.max
             }
         })
+        inputField.focusedProperty().addListener { _, _, newValue ->
+            if (newValue == false) {
+                inputField.requestFocus()
+            }
+        }
     }
 }
