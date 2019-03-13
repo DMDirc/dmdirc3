@@ -29,21 +29,13 @@ class MainApp : Application() {
         val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5")
         kodein = createKodein(stage, hostServices, stage.titleProperty(), bugsnag)
         val config by kodein.instance<ClientConfig>()
-        val dialogPane = kodein.direct.instance<ObjectProperty<Node>>("dialogPane")
-        val controller = kodein.direct.instance<MainContract.Controller>()
         initInternationalisation(Paths.get("translations"), config[ClientSpec.language])
         with(stage) {
             minWidth = 800.0
             minHeight = 600.0
             scene = Scene(kodein.direct.instance<MainView>())
             show()
-            scene.focusOwnerProperty().addListener { _, _, _ ->
-                    val selectedWindowValue = controller.selectedWindow.value
-                    val uiNode = selectedWindowValue?.connection?.children?.get(selectedWindowValue.name.value)?.ui
-                    if (uiNode is WindowUI && dialogPane.value?.visibleProperty()?.value != true) {
-                        uiNode.inputField.requestFocus()
-                    }
-            }
+            kodein.direct.instance<FocusManager>().start()
         }
         GlobalScope.launch {
             installStyles(stage.scene, kodein.direct.instance<Path>().resolve("stylesheet.css"))
@@ -78,6 +70,7 @@ private fun createKodein(
             provider()
         )
     }
+    bind<FocusManager>() with singleton { FocusManager(stage, instance(), instance("dialogPane")) }
     bind<JoinDialog>() with provider {
         JoinDialog(instance(), instance("dialogPane"))
     }
@@ -93,9 +86,7 @@ private fun createKodein(
     bind<Stage>() with instance(stage)
 
     bind<ConnectionContract.Controller>() with factory { connectionDetails: ConnectionDetails ->
-        Connection(
-            connectionDetails, instance(), instance(), instance("dialogPane")
-        )
+        Connection(connectionDetails, instance(), instance())
     }
     bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
     bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }

@@ -32,13 +32,11 @@ import com.jukusoft.i18n.I.tr
 import com.uchuhimo.konf.Item
 import javafx.application.HostServices
 import javafx.beans.Observable
-import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ListChangeListener
 import javafx.geometry.Orientation.VERTICAL
-import javafx.scene.Node
 import javafx.scene.control.ListView
 import javafx.scene.control.ScrollBar
 import javafx.scene.control.TextField
@@ -178,7 +176,7 @@ enum class MessageFlags {
     }
 }
 
-class WindowUI(model: WindowModel, hostServices: HostServices, dialogPane: ObjectProperty<Node>) : AnchorPane() {
+class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
 
     private var scrollbar: ScrollBar? = null
     private val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
@@ -235,10 +233,5 @@ class WindowUI(model: WindowModel, hostServices: HostServices, dialogPane: Objec
                 scrollbar?.valueProperty()?.value = scrollbar?.max
             }
         })
-        inputField.focusedProperty().addListener { _, _, newValue ->
-            if (newValue == false && dialogPane.value?.visibleProperty()?.value != true) {
-                inputField.requestFocus()
-            }
-        }
     }
 }
