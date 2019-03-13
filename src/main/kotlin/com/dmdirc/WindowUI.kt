@@ -180,21 +180,25 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
 
     private var scrollbar: ScrollBar? = null
     private val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
+    val inputField = TextField()
 
     init {
         val borderPane = BorderPane().apply {
-            center = VirtualizedScrollPane(textArea).apply {
+            center = VirtualizedScrollPane(textArea.apply {
+                isFocusTraversable = false
+            }).apply {
                 scrollbar = childrenUnmodifiable.filterIsInstance<ScrollBar>().find {
                     it.orientation == VERTICAL
                 }
             }
             if (!model.isConnection) {
                 right = ListView<String>(model.nickList.users).apply {
+                    isFocusTraversable = false
                     styleClass.add("nick-list")
                     prefWidth = 148.0
                 }
             }
-            bottom = TextField().apply {
+            bottom = inputField.apply {
                 model.inputField.bindBidirectional(this.textProperty())
                 styleClass.add("input-field")
                 setOnAction {

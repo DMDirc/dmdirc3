@@ -173,6 +173,7 @@ class MainView(
                 })
             }
             left = ListView(controller.windows).apply {
+                isFocusTraversable = false
                 styleClass.add("tree-view")
                 selectionModel.selectedItemProperty().addListener { _, _, newValue ->
                     controller.selectedWindow.value = newValue

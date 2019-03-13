@@ -35,6 +35,7 @@ class MainApp : Application() {
             minHeight = 600.0
             scene = Scene(kodein.direct.instance<MainView>())
             show()
+            kodein.direct.instance<FocusManager>().start()
         }
         GlobalScope.launch {
             installStyles(stage.scene, kodein.direct.instance<Path>().resolve("stylesheet.css"))
@@ -91,6 +92,7 @@ private fun createKodein(
             provider()
         )
     }
+    bind<FocusManager>() with singleton { FocusManager(stage, instance(), instance("dialogPane")) }
     bind<JoinDialog>() with provider {
         JoinDialog(instance(), instance("dialogPane"))
     }
@@ -106,9 +108,7 @@ private fun createKodein(
     bind<Stage>() with instance(stage)
 
     bind<ConnectionContract.Controller>() with factory { connectionDetails: ConnectionDetails ->
-        Connection(
-            connectionDetails, instance(), instance()
-        )
+        Connection(connectionDetails, instance(), instance())
     }
     bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
     bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
