@@ -1,8 +1,9 @@
 package com.dmdirc
 
-import com.bugsnag.Bugsnag
 import com.dmdirc.PlatformWrappers.fxThreadTester
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -13,12 +14,12 @@ import org.junit.jupiter.api.Test
 internal class FxUtilsTest {
 
     private val exception = slot<Throwable>()
-    private val mockBugsnag = mockk<Bugsnag> {
-        every { notify(capture(exception)) } returns true
+    private val mockReporter = mockk<ErrorReporter> {
+        every { notify(capture(exception)) } just Runs
     }
 
     private fun uiOperation() {
-        assertOnFxThread(mockBugsnag)
+        assertOnFxThread(mockReporter)
     }
 
     private fun doUiCall() {
@@ -47,7 +48,7 @@ internal class FxUtilsTest {
         fxThreadTester = { true }
         doUiCall()
         verify(inverse = true) {
-            mockBugsnag.notify(any<Throwable>())
+            mockReporter.notify(any())
         }
     }
 }
