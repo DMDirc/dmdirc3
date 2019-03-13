@@ -31,7 +31,9 @@ class FocusManager(
             val selectedWindowValue = controller.selectedWindow.value
             val uiNode = selectedWindowValue?.connection?.children?.get(selectedWindowValue.name.value)?.ui
             if (uiNode is WindowUI && dialogPane.value?.visibleProperty()?.value != true) {
-                inputField?.focusedProperty()?.removeListener(inputFieldListener)
+                if (inputFieldListener != null) {
+                    inputField?.focusedProperty()?.removeListener(inputFieldListener)
+                }
                 inputField = uiNode.inputField
                 uiNode.inputField.requestFocus()
                 inputFieldListener = FocusListener(uiNode, dialogPane)
