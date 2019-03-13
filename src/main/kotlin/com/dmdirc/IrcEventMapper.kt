@@ -4,6 +4,7 @@ import com.dmdirc.MessageFlags.Action
 import com.dmdirc.MessageFlags.ChannelEvent
 import com.dmdirc.MessageFlags.Message
 import com.dmdirc.MessageFlags.Notice
+import com.dmdirc.MessageFlags.Self
 import com.dmdirc.MessageFlags.ServerEvent
 import com.dmdirc.ktirc.IrcClient
 import com.dmdirc.ktirc.events.ActionReceived
@@ -30,6 +31,11 @@ class IrcEventMapper(private val client: IrcClient) {
 
     fun flags(event: IrcEvent) = sequence {
         yield(if (event.channelEvent) ChannelEvent else ServerEvent)
+
+        if (event is SourcedEvent && client.isLocalUser(event.user)) {
+            yield(Self)
+        }
+
         when (event) {
             is MessageReceived -> yield(Message)
             is ActionReceived -> yield(Action)
