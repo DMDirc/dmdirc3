@@ -23,7 +23,6 @@ import com.dmdirc.ktirc.events.ServerDisconnected
 import com.dmdirc.ktirc.events.SourcedEvent
 import com.dmdirc.ktirc.events.TargetedEvent
 import com.dmdirc.ktirc.model.User
-import com.jukusoft.i18n.I
 import com.jukusoft.i18n.I.tr
 import java.time.format.DateTimeFormatter
 
@@ -38,36 +37,18 @@ class IrcEventMapper(private val client: IrcClient) {
         }
     }.toSet()
 
-    fun displayableText(event: IrcEvent): Array<String>? = with(event) {
-        event.untranslatedText() ?: event.simpleText()?.let { arrayOf(it) } ?: when (this) {
-            is ChannelParted -> if (reason.isEmpty()) {
-                arrayOf(I.tr("%s left").format(formattedNickname))
-            } else {
-                arrayOf(I.tr("%s left (%s)").format(formattedNickname, reason))
-            }
-            is ChannelQuit -> if (reason.isEmpty()) {
-                arrayOf(I.tr("%s quit").format(formattedNickname))
-            } else {
-                arrayOf(I.tr("%s quit (%s)").format(formattedNickname, reason))
-            }
-            is ChannelTopicDiscovered -> if (topic.isNullOrEmpty()) {
-                arrayOf(I.tr("there is no topic set"))
-            } else {
-                arrayOf(I.tr("the topic is: %s").format(topic))
-            }
+    fun displayableText(event: IrcEvent): Array<String>? = event.translate()
 
-            else -> null
-        }
-    }
-
-    private fun IrcEvent.untranslatedText(): Array<String>? = when (this) {
+    private fun IrcEvent.translate(): Array<String>? = when (this) {
+        // Things that don't need translating:
         is MessageReceived -> arrayOf(formattedNickname, message)
         is NoticeReceived -> arrayOf(formattedNickname, message)
         is ActionReceived -> arrayOf(formattedNickname, action)
-        else -> null
+        else -> (translateSimpleText() ?: translateConditionalText())?.let { arrayOf(it) }
     }
 
-    private fun IrcEvent.simpleText(): String? = when (this) {
+    private fun IrcEvent.translateSimpleText(): String? = when (this) {
+        // Things that have a constant translation for their events
         is ServerConnected -> tr("Connected")
         is ServerDisconnected -> tr("Disconnected")
         is ServerConnectionError -> tr("Error: %s - %s").format(error.translated(), details ?: "")
@@ -79,6 +60,20 @@ class IrcEventMapper(private val client: IrcClient) {
             setTime.format(DateTimeFormatter.ofPattern("cccc, d LLLL yyyy")),
             user.formattedNickname
         )
+        else -> null
+    }
+
+    private fun IrcEvent.translateConditionalText(): String? = when {
+        // Things that have different transactions based on event properties
+        this is ChannelParted && reason.isEmpty() -> tr("%s left").format(formattedNickname)
+        this is ChannelParted -> tr("%s left (%s)").format(formattedNickname, reason)
+
+        this is ChannelQuit && reason.isEmpty() -> tr("%s quit").format(formattedNickname)
+        this is ChannelQuit -> tr("%s quit (%s)").format(formattedNickname, reason)
+
+        this is ChannelTopicDiscovered && topic.isNullOrEmpty() -> tr("there is no topic set")
+        this is ChannelTopicDiscovered -> tr("the topic is: %s").format(topic)
+
         else -> null
     }
 
