@@ -5,6 +5,7 @@ import com.dmdirc.ClientSpec.Formatting.channelEvent
 import com.dmdirc.ClientSpec.Formatting.message
 import com.dmdirc.ClientSpec.Formatting.notice
 import com.dmdirc.ClientSpec.Formatting.serverEvent
+import com.dmdirc.Style.CustomStyle
 import com.dmdirc.ktirc.events.ChannelMembershipAdjustment
 import com.dmdirc.ktirc.events.IrcEvent
 import com.uchuhimo.konf.Item
@@ -85,8 +86,11 @@ class WindowModel(
         val message = " ${config[MessageFlags.formatter(flags)].format(*args)}"
         val spans = message.detectLinks().convertControlCodes().toMutableList()
         spans.add(0, StyledSpan(timestamp, setOf(Style.CustomStyle("timestamp"))))
+
         hasUnreadMessages.value = true
-        lines.add(spans.toTypedArray())
+
+        val flagStyles = flags.map { CustomStyle("messagetype-${it.name}") }
+        lines.add(spans.map { StyledSpan(it.content, it.styles + flagStyles) }.toTypedArray())
     }
 
     private val IrcEvent.timestamp: String
