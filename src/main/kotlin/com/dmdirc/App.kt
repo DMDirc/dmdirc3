@@ -48,7 +48,12 @@ interface ErrorReporter {
 }
 
 class BugsnagErrorReporter(version: String) : ErrorReporter {
-    private val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5").apply { setAppVersion(version) }
+    private val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5").apply {
+        setAppVersion(version)
+        setProjectPackages("com.dmdirc")
+        addCallback { it.device.remove("hostname") }
+    }
+
     override fun notify(throwable: Throwable) {
         bugsnag.notify(throwable)
     }
