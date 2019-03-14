@@ -1,0 +1,10 @@
+= Changelog
+
+== Development version
+
+* Fixed occasional problem connecting to TLS servers that send a lot
+  of data immediately (e.g. bouncers) #237
+
+== 19.03.01
+
+* Initial release!

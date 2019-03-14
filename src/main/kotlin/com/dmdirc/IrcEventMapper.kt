@@ -1,11 +1,11 @@
 package com.dmdirc
 
-import com.dmdirc.MessageFlags.Action
-import com.dmdirc.MessageFlags.ChannelEvent
-import com.dmdirc.MessageFlags.Message
-import com.dmdirc.MessageFlags.Notice
-import com.dmdirc.MessageFlags.Self
-import com.dmdirc.MessageFlags.ServerEvent
+import com.dmdirc.MessageFlag.Action
+import com.dmdirc.MessageFlag.ChannelEvent
+import com.dmdirc.MessageFlag.Message
+import com.dmdirc.MessageFlag.Notice
+import com.dmdirc.MessageFlag.Self
+import com.dmdirc.MessageFlag.ServerEvent
 import com.dmdirc.ktirc.IrcClient
 import com.dmdirc.ktirc.events.ActionReceived
 import com.dmdirc.ktirc.events.ChannelJoined
