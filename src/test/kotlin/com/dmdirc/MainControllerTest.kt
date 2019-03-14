@@ -4,6 +4,7 @@ import com.dmdirc.ktirc.io.CaseMapping
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import javafx.beans.property.SimpleObjectProperty
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue
@@ -28,6 +29,8 @@ internal class MainControllerTest {
         every { get(ClientSpec.servers) } returns emptyList()
     }
 
+    private val selectedWindow = SimpleObjectProperty<WindowModel>()
+
     @BeforeEach
     fun setup() {
         PlatformWrappers.runLaterProvider = { it.run() }
@@ -50,7 +53,7 @@ internal class MainControllerTest {
         every { factory.invoke(serverList[0]) } returns mockServer1
         every { factory.invoke(serverList[3]) } returns mockServer2
 
-        MainController(config, factory)
+        MainController(config, selectedWindow, factory)
 
         verify {
             factory.invoke(serverList[0])
@@ -62,7 +65,7 @@ internal class MainControllerTest {
 
     @Test
     fun `connects to new servers`() {
-        val controller = MainController(emptyConfig, factory)
+        val controller = MainController(emptyConfig, selectedWindow, factory)
         val details = ConnectionDetails("host3", "pass3", 1235, tls = true, autoconnect = false)
 
         every { factory.invoke(details) } returns mockServer1
@@ -77,7 +80,7 @@ internal class MainControllerTest {
 
     @Test
     fun `adds existing windows from a server`() {
-        val controller = MainController(emptyConfig, factory)
+        val controller = MainController(emptyConfig, selectedWindow, factory)
         val details = ConnectionDetails("host3", "pass3", 1235, tls = true, autoconnect = false)
 
         every { factory.invoke(details) } returns mockServer1
@@ -91,7 +94,7 @@ internal class MainControllerTest {
 
     @Test
     fun `adds new windows from a server`() {
-        val controller = MainController(emptyConfig, factory)
+        val controller = MainController(emptyConfig, selectedWindow, factory)
         val details = ConnectionDetails("host3", "pass3", 1235, tls = true, autoconnect = false)
 
         every { factory.invoke(details) } returns mockServer1
@@ -109,7 +112,7 @@ internal class MainControllerTest {
 
     @Test
     fun `removes windows deleted from a server`() {
-        val controller = MainController(emptyConfig, factory)
+        val controller = MainController(emptyConfig, selectedWindow, factory)
         val details = ConnectionDetails("host3", "pass3", 1235, tls = true, autoconnect = false)
 
         every { factory.invoke(details) } returns mockServer1

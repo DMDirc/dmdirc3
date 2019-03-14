@@ -93,6 +93,10 @@ class WindowModel(
 
         val flagStyles = flags.map { CustomStyle("messagetype-${it.name}") }
         lines.add(spans.map { StyledSpan(it.content, it.styles + flagStyles) }.toTypedArray())
+
+        if (MessageFlag.Highlight in flags) {
+            connection?.notify(this, message)
+        }
     }
 
     private val IrcEvent.timestamp: String

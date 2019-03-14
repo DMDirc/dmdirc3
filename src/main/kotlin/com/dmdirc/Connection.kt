@@ -42,13 +42,15 @@ object ConnectionContract {
         fun leaveChannel(channel: String)
         fun getUsers(channel: String): Iterable<ChannelUser>
         fun disconnect()
+        fun notify(window: WindowModel, message: String)
     }
 }
 
 class Connection(
     private val connectionDetails: ConnectionDetails,
     private val config1: ClientConfig,
-    private val hostServices: HostServices
+    private val hostServices: HostServices,
+    private val notificationManager: NotificationManager
 ) : ConnectionContract.Controller {
 
     private val client: IrcClient = IrcClient {
@@ -108,6 +110,8 @@ class Connection(
     }
 
     override fun getUsers(channel: String): Iterable<ChannelUser> = client.channelState[channel]?.users ?: emptyList()
+
+    override fun notify(window: WindowModel, message: String) = notificationManager.notify(window, message)
 
     private fun handleEvent(event: IrcEvent) {
         when {

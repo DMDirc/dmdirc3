@@ -5,6 +5,7 @@
 * Fixed occasional problem connecting to TLS servers that send a lot
   of data immediately (e.g. bouncers) #237
 * Computer hostnames are no longer included in our error reports.
+* Mentions of your nickname are now highlighted.
 
 == 19.03.01
 
