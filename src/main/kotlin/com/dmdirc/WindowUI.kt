@@ -18,10 +18,13 @@ import javafx.geometry.Orientation.VERTICAL
 import javafx.scene.control.ListView
 import javafx.scene.control.ScrollBar
 import javafx.scene.control.TextField
+import javafx.scene.input.MouseEvent
+import javafx.scene.input.ScrollEvent
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.BorderPane
 import javafx.util.Callback
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.fxmisc.flowless.VirtualizedScrollPane
 import java.time.format.DateTimeFormatter
@@ -109,6 +112,7 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
     private var scrollbar: ScrollBar? = null
     private val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
     val inputField = TextField()
+    private var autoScroll = true
 
     init {
         val borderPane = BorderPane().apply {
@@ -141,9 +145,30 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
             AnchorPane.setBottomAnchor(this, 0.0)
         }
         children.add(borderPane)
+        textArea.totalHeightEstimateProperty().addListener { _, _, _ ->
+            if (autoScroll) {
+                scrollbar?.valueProperty()?.value = scrollbar?.max
+            }
+        }
+        scrollbar?.addEventFilter(MouseEvent.MOUSE_PRESSED) { _ ->
+            runLater {
+                autoScroll = scrollbar?.valueProperty()?.value == scrollbar?.max
+            }
+        }
+        scrollbar?.addEventFilter(MouseEvent.MOUSE_RELEASED) { _ ->
+            runLater {
+                autoScroll = scrollbar?.valueProperty()?.value == scrollbar?.max
+            }
+        }
+        textArea.addEventFilter(ScrollEvent.SCROLL) { _ ->
+            GlobalScope.launch {
+                delay(100)
+                runLater {
+                    autoScroll = scrollbar?.valueProperty()?.value == scrollbar?.max
+                }
+            }
+        }
         model.lines.addListener(ListChangeListener { change ->
-            val scrollVisible = scrollbar?.isVisible ?: false
-            val autoscroll = scrollbar?.value == scrollbar?.max
             // TODO: Support ops other than just appending lines (editing, deleting, inserting earlier, etc).
             while (change.next()) {
                 if (change.wasAdded()) {
@@ -156,9 +181,6 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
                         textArea.appendText("\n")
                     }
                 }
-            }
-            if (autoscroll || scrollVisible != scrollbar?.isVisible) {
-                scrollbar?.valueProperty()?.value = scrollbar?.max
             }
         })
     }
