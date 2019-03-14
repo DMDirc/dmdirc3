@@ -4,7 +4,6 @@ import javafx.beans.property.ObjectProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 import javafx.scene.Node
-import javafx.scene.control.TextField
 import javafx.stage.Stage
 
 class FocusListener(
@@ -23,7 +22,7 @@ class FocusManager(
     private val controller: MainContract.Controller,
     private val dialogPane: ObjectProperty<Node>
 ) {
-    private var inputField: TextField? = null
+    private var inputField: Node? = null
     private var inputFieldListener: ChangeListener<Any>? = null
 
     fun start() {
