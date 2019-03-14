@@ -36,40 +36,45 @@ class ServerContextMenu(
     private val joinDialogProvider: () -> JoinDialog,
     private val connection: ConnectionContract.Controller?
 ) : ContextMenu() {
-    private val connected = connection?.connected?.value ?: false
     private val joinChannel = MenuItem(tr("Join Channel"))
     private val disconnect = MenuItem(tr("Disconnect"))
+    private val reconnected = MenuItem()
 
     override fun show() {
+        val connected = connection?.connected?.value ?: false
         disconnect.visibleProperty().value = connected
         joinChannel.visibleProperty().value = connected
+        reconnected.text = if (connected) tr("Reconnect") else tr("Connect")
         super.show()
     }
 
     init {
-        val recon = if (connected) tr("Reconnect") else tr("Connect")
         items.addAll(joinChannel.apply {
             setOnAction {
                 joinDialogProvider().show()
             }
         }, disconnect.apply {
             setOnAction {
-                connection?.disconnect()
+                if (connection?.connected?.value == true) {
+                    connection.disconnect()
+                }
             }
-        }, MenuItem(recon).apply {
+        }, reconnected.apply {
             setOnAction {
                 GlobalScope.launch {
-                    if (connected) {
-                        connection?.disconnect()
+                    if (connection?.connected?.value == true) {
+                        connection.disconnect()
                     }
                     delay(500)
-                    connection?.connect()
+                    if (connection?.connected?.value == false) {
+                        connection.connect()
+                    }
                 }
             }
         }, MenuItem(tr("Close")).apply {
             setOnAction {
-                if (connected) {
-                    connection?.disconnect()
+                if (connection?.connected?.value == true) {
+                    connection.disconnect()
                 }
                 connection?.children?.clear()
             }
