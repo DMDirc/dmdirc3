@@ -12,9 +12,9 @@ plugins {
     jacoco
     kotlin("jvm").version("1.3.21")
     id("org.openjfx.javafxplugin").version("0.0.7")
-    id("name.remal.check-updates") version "1.0.113"
+    id("name.remal.check-updates") version "1.0.114"
     id("com.install4j.gradle") version "7.0.9"
-    id("org.jmailen.kotlinter") version "1.21.0"
+    id("org.jmailen.kotlinter") version "1.22.0"
 }
 
 install4j {
@@ -52,7 +52,7 @@ application {
 dependencies {
     implementation("org.controlsfx:controlsfx:9.0.0")
     implementation("org.fxmisc.richtext:richtextfx:0.9.3")
-    implementation("com.dmdirc:ktirc:1.0.1")
+    implementation("com.dmdirc:ktirc:1.1.0")
     implementation("com.uchuhimo:konf:0.13.1") {
         exclude(group = "com.moandjiezana.toml")
         exclude(group = "org.eclipse.jgit")
@@ -72,7 +72,7 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.4.0")
-    testImplementation("io.mockk:mockk:1.9.1")
+    testImplementation("io.mockk:mockk:1.9.2")
     testImplementation("com.google.jimfs:jimfs:1.1")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.0")
 }

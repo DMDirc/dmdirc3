@@ -142,7 +142,7 @@ class Connection(
                     windowModel(event.target)?.handleEvent(event)
                 }
             } else if (event is NicknameChangeFailed && client.serverState.status < ServerStatus.Ready) {
-                client.sendNickChange(client.serverState.localNickname + (0..9).random())
+                client.sendNickChange(client.localUser.nickname + (0..9).random())
             } else {
                 model.handleEvent(event)
             }
