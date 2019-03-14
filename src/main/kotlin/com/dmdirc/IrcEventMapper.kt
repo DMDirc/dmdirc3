@@ -2,6 +2,7 @@ package com.dmdirc
 
 import com.dmdirc.MessageFlag.Action
 import com.dmdirc.MessageFlag.ChannelEvent
+import com.dmdirc.MessageFlag.Highlight
 import com.dmdirc.MessageFlag.Message
 import com.dmdirc.MessageFlag.Notice
 import com.dmdirc.MessageFlag.Self
@@ -34,6 +35,8 @@ class IrcEventMapper(private val client: IrcClient) {
 
         if (event is SourcedEvent && client.isLocalUser(event.user)) {
             yield(Self)
+        } else if (event.isHighlight) {
+            yield(Highlight)
         }
 
         when (event) {
@@ -81,6 +84,14 @@ class IrcEventMapper(private val client: IrcClient) {
         this is ChannelTopicDiscovered -> tr("the topic is: %s").format(topic)
 
         else -> null
+    }
+
+    private val IrcEvent.isHighlight: Boolean
+    get() = when (this) {
+        is MessageReceived -> message.contains(client.localUser.nickname, true)
+        is NoticeReceived -> message.contains(client.localUser.nickname, true)
+        is ActionReceived -> action.contains(client.localUser.nickname, true)
+        else -> false
     }
 
     private val IrcEvent.channelEvent: Boolean

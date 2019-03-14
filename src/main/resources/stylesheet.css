@@ -37,7 +37,7 @@
 }
 
 .tree-view .cell:selected BorderPane {
-    -fx-border-color: black;
+    -fx-border-color: black !important;
 }
 
 .tree-view .node-unread {
@@ -162,6 +162,10 @@
 
 .text.messagetype-Notice {
     -fx-fill: #a55b5c;
+}
+
+.text.messagetype-Highlight {
+    -fx-fill: #a51f15;
 }
 
 /* Supported text styles */

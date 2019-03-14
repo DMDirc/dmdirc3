@@ -38,6 +38,7 @@ internal class WindowModelTest {
         every { isChannel(match { it.startsWith("#") }) } returns true
         every { isChannel(match { !it.startsWith("#") }) } returns false
         every { isLocalUser(any<User>()) } returns false
+        every { localUser } returns User("localNick")
     }
     private val eventMapper = IrcEventMapper(mockClient)
 

@@ -4,6 +4,7 @@ import com.bugsnag.Bugsnag
 import javafx.application.Application
 import javafx.application.HostServices
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.Property
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
 import javafx.scene.Node
@@ -77,11 +78,12 @@ private fun createKodein(
             StderrErrorReporter()
         }
     }
+    bind<Property<WindowModel>>() with singleton { SimpleObjectProperty<WindowModel>().threadAsserting() as Property<WindowModel> }
     bind<String>("version") with singleton { getVersion() }
     bind<Path>() with singleton { getConfigDirectory() }
     bind<ClientConfig>() with singleton { ClientConfig.loadFrom(instance<Path>().resolve("config.yml")) }
     bind<HostServices>() with instance(hostServices)
-    bind<MainContract.Controller>() with singleton { MainController(instance(), factory()) }
+    bind<MainContract.Controller>() with singleton { MainController(instance(), instance(), factory()) }
     bind<StringProperty>("mainViewTitle") with singleton { titleProperty }
     bind<ObjectProperty<Node>>("dialogPane") with singleton { SimpleObjectProperty<Node>() }
     bind<MainView>() with singleton {
@@ -111,9 +113,10 @@ private fun createKodein(
         WelcomePane(instance(), provider(), provider(), instance("version"))
     }
     bind<Stage>() with instance(stage)
+    bind<NotificationManager>() with singleton { NotificationManager(instance(), instance()) }
 
     bind<ConnectionContract.Controller>() with factory { connectionDetails: ConnectionDetails ->
-        Connection(connectionDetails, instance(), instance())
+        Connection(connectionDetails, instance(), instance(), instance())
     }
     bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
     bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
