@@ -123,8 +123,9 @@ class NodeListCell(
                 if (node.connection?.connected?.value == false) {
                     styleClass.add("node-disconnected")
                 }
-                if (node.hasUnreadMessages.value) {
+                node.unreadStatus.value?.let {
                     styleClass.add("node-unread")
+                    styleClass.add("node-unread-${it.name}")
                 }
                 if (node.type == WindowType.SERVER) {
                     right = Label().apply {
@@ -218,8 +219,8 @@ class MainView(
         titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
         controller.selectedWindow.addListener { _, oldValue, newValue ->
             runLater {
-                oldValue?.hasUnreadMessages?.value = false
-                newValue?.hasUnreadMessages?.value = false
+                oldValue?.unreadStatus?.value = null
+                newValue?.unreadStatus?.value = null
                 selectedWindow.value = newValue?.let {
                     it.connection?.children?.get(it.name.value)?.ui
                 } ?: VBox()

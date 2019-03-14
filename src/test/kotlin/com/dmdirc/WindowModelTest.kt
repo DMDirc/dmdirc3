@@ -1,6 +1,6 @@
 package com.dmdirc
 
-import com.dmdirc.MessageFlags.Message
+import com.dmdirc.MessageFlag.Message
 import com.dmdirc.ktirc.IrcClient
 import com.dmdirc.ktirc.events.ActionReceived
 import com.dmdirc.ktirc.events.ChannelJoined
