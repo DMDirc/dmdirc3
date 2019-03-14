@@ -34,36 +34,47 @@ import kotlinx.coroutines.launch
 
 class ServerContextMenu(
     private val joinDialogProvider: () -> JoinDialog,
-    private val controller: MainContract.Controller
+    private val connection: ConnectionContract.Controller?
 ) : ContextMenu() {
-    init {
-        val connection = controller.selectedWindow.value?.connection
+    private val joinChannel = MenuItem(tr("Join Channel"))
+    private val disconnect = MenuItem(tr("Disconnect"))
+    private val reconnected = MenuItem()
+
+    override fun show() {
         val connected = connection?.connected?.value ?: false
-        val recon = if (connected) tr("Reconnect") else tr("Connect")
-        items.addAll(MenuItem(tr("Join Channel")).apply {
+        disconnect.visibleProperty().value = connected
+        joinChannel.visibleProperty().value = connected
+        reconnected.text = if (connected) tr("Reconnect") else tr("Connect")
+        super.show()
+    }
+
+    init {
+        items.addAll(joinChannel.apply {
             setOnAction {
                 joinDialogProvider().show()
             }
-            disableProperty().bind(controller.selectedWindow.isNull())
-        }, MenuItem(tr("Disconnect")).apply {
-            visibleProperty().bind(connection?.connected)
+        }, disconnect.apply {
             setOnAction {
-                connection?.disconnect()
+                if (connection?.connected?.value == true) {
+                    connection.disconnect()
+                }
             }
-        }, MenuItem(recon).apply {
+        }, reconnected.apply {
             setOnAction {
                 GlobalScope.launch {
-                    if (connected) {
-                        connection?.disconnect()
+                    if (connection?.connected?.value == true) {
+                        connection.disconnect()
                     }
                     delay(500)
-                    connection?.connect()
+                    if (connection?.connected?.value == false) {
+                        connection.connect()
+                    }
                 }
             }
         }, MenuItem(tr("Close")).apply {
             setOnAction {
-                if (connected) {
-                    connection?.disconnect()
+                if (connection?.connected?.value == true) {
+                    connection.disconnect()
                 }
                 connection?.children?.clear()
             }
@@ -107,7 +118,7 @@ class NodeListCell(
         super.updateItem(node, empty)
         if (node != null && !empty) {
             graphic = BorderPane().apply {
-                contextMenu = ServerContextMenu(joinDialogProvider, controller)
+                contextMenu = ServerContextMenu(joinDialogProvider, item.connection)
                 styleClass.add("node-${node.type.name.toLowerCase()}")
                 if (node.connection?.connected?.value == false) {
                     styleClass.add("node-disconnected")
@@ -119,7 +130,7 @@ class NodeListCell(
                     right = Label().apply {
                         styleClass.add("node-cog")
                         graphic = FontAwesomeIconView(FontAwesomeIcon.COG)
-                        contextMenu = ServerContextMenu(joinDialogProvider, controller)
+                        contextMenu = ServerContextMenu(joinDialogProvider, item.connection)
                         // TODO: This needs to work cross platform as expected
                         onMouseClicked = EventHandler {
                             if (it.button == MouseButton.PRIMARY) {
