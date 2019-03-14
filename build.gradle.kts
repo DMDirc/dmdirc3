@@ -52,7 +52,7 @@ application {
 dependencies {
     implementation("org.controlsfx:controlsfx:9.0.0")
     implementation("org.fxmisc.richtext:richtextfx:0.9.3")
-    implementation("com.dmdirc:ktirc:1.1.0")
+    implementation("com.dmdirc:ktirc:1.1.1")
     implementation("com.uchuhimo:konf:0.13.1") {
         exclude(group = "com.moandjiezana.toml")
         exclude(group = "org.eclipse.jgit")
