@@ -51,20 +51,6 @@ class Connection(
     private val hostServices: HostServices
 ) : ConnectionContract.Controller {
 
-    private val connectionId = connectionCounter.incrementAndGet().toString(16).padStart(20)
-
-    override val model = WindowModel(
-        connectionDetails.hostname, WindowType.SERVER, this, config1, connectionId
-    )
-
-    override val connected = SimpleBooleanProperty(false).threadAsserting()
-
-    override val children = WindowMap { client.caseMapping }.apply {
-        this += Child(model, WindowUI(model, hostServices))
-    }
-
-    override var networkName = ""
-
     private val client: IrcClient = IrcClient {
         server {
             host = connectionDetails.hostname
@@ -81,6 +67,21 @@ class Connection(
             alwaysEchoMessages = true
         }
     }
+
+    private val connectionId = connectionCounter.incrementAndGet().toString(16).padStart(20)
+
+    private val eventMapper = IrcEventMapper(client)
+
+    override val model =
+        WindowModel(connectionDetails.hostname, WindowType.SERVER, this, eventMapper, config1, connectionId)
+
+    override val connected = SimpleBooleanProperty(false).threadAsserting()
+
+    override val children = WindowMap { client.caseMapping }.apply {
+        this += Child(model, WindowUI(model, hostServices))
+    }
+
+    override var networkName = ""
 
     init {
         client.onEvent(this::handleEvent)
@@ -123,9 +124,10 @@ class Connection(
             event is ServerDisconnected -> runLater { connected.value = false }
             event is ChannelJoined && client.isLocalUser(event.user) -> runLater {
                 if (!children.contains(event.target)) {
-                    val model = WindowModel(event.target, WindowType.CHANNEL, this, config1, connectionId)
+                    val model = WindowModel(event.target, WindowType.CHANNEL, this, eventMapper, config1, connectionId)
                     model.addImageHandler(config1)
-                    children += Child(model, WindowUI(model, hostServices)
+                    children += Child(
+                        model, WindowUI(model, hostServices)
                     )
                 }
             }
@@ -140,7 +142,7 @@ class Connection(
                     windowModel(event.target)?.handleEvent(event)
                 }
             } else if (event is NicknameChangeFailed && client.serverState.status < ServerStatus.Ready) {
-                client.sendNickChange(client.serverState.localNickname + (0..9).random())
+                client.sendNickChange(client.localUser.nickname + (0..9).random())
             } else {
                 model.handleEvent(event)
             }

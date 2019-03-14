@@ -137,9 +137,6 @@ internal class ServerListModelTest {
         val server = ConnectionDetailsEditable(
             hostname = "New Server", port = "6697", tls = true, autoconnect = false
         )
-        val newServer = ConnectionDetailsEditable(
-            hostname = "test", port = "6667", tls = false, autoconnect = true
-        )
         model.servers.addAll(
             ConnectionDetailsEditable(
                 hostname = "New Server", port = "6697", tls = true, autoconnect = false
