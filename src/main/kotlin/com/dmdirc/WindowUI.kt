@@ -50,7 +50,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.fxmisc.flowless.VirtualizedScrollPane
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.atomic.AtomicBoolean
 
 enum class WindowType {
     ROOT, SERVER, CHANNEL
@@ -185,7 +184,7 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
     private var scrollbar: ScrollBar? = null
     private val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
     val inputField = TextField()
-    private val autoScroll = AtomicBoolean(true)
+    private var autoScroll = true
 
     init {
         val borderPane = BorderPane().apply {
@@ -219,25 +218,25 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
         }
         children.add(borderPane)
         textArea.totalHeightEstimateProperty().addListener { _, _, _ ->
-            if (autoScroll.get()) {
+            if (autoScroll) {
                 scrollbar?.valueProperty()?.value = scrollbar?.max
             }
         }
         scrollbar?.addEventFilter(MouseEvent.MOUSE_PRESSED) { _ ->
             runLater {
-                autoScroll.getAndSet(scrollbar?.valueProperty()?.value == scrollbar?.max)
+                autoScroll = scrollbar?.valueProperty()?.value == scrollbar?.max
             }
         }
         scrollbar?.addEventFilter(MouseEvent.MOUSE_RELEASED) { _ ->
             runLater {
-                autoScroll.getAndSet(scrollbar?.valueProperty()?.value == scrollbar?.max)
+                autoScroll = scrollbar?.valueProperty()?.value == scrollbar?.max
             }
         }
         textArea.addEventFilter(ScrollEvent.SCROLL) { _ ->
             GlobalScope.launch {
                 delay(100)
                 runLater {
-                    autoScroll.getAndSet(scrollbar?.valueProperty()?.value == scrollbar?.max)
+                    autoScroll = scrollbar?.valueProperty()?.value == scrollbar?.max
                 }
             }
         }
