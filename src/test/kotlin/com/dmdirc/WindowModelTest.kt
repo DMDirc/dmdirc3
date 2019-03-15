@@ -104,14 +104,6 @@ internal class WindowModelTest {
     }
 
     @Test
-    fun `blanks input field after sending message`() {
-        val model = WindowModel("name", WindowType.ROOT, mockConnection, eventMapper, mockk(), null)
-        model.inputField.value = "Mess with the best"
-        model.handleInput()
-        assertEquals("", model.inputField.value)
-    }
-
-    @Test
     fun `formats and adds lines with timestamp`() {
         val model = WindowModel("name", WindowType.ROOT, mockConnection, eventMapper, mockConfig, null)
         every { mockConfig[ClientSpec.Formatting.message] } returns "nick=%s message=%s"
