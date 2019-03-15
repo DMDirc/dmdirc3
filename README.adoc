@@ -104,6 +104,9 @@ and so on. In particular we'd like to call out:
 * https://www.ej-technologies.com/[ej-technology] for providing an open source
   https://www.ej-technologies.com/products/install4j/overview.html[install4j] licence, which we use
   for our multi-platform installers, launchers and auto updating.
+* image:docs/bugsnag.png[Bugsnag logo,link=https://www.bugsnag.com/]
+  https://www.bugsnag.com/[Bugsnag], which we use for reporting application errors,
+  for providing an open source account.
 * https://crowdin.com/[Crowdin] for providing an open source account, which we use for managing translations.
 * https://github.com/FXMisc/RichTextFX[RichTextFX] which powers our main text area, and solves one of the
   biggest headaches we had with the previous client!

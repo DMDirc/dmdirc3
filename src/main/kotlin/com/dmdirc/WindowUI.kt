@@ -5,6 +5,7 @@ import com.dmdirc.ClientSpec.Formatting.channelEvent
 import com.dmdirc.ClientSpec.Formatting.message
 import com.dmdirc.ClientSpec.Formatting.notice
 import com.dmdirc.ClientSpec.Formatting.serverEvent
+import com.dmdirc.Style.CustomStyle
 import com.dmdirc.ktirc.events.ChannelMembershipAdjustment
 import com.dmdirc.ktirc.events.IrcEvent
 import com.uchuhimo.konf.Item
@@ -12,6 +13,7 @@ import javafx.application.HostServices
 import javafx.beans.Observable
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ListChangeListener
 import javafx.geometry.Orientation.VERTICAL
@@ -43,7 +45,7 @@ class WindowModel(
 ) {
     val name: Property<String> = SimpleStringProperty(initialName).threadAsserting()
     val title: Property<String> = SimpleStringProperty(initialName).threadAsserting()
-    val hasUnreadMessages: Property<Boolean> = SimpleBooleanProperty(false).threadAsserting()
+    val unreadStatus: Property<MessageFlag?> = SimpleObjectProperty<MessageFlag?>(null).threadAsserting()
     val nickList = NickListModel()
     val isConnection = type == WindowType.SERVER
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else initialName.toLowerCase()}"
@@ -54,7 +56,7 @@ class WindowModel(
         fun extractor(): Callback<WindowModel, Array<Observable>> {
             return Callback { m ->
                 arrayOf(
-                    m.title, m.hasUnreadMessages, m?.connection?.connected ?: SimpleBooleanProperty(false)
+                    m.title, m.unreadStatus, m?.connection?.connected ?: SimpleBooleanProperty(false)
                 )
             }
         }
@@ -81,23 +83,31 @@ class WindowModel(
         }
     }
 
-    fun addLine(timestamp: String, flags: Set<MessageFlags>, args: Array<String>) {
-        val message = " ${config[MessageFlags.formatter(flags)].format(*args)}"
+    fun addLine(timestamp: String, flags: Set<MessageFlag>, args: Array<String>) {
+        val message = " ${config[MessageFlag.formatter(flags)].format(*args)}"
         val spans = message.detectLinks().convertControlCodes().toMutableList()
         spans.add(0, StyledSpan(timestamp, setOf(Style.CustomStyle("timestamp"))))
-        hasUnreadMessages.value = true
-        lines.add(spans.toTypedArray())
+
+        val unreadFlags = unreadStatus.value?.let { flags + it } ?: flags
+        unreadStatus.value = unreadFlags.maxBy { it.ordinal }
+
+        val flagStyles = flags.map { CustomStyle("messagetype-${it.name}") }
+        lines.add(spans.map { StyledSpan(it.content, it.styles + flagStyles) }.toTypedArray())
+
+        if (MessageFlag.Highlight in flags) {
+            connection?.notify(this, message)
+        }
     }
 
     private val IrcEvent.timestamp: String
         get() = metadata.time.format(DateTimeFormatter.ofPattern(config[ClientSpec.Formatting.timestamp]))
 }
 
-enum class MessageFlags {
+enum class MessageFlag {
     ServerEvent, ChannelEvent, Self, Message, Action, Notice, Highlight;
 
     companion object {
-        fun formatter(flags: Set<MessageFlags>): Item<String> = when {
+        fun formatter(flags: Set<MessageFlag>): Item<String> = when {
             Message in flags -> message
             Action in flags -> action
             Notice in flags -> notice
