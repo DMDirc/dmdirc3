@@ -5,7 +5,7 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.Pane
 
-class ImageThingy(private val url: String) : Pane() {
+class ImageLoader(url: String) : Pane() {
     private val image: Image = Image(url, true)
     private val progress = ProgressBar(0.toDouble())
     init {
@@ -22,8 +22,8 @@ class ImageThingy(private val url: String) : Pane() {
                 })
             }
         }
-        image.errorProperty().addListener { _, _, newValue ->
-            this@ImageThingy.children.remove(progress)
+        image.errorProperty().addListener { _, _, _ ->
+            this@ImageLoader.children.remove(progress)
         }
     }
 }
