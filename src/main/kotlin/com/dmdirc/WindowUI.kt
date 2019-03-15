@@ -77,9 +77,6 @@ class WindowModel(
                         text
                     )
                 }
-                runLater {
-                    inputField.value = ""
-                }
             }
         }
     }
@@ -188,7 +185,7 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
     }
 }
 
-class MagicInput(private val testFromModel: Property<String>, model: WindowModel) : VBox() {
+class MagicInput(private val modelText: Property<String>, model: WindowModel) : VBox() {
     private var active: TextInputControl? = null
     private val single = TextField().apply {
         styleClass.add("input-field")
@@ -199,24 +196,29 @@ class MagicInput(private val testFromModel: Property<String>, model: WindowModel
         prefRowCount = 12
     }
     init {
-        single.textProperty().bindBidirectional(testFromModel)
-        multi.textProperty().bindBidirectional(testFromModel)
+        single.textProperty().bindBidirectional(modelText)
+        multi.textProperty().bindBidirectional(modelText)
         active = single
         children.add(single)
-        addEventFilter(KeyEvent.KEY_PRESSED) {
+        addEventFilter(KeyEvent.KEY_RELEASED) {
             if (active == single && it.isShiftDown && it.code == KeyCode.ENTER) {
                 swap()
             }
-            if (active == multi && !testFromModel.value.contains("\n")) {
+            if (active == multi && !modelText.value.contains("\n")) {
                 swap()
+                runLater {
+                    active?.end()
+                }
             }
             if (it.isShiftDown && !it.isControlDown && it.code == KeyCode.ENTER) {
-                testFromModel.value += "\n"
+                modelText.value += "\n"
                 runLater {
                     active?.end()
                 }
             } else if (!it.isShiftDown && !it.isControlDown && it.code == KeyCode.ENTER) {
                 model.handleInput()
+                modelText.value = ""
+                swap()
             }
         }
     }
@@ -226,14 +228,14 @@ class MagicInput(private val testFromModel: Property<String>, model: WindowModel
             val focused = active?.focusedProperty()?.value ?: false
             val pos = active?.caretPosition ?: 0
             if (active == single) {
-                single.textProperty().unbindBidirectional(testFromModel)
-                multi.textProperty().bindBidirectional(testFromModel)
+                single.textProperty().unbindBidirectional(modelText)
+                multi.textProperty().bindBidirectional(modelText)
                 children.remove(single)
                 children.add(multi)
                 active = multi
             } else {
-                multi.textProperty().unbindBidirectional(testFromModel)
-                single.textProperty().bindBidirectional(testFromModel)
+                multi.textProperty().unbindBidirectional(modelText)
+                single.textProperty().bindBidirectional(modelText)
                 children.remove(multi)
                 children.add(single)
                 active = single
