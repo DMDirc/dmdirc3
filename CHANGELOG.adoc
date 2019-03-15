@@ -6,6 +6,7 @@
   of data immediately (e.g. bouncers) #237
 * Computer hostnames are no longer included in our error reports.
 * Mentions of your nickname are now highlighted.
+* Images loading has a progress bar, and only previews valid images.
 
 == 19.03.01
 
