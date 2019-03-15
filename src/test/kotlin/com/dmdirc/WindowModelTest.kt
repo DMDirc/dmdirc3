@@ -1,6 +1,6 @@
 package com.dmdirc
 
-import com.dmdirc.MessageFlags.Message
+import com.dmdirc.MessageFlag.Message
 import com.dmdirc.ktirc.IrcClient
 import com.dmdirc.ktirc.events.ActionReceived
 import com.dmdirc.ktirc.events.ChannelJoined
@@ -38,6 +38,7 @@ internal class WindowModelTest {
         every { isChannel(match { it.startsWith("#") }) } returns true
         every { isChannel(match { !it.startsWith("#") }) } returns false
         every { isLocalUser(any<User>()) } returns false
+        every { localUser } returns User("localNick")
     }
     private val eventMapper = IrcEventMapper(mockClient)
 
@@ -112,8 +113,8 @@ internal class WindowModelTest {
         assertEquals(1, model.lines.size)
         assertArrayEquals(
             arrayOf(
-                StyledSpan("12:34:56", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" nick=n123 message=m456", emptySet())
+                StyledSpan("12:34:56", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-Message"))),
+                StyledSpan(" nick=n123 message=m456", setOf(Style.CustomStyle("messagetype-Message")))
             ), model.lines[0]
         )
     }
@@ -127,9 +128,9 @@ internal class WindowModelTest {
         assertEquals(1, model.lines.size)
         assertArrayEquals(
             arrayOf(
-                StyledSpan("12:34:56", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" nick=n123 message=", emptySet()),
-                StyledSpan("m456", setOf(Style.BoldStyle))
+                StyledSpan("12:34:56", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-Message"))),
+                StyledSpan(" nick=n123 message=", setOf(Style.CustomStyle("messagetype-Message"))),
+                StyledSpan("m456", setOf(Style.BoldStyle, Style.CustomStyle("messagetype-Message")))
             ), model.lines[0]
         )
     }
@@ -143,9 +144,12 @@ internal class WindowModelTest {
         assertEquals(1, model.lines.size)
         assertArrayEquals(
             arrayOf(
-                StyledSpan("12:34:56", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" nick=n123 message=", emptySet()),
-                StyledSpan("https://www.dmdirc.com/", setOf(Style.Link("https://www.dmdirc.com/")))
+                StyledSpan("12:34:56", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-Message"))),
+                StyledSpan(" nick=n123 message=", setOf(Style.CustomStyle("messagetype-Message"))),
+                StyledSpan(
+                    "https://www.dmdirc.com/",
+                    setOf(Style.Link("https://www.dmdirc.com/"), Style.CustomStyle("messagetype-Message"))
+                )
             ), model.lines[0]
         )
     }
@@ -160,10 +164,10 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
-                StyledSpan(" joined", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" -- ", setOf(Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" joined", setOf(Style.CustomStyle("messagetype-ChannelEvent")))
             ), model.lines[0]
         )
     }
@@ -178,10 +182,10 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
-                StyledSpan(" left", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" -- ", setOf(Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" left", setOf(Style.CustomStyle("messagetype-ChannelEvent")))
             ), model.lines[0]
         )
     }
@@ -200,10 +204,10 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
-                StyledSpan(" left (Mess with the best)", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" -- ", setOf(Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" left (Mess with the best)", setOf(Style.CustomStyle("messagetype-ChannelEvent")))
             ), model.lines[0]
         )
     }
@@ -222,10 +226,10 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" <", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
-                StyledSpan("> Mess with the best", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"), Style.CustomStyle("messagetype-Message"))),
+                StyledSpan(" <", setOf(Style.CustomStyle("messagetype-ChannelEvent"), Style.CustomStyle("messagetype-Message"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"), Style.CustomStyle("messagetype-ChannelEvent"), Style.CustomStyle("messagetype-Message"))),
+                StyledSpan("> Mess with the best", setOf(Style.CustomStyle("messagetype-ChannelEvent"), Style.CustomStyle("messagetype-Message")))
             ), model.lines[0]
         )
     }
@@ -244,10 +248,10 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
-                StyledSpan("- Mess with the best", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"), Style.CustomStyle("messagetype-Notice"))),
+                StyledSpan(" -", setOf(Style.CustomStyle("messagetype-ChannelEvent"), Style.CustomStyle("messagetype-Notice"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"), Style.CustomStyle("messagetype-ChannelEvent"), Style.CustomStyle("messagetype-Notice"))),
+                StyledSpan("- Mess with the best", setOf(Style.CustomStyle("messagetype-ChannelEvent"), Style.CustomStyle("messagetype-Notice")))
             ), model.lines[0]
         )
     }
@@ -262,10 +266,10 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" * ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
-                StyledSpan(" hacks", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"), Style.CustomStyle("messagetype-Action"))),
+                StyledSpan(" * ", setOf(Style.CustomStyle("messagetype-ChannelEvent"), Style.CustomStyle("messagetype-Action"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"), Style.CustomStyle("messagetype-ChannelEvent"), Style.CustomStyle("messagetype-Action"))),
+                StyledSpan(" hacks", setOf(Style.CustomStyle("messagetype-ChannelEvent"), Style.CustomStyle("messagetype-Action")))
             ), model.lines[0]
         )
     }
@@ -280,11 +284,11 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- ", emptySet()),
-                StyledSpan("zeroCool", setOf(Style.Nickname("zeroCool"))),
-                StyledSpan(" is now known as ", emptySet()),
-                StyledSpan("crashOverride", setOf(Style.Nickname("crashOverride")))
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" -- ", setOf(Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan("zeroCool", setOf(Style.Nickname("zeroCool"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" is now known as ", setOf(Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan("crashOverride", setOf(Style.Nickname("crashOverride"), Style.CustomStyle("messagetype-ChannelEvent")))
             ), model.lines[0]
         )
     }
@@ -299,10 +303,10 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
-                StyledSpan(" has changed the topic to: Mess with the best", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" -- ", setOf(Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" has changed the topic to: Mess with the best", setOf(Style.CustomStyle("messagetype-ChannelEvent")))
             ), model.lines[0]
         )
     }
@@ -317,8 +321,8 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- there is no topic set", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" -- there is no topic set", setOf(Style.CustomStyle("messagetype-ChannelEvent")))
             ), model.lines[0]
         )
     }
@@ -333,8 +337,8 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- the topic is: Mess with the best", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" -- the topic is: Mess with the best", setOf(Style.CustomStyle("messagetype-ChannelEvent")))
             ), model.lines[0]
         )
     }
@@ -349,9 +353,9 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- topic was set at 09:00:00 on Friday, 15 September 1995 by ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn")))
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" -- topic was set at 09:00:00 on Friday, 15 September 1995 by ", setOf(Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"), Style.CustomStyle("messagetype-ChannelEvent")))
             ), model.lines[0]
         )
     }
@@ -366,10 +370,10 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
-                StyledSpan(" quit", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" -- ", setOf(Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" quit", setOf(Style.CustomStyle("messagetype-ChannelEvent")))
             ), model.lines[0]
         )
     }
@@ -388,10 +392,10 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- ", emptySet()),
-                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"))),
-                StyledSpan(" quit (Mess with the best)", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" -- ", setOf(Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan("acidBurn", setOf(Style.Nickname("acidBurn"), Style.CustomStyle("messagetype-ChannelEvent"))),
+                StyledSpan(" quit (Mess with the best)", setOf(Style.CustomStyle("messagetype-ChannelEvent")))
             ), model.lines[0]
         )
     }
@@ -406,7 +410,8 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))), StyledSpan(" -- Connected", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ServerEvent"))),
+                StyledSpan(" -- Connected", setOf(Style.CustomStyle("messagetype-ServerEvent")))
             ), model.lines[0]
         )
     }
@@ -421,8 +426,8 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- Disconnected", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ServerEvent"))),
+                StyledSpan(" -- Disconnected", setOf(Style.CustomStyle("messagetype-ServerEvent")))
             ), model.lines[0]
         )
     }
@@ -437,8 +442,8 @@ internal class WindowModelTest {
 
         assertArrayEquals(
             arrayOf(
-                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"))),
-                StyledSpan(" -- Error: the server's certificate was not valid - details", emptySet())
+                StyledSpan("09:00:00", setOf(Style.CustomStyle("timestamp"), Style.CustomStyle("messagetype-ServerEvent"))),
+                StyledSpan(" -- Error: the server's certificate was not valid - details", setOf(Style.CustomStyle("messagetype-ServerEvent")))
             ), model.lines[0]
         )
     }

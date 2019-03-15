@@ -1,8 +1,6 @@
 package com.dmdirc
 
 import javafx.scene.Node
-import javafx.scene.image.Image
-import javafx.scene.image.ImageView
 import javafx.scene.layout.Pane
 import org.fxmisc.richtext.GenericStyledArea
 import org.fxmisc.richtext.TextExt
@@ -84,13 +82,7 @@ class IrcTextArea(linkClickHandler: (String) -> Unit) :
                         te.styleClass.add("text")
                         applyStyles(te, ss.style, linkClickHandler)
                     }
-                    is Segment.Image -> with(ImageView(Image(seg.url, true))) {
-                        // We can't seem to set the width/height in CSS :(
-                        fitWidth = 250.0
-                        fitHeight = 250.0
-                        isPreserveRatio = true
-                        isSmooth = true
-
+                    is Segment.Image -> with(ImageLoader(seg.url)) {
                         Pane(this).also { te ->
                             te.styleClass.add("inline-image")
                             te.styleClass.add("irc-link")

@@ -1,7 +1,6 @@
 package com.dmdirc
 
 import javafx.beans.property.Property
-import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.collections.SetChangeListener
@@ -19,6 +18,7 @@ object MainContract {
 
 class MainController(
     private val config1: ClientConfig,
+    override val selectedWindow: Property<WindowModel>,
     private val connectionFactory: (ConnectionDetails) -> ConnectionContract.Controller
 ) : MainContract.Controller {
     override fun joinDev() {
@@ -30,7 +30,6 @@ class MainController(
     }
 
     override val windows: ObservableList<WindowModel> = FXCollections.observableArrayList(WindowModel.extractor())
-    override val selectedWindow = SimpleObjectProperty<WindowModel>().threadAsserting()
 
     init {
         autoConnect()
