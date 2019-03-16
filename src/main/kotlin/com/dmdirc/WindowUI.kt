@@ -19,11 +19,16 @@ import javafx.collections.ListChangeListener
 import javafx.geometry.Orientation.VERTICAL
 import javafx.scene.control.ListView
 import javafx.scene.control.ScrollBar
+import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
+import javafx.scene.control.TextInputControl
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.scene.input.MouseEvent
 import javafx.scene.input.ScrollEvent
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.VBox
 import javafx.util.Callback
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -63,15 +68,17 @@ class WindowModel(
     }
 
     fun handleInput() {
-        val text = inputField.value
-        if (text.isNotEmpty()) {
-            if (text.startsWith("/me ")) {
-                connection?.sendAction(name.value, text.substring(4))
-            } else {
-                connection?.sendMessage(name.value, text)
-            }
-            runLater {
-                inputField.value = ""
+        val texts = inputField.value.split("\n")
+        texts.forEach { text ->
+            if (text.isNotEmpty()) {
+                if (text.startsWith("/me ")) {
+                    connection?.sendAction(name.value, text.substring(4))
+                } else {
+                    connection?.sendMessage(
+                        name.value,
+                        text
+                    )
+                }
             }
         }
     }
@@ -121,7 +128,7 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
 
     private var scrollbar: ScrollBar? = null
     private val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
-    val inputField = TextField()
+    val inputField = MagicInput(model.inputField, model)
     private var autoScroll = true
 
     init {
@@ -140,15 +147,7 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
                     prefWidth = 148.0
                 }
             }
-            bottom = inputField.apply {
-                model.inputField.bindBidirectional(this.textProperty())
-                styleClass.add("input-field")
-                setOnAction {
-                    GlobalScope.launch {
-                        model.handleInput()
-                    }
-                }
-            }
+            bottom = inputField
             AnchorPane.setTopAnchor(this, 0.0)
             AnchorPane.setLeftAnchor(this, 0.0)
             AnchorPane.setRightAnchor(this, 0.0)
@@ -193,5 +192,71 @@ class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
                 }
             }
         })
+    }
+}
+
+class MagicInput(private val modelText: Property<String>, model: WindowModel) : VBox() {
+    private var active: TextInputControl? = null
+    private val single = TextField().apply {
+        styleClass.add("input-field")
+    }
+    private val multi = TextArea().apply {
+        styleClass.add("input-field")
+        isWrapText = true
+        prefRowCount = 12
+    }
+    init {
+        single.textProperty().bindBidirectional(modelText)
+        multi.textProperty().bindBidirectional(modelText)
+        active = single
+        children.add(single)
+        addEventFilter(KeyEvent.KEY_RELEASED) {
+            if (active == single && it.isShiftDown && it.code == KeyCode.ENTER) {
+                swap()
+            }
+            if (active == multi && !modelText.value.contains("\n")) {
+                swap()
+                runLater {
+                    active?.end()
+                }
+            }
+            if (it.isShiftDown && !it.isControlDown && it.code == KeyCode.ENTER) {
+                modelText.value += "\n"
+                runLater {
+                    active?.end()
+                }
+            } else if (!it.isShiftDown && !it.isControlDown && it.code == KeyCode.ENTER) {
+                model.handleInput()
+                modelText.value = ""
+                swap()
+            }
+        }
+    }
+
+    private fun swap() {
+        runLater {
+            val focused = active?.focusedProperty()?.value ?: false
+            val pos = active?.caretPosition ?: 0
+            if (active == single) {
+                single.textProperty().unbindBidirectional(modelText)
+                multi.textProperty().bindBidirectional(modelText)
+                children.remove(single)
+                children.add(multi)
+                active = multi
+            } else {
+                multi.textProperty().unbindBidirectional(modelText)
+                single.textProperty().bindBidirectional(modelText)
+                children.remove(multi)
+                children.add(single)
+                active = single
+            }
+            if (focused) {
+                active?.requestFocus()
+            }
+        }
+    }
+
+    override fun requestFocus() {
+        active?.requestFocus()
     }
 }
