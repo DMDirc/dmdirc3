@@ -110,7 +110,7 @@ class NodeListCell(
     private val controller: MainContract.Controller
 ) : ListCell<WindowModel>() {
     init {
-        prefWidthProperty().bind(list.widthProperty().subtract(5))
+        prefWidthProperty().bind(list.widthProperty().subtract(20))
         maxWidth = Control.USE_PREF_SIZE
     }
 
