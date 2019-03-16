@@ -124,10 +124,10 @@ enum class MessageFlag {
     }
 }
 
-class WindowUI(model: WindowModel, hostServices: HostServices) : AnchorPane() {
+class WindowUI(model: WindowModel, hostServices: HostServices, imageLoader: (String) -> ImageLoader) : AnchorPane() {
 
     private var scrollbar: ScrollBar? = null
-    private val textArea = IrcTextArea { url -> hostServices.showDocument(url) }
+    private val textArea = IrcTextArea({ url -> hostServices.showDocument(url) }, { url -> imageLoader(url) })
     val inputField = MagicInput(model.inputField, model)
     private var autoScroll = true
 

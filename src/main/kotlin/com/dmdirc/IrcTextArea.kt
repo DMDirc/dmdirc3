@@ -69,7 +69,7 @@ class IrcSegmentOps : SegmentOpsBase<Segment, Collection<Style>>(Segment.Empty),
     } ?: Segment.Empty
 }
 
-class IrcTextArea(linkClickHandler: (String) -> Unit) :
+class IrcTextArea(linkClickHandler: (String) -> Unit, imageLoader: (String) -> ImageLoader) :
     GenericStyledArea<Collection<Style>, Segment, Collection<Style>>(emptySet(),
         { _, _ -> Unit },
         emptySet(),
@@ -82,7 +82,7 @@ class IrcTextArea(linkClickHandler: (String) -> Unit) :
                         te.styleClass.add("text")
                         applyStyles(te, ss.style, linkClickHandler)
                     }
-                    is Segment.Image -> with(ImageLoader(seg.url)) {
+                    is Segment.Image -> with(imageLoader(seg.url)) {
                         Pane(this).also { te ->
                             te.styleClass.add("inline-image")
                             te.styleClass.add("irc-link")

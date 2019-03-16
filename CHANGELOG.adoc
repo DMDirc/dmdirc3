@@ -12,7 +12,7 @@
 
 * Fixed occasional problem connecting to TLS servers that send a lot of data immediately (e.g. bouncers) #237
 * Computer hostnames are no longer included in our error reports
-* Images that are loading now have a progress bar, and only previews of valid images are displayed
+* Images loading now follows redirects and only previews of valid images are displayed
 * Fixed servers not becoming selected properly when auto-connecting #250
 * Various default style tweaks:
 ** Timestamps are now gray
