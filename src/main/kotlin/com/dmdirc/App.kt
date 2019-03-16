@@ -51,7 +51,9 @@ interface ErrorReporter {
 class BugsnagErrorReporter(version: String) : ErrorReporter {
     private val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5").apply {
         setAppVersion(version)
+        setReleaseStage(if (version == "dev") "development" else "production")
         setProjectPackages("com.dmdirc")
+        startSession()
         addCallback { it.device.remove("hostname") }
     }
 
