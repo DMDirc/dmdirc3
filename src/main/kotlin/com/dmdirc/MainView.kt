@@ -166,9 +166,9 @@ class MainView(
     private val selectedWindow = SimpleObjectProperty<Node>()
 
     init {
-        selectedWindow.value = welcomePaneProvider.invoke()
         val ui = BorderPane()
         children.addAll(ui.apply {
+            centerProperty().bindBidirectional(selectedWindow)
             top = MenuBar().apply {
                 menus.addAll(Menu(tr("IRC")).apply {
                     items.addAll(MenuItem(tr("Server List")).apply {
@@ -196,7 +196,6 @@ class MainView(
                 selectionModel.select(controller.selectedWindow.value)
                 cellFactory = NodeListCellFactory(this, joinDialogProvider, controller)
             }
-            centerProperty().bindBidirectional(selectedWindow)
         }, BorderPane().apply {
             top = VBox().apply { minHeightProperty().bind(primaryStage.heightProperty().multiply(0.1)) }
             bottom = VBox().apply { minHeightProperty().bind(primaryStage.heightProperty().multiply(0.1)) }
@@ -217,6 +216,9 @@ class MainView(
         })
         primaryStage.icons.add(Image(MainView::class.java.getResourceAsStream("/logo.png")))
         titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
+        selectedWindow.value = controller.selectedWindow.value?.let {
+            it.connection?.children?.get(it.name.value)?.ui
+        } ?: welcomePaneProvider.invoke()
         controller.selectedWindow.addListener { _, oldValue, newValue ->
             runLater {
                 oldValue?.unreadStatus?.value = null
