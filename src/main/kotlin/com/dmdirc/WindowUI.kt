@@ -228,7 +228,9 @@ class MagicInput(private val modelText: Property<String>, model: WindowModel) : 
             } else if (!it.isShiftDown && !it.isControlDown && it.code == KeyCode.ENTER) {
                 model.handleInput()
                 modelText.value = ""
-                swap()
+                if (active == multi) {
+                    swap()
+                }
             }
         }
     }
