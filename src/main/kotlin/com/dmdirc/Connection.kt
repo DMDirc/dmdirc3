@@ -50,7 +50,8 @@ class Connection(
     private val connectionDetails: ConnectionDetails,
     private val config1: ClientConfig,
     private val hostServices: HostServices,
-    private val notificationManager: NotificationManager
+    private val notificationManager: NotificationManager,
+    private val imageLoader: (String) -> ImageLoader
 ) : ConnectionContract.Controller {
 
     private val client: IrcClient = IrcClient {
@@ -80,7 +81,7 @@ class Connection(
     override val connected = SimpleBooleanProperty(false).threadAsserting()
 
     override val children = WindowMap { client.caseMapping }.apply {
-        this += Child(model, WindowUI(model, hostServices))
+        this += Child(model, WindowUI(model, hostServices, imageLoader))
     }
 
     override var networkName = ""
@@ -131,7 +132,7 @@ class Connection(
                     val model = WindowModel(event.target, WindowType.CHANNEL, this, eventMapper, config1, connectionId)
                     model.addImageHandler(config1)
                     children += Child(
-                        model, WindowUI(model, hostServices)
+                        model, WindowUI(model, hostServices, imageLoader)
                     )
                 }
             }

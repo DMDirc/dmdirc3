@@ -11,14 +11,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
-import java.time.Duration
 
-class ImageLoader(url: String) : Pane() {
+class ImageLoader(url: String, http: OkHttpClient, requestFactory: (String) -> Request) : Pane() {
     init {
-        val http = OkHttpClient().newBuilder()
-            .callTimeout(Duration.ofSeconds(2))
-            .build()
-        val request = Request.Builder().url(url).build()
+        val request = requestFactory(url)
         http.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 // NOOP

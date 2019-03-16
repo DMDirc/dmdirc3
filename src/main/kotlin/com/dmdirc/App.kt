@@ -12,6 +12,8 @@ import javafx.scene.Scene
 import javafx.stage.Stage
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.kodein.di.Kodein
 import org.kodein.di.direct
 import org.kodein.di.generic.bind
@@ -20,8 +22,10 @@ import org.kodein.di.generic.factory
 import org.kodein.di.generic.instance
 import org.kodein.di.generic.provider
 import org.kodein.di.generic.singleton
+import java.net.URL
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.Duration
 import java.util.logging.LogManager
 
 internal lateinit var kodein: Kodein
@@ -118,7 +122,7 @@ private fun createKodein(
     bind<NotificationManager>() with singleton { NotificationManager(instance(), instance()) }
 
     bind<ConnectionContract.Controller>() with factory { connectionDetails: ConnectionDetails ->
-        Connection(connectionDetails, instance(), instance(), instance())
+        Connection(connectionDetails, instance(), instance(), instance(), factory())
     }
     bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
     bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
@@ -128,6 +132,21 @@ private fun createKodein(
 
     bind<ServerListDialogContract.Controller>() with provider { ServerListController(instance(), instance()) }
     bind<ServerListDialogContract.ViewModel>() with provider { ServerListModel(instance(), instance()) }
+
+    bind<OkHttpClient>() with singleton {
+        OkHttpClient().newBuilder()
+            .callTimeout(Duration.ofSeconds(2))
+            .build()
+    }
+    bind<Request>() with factory { url: String ->
+        Request.Builder().url(url).build()
+    }
+    bind<Request>() with factory { url: URL ->
+        Request.Builder().url(url).build()
+    }
+    bind<ImageLoader>() with factory { url: String ->
+        ImageLoader(url, instance(), factory())
+    }
 }
 
 fun main() {
