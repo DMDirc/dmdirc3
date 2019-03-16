@@ -1,4 +1,14 @@
 /* General styling */
+
+@font-face {
+    src: url('./SourceSansPro-Regular.ttf');
+}
+
+.text {
+    -fx-font-family: 'Source Sans Pro Regular';
+    -fx-font-size: 14;
+}
+
 .validation-error {
     -fx-focus-color: #d35244;
     -fx-faint-focus-color: #d3524422;
@@ -67,6 +77,7 @@
 
 .tree-view .cell:selected .text {
     -fx-fill: #ffffff;
+    -fx-font-weight: bold;
 }
 
 .tree-view .node-server .node-cog {
@@ -91,6 +102,10 @@
     -fx-border-width: 1px 0 0 0;
     -fx-border-style: solid;
     -fx-border-color: #999999;
+}
+
+ParagraphBox {
+    -fx-padding: 0.5px 1px;
 }
 
 .welcome {
@@ -153,7 +168,7 @@
 }
 
 .text.messagetype-Message {
-    -fx-fill: #000000;
+    -fx-fill: #444444;
 }
 
 .text.messagetype-Action {
@@ -166,6 +181,10 @@
 
 .text.messagetype-Highlight {
     -fx-fill: #a51f15;
+}
+
+.text.timestamp {
+    -fx-fill: #999999;
 }
 
 /* Supported text styles */
