@@ -122,7 +122,7 @@ private fun createKodein(
     bind<NotificationManager>() with singleton { NotificationManager(instance(), instance()) }
 
     bind<ConnectionContract.Controller>() with factory { connectionDetails: ConnectionDetails ->
-        Connection(connectionDetails, instance(), instance(), instance(), factory())
+        Connection(connectionDetails, instance(), instance(), factory())
     }
     bind<JoinDialogContract.Controller>() with provider { JoinDialogController(instance()) }
     bind<JoinDialogContract.ViewModel>() with provider { JoinDialogModel(instance()) }
@@ -146,6 +146,9 @@ private fun createKodein(
     }
     bind<ImageLoader>() with factory { url: String ->
         ImageLoader(url, instance(), factory())
+    }
+    bind<WindowUI>() with factory { model: WindowModel ->
+        WindowUI(model, instance(), factory())
     }
 }
 

@@ -19,7 +19,6 @@ import com.dmdirc.ktirc.messages.sendPart
 import com.dmdirc.ktirc.model.ChannelUser
 import com.dmdirc.ktirc.model.ServerFeature
 import com.dmdirc.ktirc.model.ServerStatus
-import javafx.application.HostServices
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableSet
@@ -49,9 +48,8 @@ object ConnectionContract {
 class Connection(
     private val connectionDetails: ConnectionDetails,
     private val config1: ClientConfig,
-    private val hostServices: HostServices,
     private val notificationManager: NotificationManager,
-    private val imageLoader: (String) -> ImageLoader
+    private val windowFactory: (WindowModel) -> WindowUI
 ) : ConnectionContract.Controller {
 
     private val client: IrcClient = IrcClient {
@@ -81,7 +79,7 @@ class Connection(
     override val connected = SimpleBooleanProperty(false).threadAsserting()
 
     override val children = WindowMap { client.caseMapping }.apply {
-        this += Child(model, WindowUI(model, hostServices, imageLoader))
+        this += Child(model, windowFactory(model))
     }
 
     override var networkName = ""
@@ -131,9 +129,7 @@ class Connection(
                 if (!children.contains(event.target)) {
                     val model = WindowModel(event.target, WindowType.CHANNEL, this, eventMapper, config1, connectionId)
                     model.addImageHandler(config1)
-                    children += Child(
-                        model, WindowUI(model, hostServices, imageLoader)
-                    )
+                    children += Child(model, windowFactory(model))
                 }
             }
             event is ChannelParted && client.isLocalUser(event.user) -> runLater { children -= event.target }
