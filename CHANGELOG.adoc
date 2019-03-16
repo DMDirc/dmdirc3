@@ -7,6 +7,7 @@
 * Computer hostnames are no longer included in our error reports.
 * Mentions of your nickname are now highlighted.
 * Images loading has a progress bar, and only previews valid images.
+* Multi line text support added. Shift + Enter.
 
 == 19.03.01
 
