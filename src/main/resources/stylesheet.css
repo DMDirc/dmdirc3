@@ -167,6 +167,10 @@ ParagraphBox {
     -fx-fill: #5b60a5;
 }
 
+.text.messagetype-Away {
+    -fx-fill: #737373;
+}
+
 .text.messagetype-Message {
     -fx-fill: #444444;
 }

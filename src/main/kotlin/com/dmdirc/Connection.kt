@@ -12,6 +12,7 @@ import com.dmdirc.ktirc.events.ServerReady
 import com.dmdirc.ktirc.events.TargetedEvent
 import com.dmdirc.ktirc.io.CaseMapping
 import com.dmdirc.ktirc.messages.sendAction
+import com.dmdirc.ktirc.messages.sendAway
 import com.dmdirc.ktirc.messages.sendJoin
 import com.dmdirc.ktirc.messages.sendMessage
 import com.dmdirc.ktirc.messages.sendNickChange
@@ -37,6 +38,7 @@ object ConnectionContract {
         fun connect()
         fun sendMessage(channel: String, message: String)
         fun sendAction(channel: String, action: String)
+        fun sendAway(message: String? = null)
         fun joinChannel(channel: String)
         fun leaveChannel(channel: String)
         fun getUsers(channel: String): Iterable<ChannelUser>
@@ -98,6 +100,10 @@ class Connection(
 
     override fun sendAction(channel: String, action: String) {
         client.sendAction(channel, action)
+    }
+
+    override fun sendAway(message: String?) {
+        client.sendAway(message)
     }
 
     override fun joinChannel(channel: String) {

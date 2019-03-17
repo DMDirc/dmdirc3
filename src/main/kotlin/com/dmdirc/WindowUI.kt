@@ -84,13 +84,11 @@ class WindowModel(
         val texts = inputField.value.split("\n")
         texts.forEach { text ->
             if (text.isNotEmpty()) {
-                if (text.startsWith("/me ")) {
-                    connection?.sendAction(name.value, text.substring(4))
-                } else {
-                    connection?.sendMessage(
-                        name.value,
-                        text
-                    )
+                when {
+                    text.startsWith("/me ") -> connection?.sendAction(name.value, text.substring(4))
+                    text.trim() == "/away" -> connection?.sendAway()
+                    text.startsWith("/away ") -> connection?.sendAway(text.substring(6))
+                    else -> connection?.sendMessage(name.value, text)
                 }
             }
         }
@@ -124,7 +122,7 @@ class WindowModel(
 }
 
 enum class MessageFlag {
-    ServerEvent, ChannelEvent, Self, Message, Action, Notice, Highlight;
+    Away, ServerEvent, ChannelEvent, Self, Message, Action, Notice, Highlight;
 
     companion object {
         fun formatter(flags: Set<MessageFlag>): Item<String> = when {
@@ -251,7 +249,6 @@ class MagicInput(private val modelText: Property<String>, model: WindowModel) : 
     private fun swap() {
         runLater {
             val focused = active?.focusedProperty()?.value ?: false
-            val pos = active?.caretPosition ?: 0
             if (active == single) {
                 single.textProperty().unbindBidirectional(modelText)
                 multi.textProperty().bindBidirectional(modelText)

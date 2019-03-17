@@ -7,6 +7,8 @@
 * Mentions of your nickname are now highlighted
 * You can now enter multiple lines of text by holding `shift` when pressing `enter`
 * Changed default font to Source Sans Pro
+* Away messages are now displayed on servers that support the away-notify capability
+* You can set away and back using the `/away` command
 
 === Bug fixes and tweaks
 
