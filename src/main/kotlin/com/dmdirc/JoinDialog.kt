@@ -2,12 +2,10 @@ package com.dmdirc
 
 import com.jukusoft.i18n.I
 import com.jukusoft.i18n.I.tr
-import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
 import javafx.scene.control.Label
@@ -58,10 +56,10 @@ class JoinDialogModel(private val controller: JoinDialogContract.Controller) : J
     override fun onCancelPressed() = close()
 }
 
-class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: ObjectProperty<Node>) : VBox() {
+class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: MainView) : VBox() {
     private val textfield = TextField()
     fun show() {
-        parent.value = this
+        parent.showDialog(this)
         runLater {
             textfield.requestFocus()
         }
@@ -70,7 +68,7 @@ class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: Object
     init {
         model.open.addListener { _, _, newValue ->
             if (newValue == false) {
-                parent.value = null
+                parent.hideDialog()
             }
         }
         styleClass.add("join-dialog")

@@ -4,7 +4,6 @@ import com.jukusoft.i18n.I.tr
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EYE
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EYE_SLASH
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
-import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -12,7 +11,6 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.ObservableList
 import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
 import javafx.scene.control.ButtonBar.setButtonData
@@ -190,17 +188,17 @@ class ConnectionDetailsListCell : ListCell<ConnectionDetailsEditable>() {
 
 class ServerlistDialog(
     private val model: ServerListDialogContract.ViewModel,
-    private val parent: ObjectProperty<Node>
+    private val parent: MainView
 ) : VBox() {
     fun show() {
-        parent.value = this
+        parent.showDialog(this)
         model.show()
     }
 
     init {
         model.open.addListener { _, _, newValue ->
             if (newValue == false) {
-                parent.value = null
+                parent.hideDialog()
             }
         }
         styleClass.add("serverlist-dialog")

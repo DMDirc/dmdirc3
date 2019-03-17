@@ -96,9 +96,9 @@ private fun createKodein(
         MainView(
             instance(),
             instance(),
-            provider(),
-            provider(),
-            provider(),
+            factory(),
+            factory(),
+            factory(),
             instance(),
             instance("mainViewTitle"),
             instance("dialogPane"),
@@ -106,14 +106,14 @@ private fun createKodein(
         )
     }
     bind<FocusManager>() with singleton { FocusManager(stage, instance(), instance("dialogPane")) }
-    bind<JoinDialog>() with provider {
-        JoinDialog(instance(), instance("dialogPane"))
+    bind<JoinDialog>() with factory { mainview: MainView ->
+        JoinDialog(instance(), mainview)
     }
-    bind<SettingsDialog>() with provider {
-        SettingsDialog(instance(), instance("dialogPane"))
+    bind<SettingsDialog>() with factory { mainview: MainView ->
+        SettingsDialog(instance(), mainview)
     }
-    bind<ServerlistDialog>() with provider {
-        ServerlistDialog(instance(), instance("dialogPane"))
+    bind<ServerlistDialog>() with factory { mainview: MainView ->
+        ServerlistDialog(instance(), mainview)
     }
     bind<WelcomePane>() with provider {
         WelcomePane(instance(), provider(), provider(), instance("version"))
