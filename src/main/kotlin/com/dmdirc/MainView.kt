@@ -237,7 +237,6 @@ class MainView(
             }
         })
         primaryStage.icons.add(Image(MainView::class.java.getResourceAsStream("/logo.png")))
-        titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
         selectedWindow.value = controller.selectedWindow.value?.let {
             it.connection?.children?.get(it.name.value)?.ui
         } ?: welcomePaneProvider.invoke()
@@ -250,6 +249,8 @@ class MainView(
                 } ?: VBox()
             }
         }
+        titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
+        titleProperty.value = controller.selectedWindow.value?.getTitle() ?: tr("DMDirc")
     }
 
     fun showDialog(dialog: Node) {
@@ -273,8 +274,7 @@ class TitleStringConverter : StringConverter<WindowModel>() {
 
     override fun toString(window: WindowModel?): String = when {
         window == null -> tr("DMDirc")
-        window.isConnection -> tr("DMDirc: %s").format(window.connection?.networkName ?: "")
-        else -> tr("DMDirc: %s | %s").format(window.name.value, window.connection?.networkName ?: "")
+        else -> window.getTitle()
     }
 }
 
