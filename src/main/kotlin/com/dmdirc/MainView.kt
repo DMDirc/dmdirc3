@@ -132,7 +132,7 @@ class NodeListCell(
                         graphic = FontAwesomeIconView(FontAwesomeIcon.COG)
                         contextMenu = ServerContextMenu(joinDialogProvider, item.connection)
                         onMouseClicked = EventHandler {
-                            if (it.isPopupTrigger) {
+                            if (!it.isPopupTrigger) {
                                 contextMenu.show(graphic, it.screenX, it.screenY)
                             }
                         }
