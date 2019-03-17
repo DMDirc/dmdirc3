@@ -19,6 +19,8 @@
 * Fixed window list sometimes scrolling horizontally #239
 * Dialogs now animate in and out
 * The client's debug logs are now written to a cache directory instead of being ignored entirely
+* Lines now start at the bottom of windows instead of top
+* Fixed inconsistent blank space at the bottom of windows
 * Various default style tweaks:
 ** Timestamps are now gray
 ** Selected window is bolded
