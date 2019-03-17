@@ -193,12 +193,12 @@ class WindowUI(model: WindowModel, hostServices: HostServices, imageLoader: (Str
             while (change.next()) {
                 if (change.wasAdded()) {
                     change.addedSubList.forEach { line ->
+                        textArea.appendText("\n")
                         line.forEach { segment ->
                             val position = textArea.length
                             textArea.appendText(segment.content)
                             textArea.setStyle(position, textArea.length, segment.styles)
                         }
-                        textArea.appendText("\n")
                     }
                 }
             }

@@ -23,6 +23,10 @@
     -fx-prompt-text-fill: transparent;
 }
 
+.styled-text-area > .virtual-flow {
+    -flowless-gravity: rear;
+}
+
 .tree-view {
     -fx-background-color: transparent;
     -fx-pref-width: 175px;
