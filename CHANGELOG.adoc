@@ -14,6 +14,9 @@
 * Computer hostnames are no longer included in our error reports
 * Images loading now follows redirects and only previews of valid images are displayed
 * Fixed servers not becoming selected properly when auto-connecting #250
+* Fixed window list sometimes scrolling horizontally #239
+* Dialogs now animate in and out
+* The client's debug logs are now written to a cache directory instead of being ignored entirely
 * Various default style tweaks:
 ** Timestamps are now gray
 ** Selected window is bolded
