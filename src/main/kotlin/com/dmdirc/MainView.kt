@@ -9,6 +9,8 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
 import javafx.event.EventHandler
 import javafx.geometry.Pos
+import javafx.geometry.Pos.CENTER_LEFT
+import javafx.geometry.Pos.CENTER_RIGHT
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ContextMenu
@@ -121,7 +123,7 @@ class NodeListCell(
     override fun updateItem(node: WindowModel?, empty: Boolean) {
         super.updateItem(node, empty)
         if (node != null && !empty) {
-            graphic = BorderPane().apply {
+            graphic = StackPane().apply {
                 contextMenu = ServerContextMenu(mainView, joinDialogProvider, item.connection)
                 styleClass.add("node-${node.type.name.toLowerCase()}")
                 if (node.connection?.connected?.value == false) {
@@ -132,7 +134,8 @@ class NodeListCell(
                     styleClass.add("node-unread-${it.name}")
                 }
                 if (node.type == WindowType.SERVER) {
-                    right = Label().apply {
+                    children.add(Label().apply {
+                        StackPane.setAlignment(this, CENTER_RIGHT)
                         styleClass.add("node-cog")
                         graphic = FontAwesomeIconView(FontAwesomeIcon.COG)
                         contextMenu = ServerContextMenu(mainView, joinDialogProvider, item.connection)
@@ -141,11 +144,13 @@ class NodeListCell(
                                 contextMenu.show(graphic, it.screenX, it.screenY)
                             }
                         }
-                    }
+                    })
                 } else {
                     contextMenu = ChannelContextMenu(controller)
                 }
-                left = Label(node.title.value)
+                children.add(Label(node.title.value).apply {
+                    StackPane.setAlignment(this, CENTER_LEFT)
+                })
             }
             tooltip = Tooltip(node.title.value)
         }
