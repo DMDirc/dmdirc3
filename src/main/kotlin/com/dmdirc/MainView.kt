@@ -21,7 +21,6 @@ import javafx.scene.control.MenuItem
 import javafx.scene.control.Tooltip
 import javafx.scene.effect.GaussianBlur
 import javafx.scene.image.Image
-import javafx.scene.input.MouseButton
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
@@ -132,9 +131,8 @@ class NodeListCell(
                         styleClass.add("node-cog")
                         graphic = FontAwesomeIconView(FontAwesomeIcon.COG)
                         contextMenu = ServerContextMenu(joinDialogProvider, item.connection)
-                        // TODO: This needs to work cross platform as expected
                         onMouseClicked = EventHandler {
-                            if (it.button == MouseButton.PRIMARY) {
+                            if (it.isPopupTrigger) {
                                 contextMenu.show(graphic, it.screenX, it.screenY)
                             }
                         }
