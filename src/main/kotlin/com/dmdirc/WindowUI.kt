@@ -8,6 +8,7 @@ import com.dmdirc.ClientSpec.Formatting.serverEvent
 import com.dmdirc.Style.CustomStyle
 import com.dmdirc.ktirc.events.ChannelMembershipAdjustment
 import com.dmdirc.ktirc.events.IrcEvent
+import com.jukusoft.i18n.I
 import com.uchuhimo.konf.Item
 import javafx.application.HostServices
 import javafx.beans.Observable
@@ -64,6 +65,18 @@ class WindowModel(
                     m.title, m.unreadStatus, m?.connection?.connected ?: SimpleBooleanProperty(false)
                 )
             }
+        }
+    }
+
+    fun getTitle(): String {
+        val connectionName = if (connection?.networkName?.isBlank() != false) {
+            name.value
+        } else {
+            connection.networkName
+        }
+        return when {
+            isConnection -> I.tr("DMDirc: %s").format(connectionName)
+            else -> I.tr("DMDirc: %s | %s").format(name.value, connectionName)
         }
     }
 
