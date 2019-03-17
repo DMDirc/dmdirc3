@@ -3,6 +3,7 @@ package com.dmdirc
 import com.jukusoft.i18n.I.tr
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
+import javafx.animation.ScaleTransition
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
@@ -27,13 +28,15 @@ import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import javafx.util.Callback
+import javafx.util.Duration
 import javafx.util.StringConverter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ServerContextMenu(
-    private val joinDialogProvider: () -> JoinDialog,
+    private val mainView: MainView,
+    private val joinDialogProvider: (MainView) -> JoinDialog,
     private val connection: ConnectionContract.Controller?
 ) : ContextMenu() {
     private val joinChannel = MenuItem(tr("Join Channel"))
@@ -51,7 +54,7 @@ class ServerContextMenu(
     init {
         items.addAll(joinChannel.apply {
             setOnAction {
-                joinDialogProvider().show()
+                joinDialogProvider(mainView).show()
             }
         }, disconnect.apply {
             setOnAction {
@@ -95,18 +98,20 @@ class ChannelContextMenu(
 }
 
 class NodeListCellFactory(
+    private val mainView: MainView,
     private val list: ListView<WindowModel>,
-    private val joinDialogProvider: () -> JoinDialog,
+    private val joinDialogProvider: (MainView) -> JoinDialog,
     private val controller: MainContract.Controller
 ) : Callback<ListView<WindowModel>, ListCell<WindowModel>> {
     override fun call(param: ListView<WindowModel>?): ListCell<WindowModel> {
-        return NodeListCell(list, joinDialogProvider, controller)
+        return NodeListCell(mainView, list, joinDialogProvider, controller)
     }
 }
 
 class NodeListCell(
+    private val mainView: MainView,
     list: ListView<WindowModel>,
-    private val joinDialogProvider: () -> JoinDialog,
+    private val joinDialogProvider: (MainView) -> JoinDialog,
     private val controller: MainContract.Controller
 ) : ListCell<WindowModel>() {
     init {
@@ -118,7 +123,7 @@ class NodeListCell(
         super.updateItem(node, empty)
         if (node != null && !empty) {
             graphic = BorderPane().apply {
-                contextMenu = ServerContextMenu(joinDialogProvider, item.connection)
+                contextMenu = ServerContextMenu(mainView, joinDialogProvider, item.connection)
                 styleClass.add("node-${node.type.name.toLowerCase()}")
                 if (node.connection?.connected?.value == false) {
                     styleClass.add("node-disconnected")
@@ -131,7 +136,7 @@ class NodeListCell(
                     right = Label().apply {
                         styleClass.add("node-cog")
                         graphic = FontAwesomeIconView(FontAwesomeIcon.COG)
-                        contextMenu = ServerContextMenu(joinDialogProvider, item.connection)
+                        contextMenu = ServerContextMenu(mainView, joinDialogProvider, item.connection)
                         // TODO: This needs to work cross platform as expected
                         onMouseClicked = EventHandler {
                             if (it.button == MouseButton.PRIMARY) {
@@ -155,15 +160,29 @@ class NodeListCell(
 class MainView(
     private val controller: MainContract.Controller,
     val config: ClientConfig,
-    private val joinDialogProvider: () -> JoinDialog,
-    val settingsDialogProvider: () -> SettingsDialog,
-    val serverlistDialogProvider: () -> ServerlistDialog,
+    private val joinDialogProvider: (MainView) -> JoinDialog,
+    val settingsDialogProvider: (MainView) -> SettingsDialog,
+    val serverlistDialogProvider: (MainView) -> ServerlistDialog,
     private val primaryStage: Stage,
     titleProperty: StringProperty,
-    dialogPane: ObjectProperty<Node>,
+    private val dialogPane: ObjectProperty<Node>,
     welcomePaneProvider: () -> WelcomePane
 ) : StackPane() {
     private val selectedWindow = SimpleObjectProperty<Node>()
+    private val fadeIn = ScaleTransition(Duration.millis(100.0)).apply {
+        fromX = 0.0
+        toX = 1.0
+        fromY = 0.0
+        toY = 1.0
+        cycleCount = 1
+    }
+    private val fadeOut = ScaleTransition(Duration.millis(100.0)).apply {
+        fromX = 1.0
+        toX = 0.0
+        fromY = 1.0
+        toY = 0.0
+        cycleCount = 1
+    }
 
     init {
         val ui = BorderPane()
@@ -173,13 +192,13 @@ class MainView(
                 menus.addAll(Menu(tr("IRC")).apply {
                     items.addAll(MenuItem(tr("Server List")).apply {
                         setOnAction {
-                            serverlistDialogProvider().show()
+                            serverlistDialogProvider(this@MainView).show()
                         }
                     })
                 }, Menu(tr("Settings")).apply {
                     items.add(MenuItem(tr("Settings")).apply {
                         setOnAction {
-                            settingsDialogProvider().show()
+                            settingsDialogProvider(this@MainView).show()
                         }
                     })
                 })
@@ -194,7 +213,7 @@ class MainView(
                     selectionModel.select(newValue)
                 }
                 selectionModel.select(controller.selectedWindow.value)
-                cellFactory = NodeListCellFactory(this, joinDialogProvider, controller)
+                cellFactory = NodeListCellFactory(this@MainView, this, joinDialogProvider, controller)
             }
         }, BorderPane().apply {
             top = VBox().apply { minHeightProperty().bind(primaryStage.heightProperty().multiply(0.1)) }
@@ -227,6 +246,20 @@ class MainView(
                     it.connection?.children?.get(it.name.value)?.ui
                 } ?: VBox()
             }
+        }
+    }
+
+    fun showDialog(dialog: Node) {
+        dialogPane.value = dialog
+        fadeIn.node = dialog
+        fadeIn.playFromStart()
+    }
+
+    fun hideDialog() {
+        fadeOut.node = dialogPane.value
+        fadeOut.playFromStart()
+        fadeOut.onFinishedProperty().value = EventHandler {
+            dialogPane.value = null
         }
     }
 }
