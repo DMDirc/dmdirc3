@@ -1,12 +1,10 @@
 package com.dmdirc
 
 import com.jukusoft.i18n.I.tr
-import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
 import javafx.scene.control.ButtonBar.setButtonData
@@ -64,15 +62,15 @@ class SettingsDialogModel(private val controller: SettingsDialogContract.Control
     }
 }
 
-class SettingsDialog(model: SettingsDialogContract.ViewModel, private val parent: ObjectProperty<Node>) : VBox() {
+class SettingsDialog(model: SettingsDialogContract.ViewModel, private val parent: MainView) : VBox() {
     fun show() {
-        parent.value = this
+        parent.showDialog(this)
     }
 
     init {
         model.open.addListener { _, _, newValue ->
             if (newValue == false) {
-                parent.value = null
+                parent.hideDialog()
             }
         }
         styleClass.add("settings-dialog")
