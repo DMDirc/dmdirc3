@@ -55,9 +55,9 @@ interface ErrorReporter {
 }
 
 class BugsnagErrorReporter(private val version: String) : ErrorReporter {
-    private val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5");
+    private val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5")
 
-    override fun init(){
+    override fun init() {
         bugsnag.apply {
             setAppVersion(version)
             setReleaseStage(if (version == "dev") "development" else "production")
