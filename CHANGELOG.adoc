@@ -21,6 +21,7 @@
 * The client's debug logs are now written to a cache directory instead of being ignored entirely
 * Lines now start at the bottom of windows instead of top
 * Fixed inconsistent blank space at the bottom of windows
+* Fixed some errors not being reported if they occur immediately on launch #271
 * Various default style tweaks:
 ** Timestamps are now gray
 ** Selected window is bolded

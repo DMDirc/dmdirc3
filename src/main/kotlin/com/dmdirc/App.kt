@@ -33,6 +33,7 @@ internal lateinit var kodein: Kodein
 class MainApp : Application() {
     override fun start(stage: Stage) {
         kodein = createKodein(stage, hostServices, stage.titleProperty())
+        kodein.direct.instance<ErrorReporter>().init()
         val config by kodein.instance<ClientConfig>()
         initInternationalisation(Paths.get("translations"), config[ClientSpec.language])
         with(stage) {
@@ -49,16 +50,21 @@ class MainApp : Application() {
 }
 
 interface ErrorReporter {
+    fun init()
     fun notify(throwable: Throwable)
 }
 
-class BugsnagErrorReporter(version: String) : ErrorReporter {
-    private val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5").apply {
-        setAppVersion(version)
-        setReleaseStage(if (version == "dev") "development" else "production")
-        setProjectPackages("com.dmdirc")
-        startSession()
-        addCallback { it.device.remove("hostname") }
+class BugsnagErrorReporter(private val version: String) : ErrorReporter {
+    private val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5")
+
+    override fun init() {
+        bugsnag.apply {
+            setAppVersion(version)
+            setReleaseStage(if (version == "dev") "development" else "production")
+            setProjectPackages("com.dmdirc")
+            startSession()
+            addCallback { it.device.remove("hostname") }
+        }
     }
 
     override fun notify(throwable: Throwable) {
@@ -67,6 +73,7 @@ class BugsnagErrorReporter(version: String) : ErrorReporter {
 }
 
 class StderrErrorReporter : ErrorReporter {
+    override fun init() {}
     override fun notify(throwable: Throwable) {
         throwable.printStackTrace(System.err)
     }
