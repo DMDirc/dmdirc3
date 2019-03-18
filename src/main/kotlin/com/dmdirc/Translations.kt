@@ -1,19 +1,23 @@
 package com.dmdirc
 
+import com.dmdirc.edgar.Edgar
+import com.dmdirc.edgar.Edgar.tr
 import com.dmdirc.ktirc.model.ConnectionError
-import com.jukusoft.i18n.I
-import com.jukusoft.i18n.I.tr
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.Locale
 
 fun initInternationalisation(path: Path, locale: String?) {
     if (!Files.exists(path)) {
         Files.createDirectory(path)
     }
 
-    I.init(path.toFile(), Locale.ENGLISH, "messages")
-    I.setLanguage(Locale.forLanguageTag(locale))
+    Edgar.init(path)
+    try {
+        Edgar.setLanguage(locale?.replace('-', '_') ?: "en_GB")
+    } catch (_: IllegalArgumentException) {
+        // Language not found
+        Edgar.setLanguage("en_GB")
+    }
 }
 
 fun ConnectionError.translated() = when (this) {

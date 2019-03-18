@@ -6,9 +6,9 @@ import com.dmdirc.ClientSpec.Formatting.message
 import com.dmdirc.ClientSpec.Formatting.notice
 import com.dmdirc.ClientSpec.Formatting.serverEvent
 import com.dmdirc.Style.CustomStyle
+import com.dmdirc.edgar.Edgar.tr
 import com.dmdirc.ktirc.events.ChannelMembershipAdjustment
 import com.dmdirc.ktirc.events.IrcEvent
-import com.jukusoft.i18n.I
 import com.uchuhimo.konf.Item
 import javafx.application.HostServices
 import javafx.beans.Observable
@@ -75,8 +75,8 @@ class WindowModel(
             connection.networkName
         }
         return when {
-            isConnection -> I.tr("DMDirc: %s").format(connectionName)
-            else -> I.tr("DMDirc: %s | %s").format(name.value, connectionName)
+            isConnection -> tr("DMDirc: %s").format(connectionName)
+            else -> tr("DMDirc: %s | %s").format(name.value, connectionName)
         }
     }
 
@@ -170,17 +170,17 @@ class WindowUI(model: WindowModel, hostServices: HostServices, imageLoader: (Str
                 scrollbar?.valueProperty()?.value = scrollbar?.max
             }
         }
-        scrollbar?.addEventFilter(MouseEvent.MOUSE_PRESSED) { _ ->
+        scrollbar?.addEventFilter(MouseEvent.MOUSE_PRESSED) {
             runLater {
                 autoScroll = scrollbar?.valueProperty()?.value == scrollbar?.max
             }
         }
-        scrollbar?.addEventFilter(MouseEvent.MOUSE_RELEASED) { _ ->
+        scrollbar?.addEventFilter(MouseEvent.MOUSE_RELEASED) {
             runLater {
                 autoScroll = scrollbar?.valueProperty()?.value == scrollbar?.max
             }
         }
-        textArea.addEventFilter(ScrollEvent.SCROLL) { _ ->
+        textArea.addEventFilter(ScrollEvent.SCROLL) {
             GlobalScope.launch {
                 delay(100)
                 runLater {

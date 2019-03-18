@@ -28,7 +28,7 @@ import com.dmdirc.ktirc.events.SourcedEvent
 import com.dmdirc.ktirc.events.TargetedEvent
 import com.dmdirc.ktirc.events.UserAway
 import com.dmdirc.ktirc.model.User
-import com.jukusoft.i18n.I.tr
+import com.dmdirc.edgar.Edgar.tr
 import java.time.format.DateTimeFormatter
 
 class IrcEventMapper(private val client: IrcClient) {

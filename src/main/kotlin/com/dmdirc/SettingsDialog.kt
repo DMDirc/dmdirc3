@@ -1,6 +1,6 @@
 package com.dmdirc
 
-import com.jukusoft.i18n.I.tr
+import com.dmdirc.edgar.Edgar.tr
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty

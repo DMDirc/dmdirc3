@@ -22,6 +22,7 @@
 * Lines now start at the bottom of windows instead of top
 * Fixed inconsistent blank space at the bottom of windows
 * Fixed some errors not being reported if they occur immediately on launch #271
+* Fixed the welcome text not being translated #227
 * Various default style tweaks:
 ** Timestamps are now gray
 ** Selected window is bolded
