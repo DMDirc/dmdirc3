@@ -123,7 +123,7 @@ private fun createKodein(
         ServerlistDialog(instance(), mainview)
     }
     bind<WelcomePane>() with provider {
-        WelcomePane(instance(), provider(), provider(), instance("version"))
+        WelcomePane(instance(), instance("version"))
     }
     bind<Stage>() with instance(stage)
     bind<NotificationManager>() with singleton { NotificationManager(instance(), instance()) }

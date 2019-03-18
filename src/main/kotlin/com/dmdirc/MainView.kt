@@ -34,6 +34,8 @@ import javafx.util.StringConverter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.kodein.di.direct
+import org.kodein.di.generic.instance
 
 class ServerContextMenu(
     private val mainView: MainView,
@@ -280,8 +282,6 @@ class TitleStringConverter : StringConverter<WindowModel>() {
 
 class WelcomePane(
     controller: MainContract.Controller,
-    settingsDialogProvider: () -> SettingsDialog,
-    serverlistDialogProvider: () -> ServerlistDialog,
     version: String
 ) : VBox() {
     init {
@@ -300,12 +300,12 @@ class WelcomePane(
             children.addAll(Button(tr("Profile")).apply {
                 maxWidth = Double.MAX_VALUE
                 setOnAction {
-                    settingsDialogProvider().show()
+                    kodein.direct.instance<SettingsDialog>()
                 }
             }, Button(tr("Server list")).apply {
                 maxWidth = Double.MAX_VALUE
                 setOnAction {
-                    serverlistDialogProvider().show()
+                    kodein.direct.instance<ServerlistDialog>()
                 }
             }, Button(tr("Chat with us")).apply {
                 maxWidth = Double.MAX_VALUE
