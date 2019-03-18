@@ -300,12 +300,12 @@ class WelcomePane(
             children.addAll(Button(tr("Profile")).apply {
                 maxWidth = Double.MAX_VALUE
                 setOnAction {
-                    kodein.direct.instance<SettingsDialog>()
+                    kodein.direct.instance<SettingsDialog>().show()
                 }
             }, Button(tr("Server list")).apply {
                 maxWidth = Double.MAX_VALUE
                 setOnAction {
-                    kodein.direct.instance<ServerlistDialog>()
+                    kodein.direct.instance<ServerlistDialog>().show()
                 }
             }, Button(tr("Chat with us")).apply {
                 maxWidth = Double.MAX_VALUE
