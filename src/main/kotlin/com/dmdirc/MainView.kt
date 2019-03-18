@@ -1,6 +1,6 @@
 package com.dmdirc
 
-import com.jukusoft.i18n.I.tr
+import com.dmdirc.edgar.Edgar.tr
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.animation.ScaleTransition

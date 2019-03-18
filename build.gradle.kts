@@ -34,6 +34,7 @@ repositories {
     mavenCentral()
     jcenter()
     maven("https://maven.ej-technologies.com/repository")
+    maven("https://dl.bintray.com/dmdirc/releases")
     mavenLocal()
 }
 java {
@@ -58,7 +59,7 @@ dependencies {
         exclude(group = "org.eclipse.jgit")
     }
     implementation("org.kodein.di:kodein-di-generic-jvm:6.1.0")
-    implementation("com.jukusoft:easy-i18n-gettext:1.2.0")
+    implementation("com.dmdirc:edgar:0.1.1")
     implementation("de.jensd:fontawesomefx-fontawesome:4.7.0-11")
     implementation("de.jensd:fontawesomefx-commons:11.0")
     implementation("de.jensd:fontawesomefx-controls:11.0")

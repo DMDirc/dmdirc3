@@ -1,6 +1,6 @@
 package com.dmdirc
 
-import com.jukusoft.i18n.I.tr
+import com.dmdirc.edgar.Edgar.tr
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EYE
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EYE_SLASH
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView

@@ -1,7 +1,6 @@
 package com.dmdirc
 
-import com.jukusoft.i18n.I
-import com.jukusoft.i18n.I.tr
+import com.dmdirc.edgar.Edgar.tr
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
@@ -81,11 +80,11 @@ class JoinDialog(model: JoinDialogContract.ViewModel, private val parent: MainVi
                     bindRequiredTextControl(this, model.channel, model)
                     setOnAction { model.onTextAction() }
                 }, ButtonBar().apply {
-                    buttons.addAll(Button(I.tr("Join")).apply {
+                    buttons.addAll(Button(tr("Join")).apply {
                         ButtonBar.setButtonData(this, ButtonBar.ButtonData.OK_DONE)
                         disableProperty().bind(model.valid.not())
                         setOnAction { model.onJoinPressed() }
-                    }, Button(I.tr("Cancel")).apply {
+                    }, Button(tr("Cancel")).apply {
                         ButtonBar.setButtonData(this, ButtonBar.ButtonData.CANCEL_CLOSE)
                         setOnAction { model.onCancelPressed() }
                     })
