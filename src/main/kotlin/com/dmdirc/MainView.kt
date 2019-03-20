@@ -5,6 +5,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.animation.ScaleTransition
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.Property
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
 import javafx.event.EventHandler
@@ -37,7 +38,7 @@ import kotlinx.coroutines.launch
 
 class ServerContextMenu(
     private val mainView: MainView,
-    private val joinDialogProvider: (MainView) -> JoinDialog,
+    private val joinDialogProvider: () -> JoinDialog,
     private val connection: ConnectionContract.Controller?
 ) : ContextMenu() {
     private val joinChannel = MenuItem(tr("Join Channel"))
@@ -55,7 +56,7 @@ class ServerContextMenu(
     init {
         items.addAll(joinChannel.apply {
             setOnAction {
-                joinDialogProvider(mainView).show()
+                joinDialogProvider().show()
             }
         }, disconnect.apply {
             setOnAction {
@@ -101,7 +102,7 @@ class ChannelContextMenu(
 class NodeListCellFactory(
     private val mainView: MainView,
     private val list: ListView<WindowModel>,
-    private val joinDialogProvider: (MainView) -> JoinDialog,
+    private val joinDialogProvider: () -> JoinDialog,
     private val controller: MainContract.Controller
 ) : Callback<ListView<WindowModel>, ListCell<WindowModel>> {
     override fun call(param: ListView<WindowModel>?): ListCell<WindowModel> {
@@ -112,7 +113,7 @@ class NodeListCellFactory(
 class NodeListCell(
     private val mainView: MainView,
     list: ListView<WindowModel>,
-    private val joinDialogProvider: (MainView) -> JoinDialog,
+    private val joinDialogProvider: () -> JoinDialog,
     private val controller: MainContract.Controller
 ) : ListCell<WindowModel>() {
     init {
@@ -163,13 +164,14 @@ class NodeListCell(
 class MainView(
     private val controller: MainContract.Controller,
     val config: ClientConfig,
-    private val joinDialogProvider: (MainView) -> JoinDialog,
-    val settingsDialogProvider: (MainView) -> SettingsDialog,
-    val serverlistDialogProvider: (MainView) -> ServerlistDialog,
+    private val joinDialogProvider: () -> JoinDialog,
+    val settingsDialogProvider: () -> SettingsDialog,
+    val serverlistDialogProvider: () -> ServerlistDialog,
     private val primaryStage: Stage,
     titleProperty: StringProperty,
     private val dialogPane: ObjectProperty<Node>,
-    welcomePaneProvider: () -> WelcomePane
+    welcomePaneProvider: () -> WelcomePane,
+    private val dialogShowing: Property<Boolean>
 ) : StackPane() {
     private val selectedWindow = SimpleObjectProperty<Node>()
     private val fadeIn = ScaleTransition(Duration.millis(100.0)).apply {
@@ -195,13 +197,13 @@ class MainView(
                 menus.addAll(Menu(tr("IRC")).apply {
                     items.addAll(MenuItem(tr("Server List")).apply {
                         setOnAction {
-                            serverlistDialogProvider(this@MainView).show()
+                            serverlistDialogProvider().show()
                         }
                     })
                 }, Menu(tr("Settings")).apply {
                     items.add(MenuItem(tr("Settings")).apply {
                         setOnAction {
-                            settingsDialogProvider(this@MainView).show()
+                            settingsDialogProvider().show()
                         }
                     })
                 })
@@ -251,19 +253,18 @@ class MainView(
         }
         titleProperty.bindBidirectional(controller.selectedWindow, TitleStringConverter())
         titleProperty.value = controller.selectedWindow.value?.getTitle() ?: tr("DMDirc")
-    }
-
-    fun showDialog(dialog: Node) {
-        dialogPane.value = dialog
-        fadeIn.node = dialog
-        fadeIn.playFromStart()
-    }
-
-    fun hideDialog() {
-        fadeOut.node = dialogPane.value
-        fadeOut.playFromStart()
-        fadeOut.onFinishedProperty().value = EventHandler {
-            dialogPane.value = null
+        dialogShowing.addListener { _, _, newValue ->
+            if (newValue == true) {
+                fadeIn.node = dialogPane.value
+                fadeIn.playFromStart()
+            }
+            if (newValue == false) {
+                fadeOut.node = dialogPane.value
+                fadeOut.playFromStart()
+                fadeOut.onFinishedProperty().value = EventHandler {
+                    dialogPane.value = null
+                }
+            }
         }
     }
 }

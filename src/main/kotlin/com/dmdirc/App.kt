@@ -5,6 +5,7 @@ import javafx.application.Application
 import javafx.application.HostServices
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
 import javafx.scene.Node
@@ -99,28 +100,30 @@ private fun createKodein(
     bind<MainContract.Controller>() with singleton { MainController(instance(), instance(), factory()) }
     bind<StringProperty>("mainViewTitle") with singleton { titleProperty }
     bind<ObjectProperty<Node>>("dialogPane") with singleton { SimpleObjectProperty<Node>() }
+    bind<Property<Boolean>>("dialogShowing") with singleton { SimpleBooleanProperty(false) }
     bind<MainView>() with singleton {
         MainView(
             instance(),
             instance(),
-            factory(),
-            factory(),
-            factory(),
+            provider(),
+            provider(),
+            provider(),
             instance(),
             instance("mainViewTitle"),
             instance("dialogPane"),
-            provider()
+            provider(),
+            instance("dialogShowing")
         )
     }
     bind<FocusManager>() with singleton { FocusManager(stage, instance(), instance("dialogPane")) }
-    bind<JoinDialog>() with factory { mainview: MainView ->
-        JoinDialog(instance(), mainview)
+    bind<JoinDialog>() with provider {
+        JoinDialog(instance(), instance("dialogPane"), instance("dialogShowing"))
     }
-    bind<SettingsDialog>() with factory { mainview: MainView ->
-        SettingsDialog(instance(), mainview)
+    bind<SettingsDialog>() with provider {
+        SettingsDialog(instance(), instance("dialogPane"), instance("dialogShowing"))
     }
-    bind<ServerlistDialog>() with factory { mainview: MainView ->
-        ServerlistDialog(instance(), mainview)
+    bind<ServerlistDialog>() with provider {
+        ServerlistDialog(instance(), instance("dialogPane"), instance("dialogShowing"))
     }
     bind<WelcomePane>() with provider {
         WelcomePane(instance(), provider(), provider(), instance("version"))
