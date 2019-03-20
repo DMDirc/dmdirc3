@@ -1,10 +1,12 @@
 package com.dmdirc
 
 import com.dmdirc.edgar.Edgar.tr
+import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
 import javafx.scene.control.ButtonBar.setButtonData
@@ -62,15 +64,20 @@ class SettingsDialogModel(private val controller: SettingsDialogContract.Control
     }
 }
 
-class SettingsDialog(model: SettingsDialogContract.ViewModel, private val parent: MainView) : VBox() {
+class SettingsDialog(
+    model: SettingsDialogContract.ViewModel,
+    private val parent: ObjectProperty<Node>,
+    private val showing: Property<Boolean>
+) : VBox() {
     fun show() {
-        parent.showDialog(this)
+        parent.value = this
+        showing.value = true
     }
 
     init {
         model.open.addListener { _, _, newValue ->
             if (newValue == false) {
-                parent.hideDialog()
+                showing.value = false
             }
         }
         styleClass.add("settings-dialog")
