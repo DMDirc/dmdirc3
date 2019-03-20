@@ -7,6 +7,7 @@ import com.dmdirc.ktirc.events.ChannelQuit
 import com.dmdirc.ktirc.events.ChannelUserKicked
 import com.dmdirc.ktirc.events.EventMetadata
 import com.dmdirc.ktirc.model.User
+import com.dmdirc.ui.nicklist.NickListModel
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals

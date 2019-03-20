@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.ListView?>
+<ListView xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:id="nicklist"
+          prefWidth="148"
+          styleClass="nick-list"
+          focusTraversable="false">
+</ListView>
