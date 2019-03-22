@@ -52,6 +52,8 @@ steps:
               - /drone/src/build/libs/dmdircui.jar
           checksum:
               - sha256
+          draft: true
+          note: CHANGELOG.md
           title: ${DRONE_TAG}
       when:
           event:
