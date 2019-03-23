@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="7.0.9" transformSequenceNumber="7">
   <directoryPresets config="" />
-  <application name="DMDirc" distributionSourceDir="" applicationId="9456-9552-0498-1496" mediaDir="./build/installer" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}${compiler:sys.withJre}" compression="6" lzmaCompression="true" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="DMDirc" publisher="DMDirc Developers" publisherWeb="https://dmdirc.com" version="Dev-Snapshot" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" macVolumeId="78d02d9d317a3fe1" javaMinVersion="11" javaMaxVersion="" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
+  <application name="DMDirc3" distributionSourceDir="" applicationId="9456-9552-0498-1496" mediaDir="./build/installer" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}${compiler:sys.withJre}" compression="6" lzmaCompression="true" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="dmdirc3" publisher="20.01.01" publisherWeb="https://dmdirc.com" version="dev" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" macVolumeId="78d02d9d317a3fe1" javaMinVersion="11" javaMaxVersion="" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -34,7 +34,7 @@
     <components />
   </files>
   <launchers>
-    <launcher name="DMDirc" id="61" customizedId="" external="false" excludeFromMenu="false" unixMode="755" unixAutoStart="true" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="" useJavaMinVersionOverride="false" javaMinVersionOverride="" useJavaMaxVersionOverride="false" javaMaxVersionOverride="" checkUpdater="true" updateExecutionMode="unattendedProgress" unattendedUpdateTitle="${i18n:updater.WindowTitle(&quot;${compiler:sys.fullName}&quot;)}">
+    <launcher name="DMDirc" id="61" customizedId="" external="false" excludeFromMenu="false" unixMode="755" unixAutoStart="true" menuName="DMDirc3" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="" useJavaMinVersionOverride="false" javaMinVersionOverride="" useJavaMaxVersionOverride="false" javaMaxVersionOverride="" checkUpdater="true" updateExecutionMode="unattendedProgress" unattendedUpdateTitle="${i18n:updater.WindowTitle(&quot;${compiler:sys.fullName}&quot;)}">
       <executable name="DMDirc" type="1" iconSet="true" iconFile="./src/main/resources/icon.ico" executableDir="" redirectStderr="true" stderrFile="${installer:sys.appdataDir}${installer:sys.fileSeparator}dmdirc3${installer:sys.fileSeparator}error.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="true" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="true" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="java9+">
         <versionInfo include="true" fileVersion="" fileDescription="DMDirc Launcher" legalCopyright="DMDirc Developers" internalName="dmdirc3" productName="" />
       </executable>
@@ -1652,14 +1652,34 @@ file.getParent() != null || (file.getName().endsWith(".app") &amp;&amp; director
       <preInstallScript mode="1" file="">
         <content />
       </preInstallScript>
-      <postInstallScript mode="1" file="">
-        <content />
+      <postInstallScript mode="3" file="">
+        <content>#!/bin/bash
+
+echo "Categories=Internet;" &gt;&gt; dmdirc3.desktop
+if [ -x "$(command -v desktop-file-install)" ]; then
+  desktop-file-install dmdirc3.desktop
+fi
+if [ -x "$(command -v xdg-desktop-menu)" ]; then
+  xdg-desktop-menu install --novendordmdirc3.desktop
+fi
+
+exit 0</content>
       </postInstallScript>
       <preUninstallScript mode="1" file="">
         <content />
       </preUninstallScript>
-      <postUninstallScript mode="1" file="">
-        <content />
+      <postUninstallScript mode="3" file="">
+        <content>#!/bin/bash
+
+if [ -f /usr/share/applications/dmdirc3.desktop ]; then
+  if [ -x "$(command -v xdg-desktop-menu)" ]; then
+    xdg-desktop-menu uninstall --novendor dmdirc3.desktop
+  else
+    rm "/usr/share/applications/dmdirc3.desktop"
+  fi
+fi
+
+exit 0</content>
       </postUninstallScript>
     </linuxDeb>
   </mediaSets>
