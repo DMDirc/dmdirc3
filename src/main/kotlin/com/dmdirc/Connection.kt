@@ -24,6 +24,7 @@ import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableSet
 import javafx.scene.Node
+import java.util.Collections
 import java.util.HashSet
 import java.util.concurrent.atomic.AtomicLong
 
@@ -44,6 +45,8 @@ object ConnectionContract {
         fun getUsers(channel: String): Iterable<ChannelUser>
         fun disconnect()
         fun notify(window: WindowModel, message: String)
+        fun addEventListener(listener: (IrcEvent) -> Unit)
+        fun removeEventListener(listener: (IrcEvent) -> Unit)
     }
 }
 
@@ -53,6 +56,8 @@ class Connection(
     private val notificationManager: NotificationManager,
     private val windowFactory: (WindowModel) -> WindowUI
 ) : ConnectionContract.Controller {
+
+    private val listeners = Collections.synchronizedList(mutableListOf<(IrcEvent) -> Unit>())
 
     private val client: IrcClient = IrcClient {
         server {
@@ -118,7 +123,17 @@ class Connection(
 
     override fun notify(window: WindowModel, message: String) = notificationManager.notify(window, message)
 
+    override fun addEventListener(listener: (IrcEvent) -> Unit) {
+        listeners += listener
+    }
+
+    override fun removeEventListener(listener: (IrcEvent) -> Unit) {
+        listeners -= listener
+    }
+
     private fun handleEvent(event: IrcEvent) {
+        listeners.forEach { it(event) }
+
         when {
             event is BatchReceived -> event.events.forEach(this::handleEvent)
             event is ServerReady -> {

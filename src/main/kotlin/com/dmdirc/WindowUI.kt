@@ -7,8 +7,8 @@ import com.dmdirc.ClientSpec.Formatting.notice
 import com.dmdirc.ClientSpec.Formatting.serverEvent
 import com.dmdirc.Style.CustomStyle
 import com.dmdirc.edgar.Edgar.tr
-import com.dmdirc.ktirc.events.ChannelMembershipAdjustment
 import com.dmdirc.ktirc.events.IrcEvent
+import com.dmdirc.ui.nicklist.NickListView
 import com.uchuhimo.konf.Item
 import javafx.application.HostServices
 import javafx.beans.Observable
@@ -18,7 +18,6 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ListChangeListener
 import javafx.geometry.Orientation.VERTICAL
-import javafx.scene.control.ListView
 import javafx.scene.control.ScrollBar
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
@@ -52,7 +51,6 @@ class WindowModel(
     val name: Property<String> = SimpleStringProperty(initialName).threadAsserting()
     val title: Property<String> = SimpleStringProperty(initialName).threadAsserting()
     val unreadStatus: Property<MessageFlag?> = SimpleObjectProperty<MessageFlag?>(null).threadAsserting()
-    val nickList = NickListModel()
     val isConnection = type == WindowType.SERVER
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else initialName.toLowerCase()}"
     val lines = mutableListOf<Array<StyledSpan>>().observable()
@@ -95,7 +93,6 @@ class WindowModel(
     }
 
     fun handleEvent(event: IrcEvent) {
-        if (event is ChannelMembershipAdjustment) nickList.handleEvent(event)
         eventMapper.displayableText(event)?.let {
             addLine(event.timestamp, eventMapper.flags(event), it)
         }
@@ -135,7 +132,12 @@ enum class MessageFlag {
     }
 }
 
-class WindowUI(model: WindowModel, hostServices: HostServices, imageLoader: (String) -> ImageLoader) : AnchorPane() {
+class WindowUI(
+    model: WindowModel,
+    hostServices: HostServices,
+    nickListView: NickListView,
+    imageLoader: (String) -> ImageLoader
+) : AnchorPane() {
 
     private var scrollbar: ScrollBar? = null
     private val textArea = IrcTextArea({ url -> hostServices.showDocument(url) }, { url -> imageLoader(url) })
@@ -152,11 +154,7 @@ class WindowUI(model: WindowModel, hostServices: HostServices, imageLoader: (Str
                 }
             }
             if (!model.isConnection) {
-                right = ListView<String>(model.nickList.users).apply {
-                    isFocusTraversable = false
-                    styleClass.add("nick-list")
-                    prefWidth = 148.0
-                }
+                right = nickListView
             }
             bottom = inputField
             AnchorPane.setTopAnchor(this, 0.0)

@@ -1,6 +1,7 @@
 package com.dmdirc
 
 import com.bugsnag.Bugsnag
+import com.dmdirc.ui.nicklist.nickListModule
 import javafx.application.Application
 import javafx.application.HostServices
 import javafx.beans.property.ObjectProperty
@@ -85,6 +86,8 @@ private fun createKodein(
     hostServices: HostServices,
     titleProperty: StringProperty
 ) = Kodein {
+    import(nickListModule)
+
     bind<ErrorReporter>() with eagerSingleton {
         if (instance<ClientConfig>()[ClientSpec.sendBugReports]) {
             BugsnagErrorReporter(instance("version"))
@@ -158,7 +161,7 @@ private fun createKodein(
         ImageLoader(url, instance(), factory())
     }
     bind<WindowUI>() with factory { model: WindowModel ->
-        WindowUI(model, instance(), factory())
+        WindowUI(model, instance(), instance(), factory())
     }
 }
 
