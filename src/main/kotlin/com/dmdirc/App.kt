@@ -1,10 +1,12 @@
 package com.dmdirc
 
 import com.bugsnag.Bugsnag
+import com.dmdirc.ui.nicklist.nickListModule
 import javafx.application.Application
 import javafx.application.HostServices
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.StringProperty
 import javafx.scene.Node
@@ -33,6 +35,7 @@ internal lateinit var kodein: Kodein
 class MainApp : Application() {
     override fun start(stage: Stage) {
         kodein = createKodein(stage, hostServices, stage.titleProperty())
+        kodein.direct.instance<ErrorReporter>().init()
         val config by kodein.instance<ClientConfig>()
         initInternationalisation(Paths.get("translations"), config[ClientSpec.language])
         with(stage) {
@@ -49,16 +52,21 @@ class MainApp : Application() {
 }
 
 interface ErrorReporter {
+    fun init()
     fun notify(throwable: Throwable)
 }
 
-class BugsnagErrorReporter(version: String) : ErrorReporter {
-    private val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5").apply {
-        setAppVersion(version)
-        setReleaseStage(if (version == "dev") "development" else "production")
-        setProjectPackages("com.dmdirc")
-        startSession()
-        addCallback { it.device.remove("hostname") }
+class BugsnagErrorReporter(private val version: String) : ErrorReporter {
+    private val bugsnag = Bugsnag("972c7b9be25508467fccdded43791bc5")
+
+    override fun init() {
+        bugsnag.apply {
+            setAppVersion(version)
+            setReleaseStage(if (version == "dev") "development" else "production")
+            setProjectPackages("com.dmdirc")
+            startSession()
+            addCallback { it.device.remove("hostname") }
+        }
     }
 
     override fun notify(throwable: Throwable) {
@@ -67,6 +75,7 @@ class BugsnagErrorReporter(version: String) : ErrorReporter {
 }
 
 class StderrErrorReporter : ErrorReporter {
+    override fun init() {}
     override fun notify(throwable: Throwable) {
         throwable.printStackTrace(System.err)
     }
@@ -77,6 +86,8 @@ private fun createKodein(
     hostServices: HostServices,
     titleProperty: StringProperty
 ) = Kodein {
+    import(nickListModule)
+
     bind<ErrorReporter>() with eagerSingleton {
         if (instance<ClientConfig>()[ClientSpec.sendBugReports]) {
             BugsnagErrorReporter(instance("version"))
@@ -92,28 +103,30 @@ private fun createKodein(
     bind<MainContract.Controller>() with singleton { MainController(instance(), instance(), factory()) }
     bind<StringProperty>("mainViewTitle") with singleton { titleProperty }
     bind<ObjectProperty<Node>>("dialogPane") with singleton { SimpleObjectProperty<Node>() }
+    bind<Property<Boolean>>("dialogShowing") with singleton { SimpleBooleanProperty(false) }
     bind<MainView>() with singleton {
         MainView(
             instance(),
             instance(),
-            factory(),
-            factory(),
-            factory(),
+            provider(),
+            provider(),
+            provider(),
             instance(),
             instance("mainViewTitle"),
             instance("dialogPane"),
-            provider()
+            provider(),
+            instance("dialogShowing")
         )
     }
     bind<FocusManager>() with singleton { FocusManager(stage, instance(), instance("dialogPane")) }
-    bind<JoinDialog>() with factory { mainview: MainView ->
-        JoinDialog(instance(), mainview)
+    bind<JoinDialog>() with provider {
+        JoinDialog(instance(), instance("dialogPane"), instance("dialogShowing"))
     }
-    bind<SettingsDialog>() with factory { mainview: MainView ->
-        SettingsDialog(instance(), mainview)
+    bind<SettingsDialog>() with provider {
+        SettingsDialog(instance(), instance("dialogPane"), instance("dialogShowing"))
     }
-    bind<ServerlistDialog>() with factory { mainview: MainView ->
-        ServerlistDialog(instance(), mainview)
+    bind<ServerlistDialog>() with provider {
+        ServerlistDialog(instance(), instance("dialogPane"), instance("dialogShowing"))
     }
     bind<WelcomePane>() with provider {
         WelcomePane(instance(), provider(), provider(), instance("version"))
@@ -148,7 +161,7 @@ private fun createKodein(
         ImageLoader(url, instance(), factory())
     }
     bind<WindowUI>() with factory { model: WindowModel ->
-        WindowUI(model, instance(), factory())
+        WindowUI(model, instance(), instance(), factory())
     }
 }
 

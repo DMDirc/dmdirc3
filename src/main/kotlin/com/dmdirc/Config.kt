@@ -23,7 +23,7 @@ data class ConnectionDetails(
 
 object ClientSpec : ConfigSpec("") {
     val servers by optional(listOf<ConnectionDetails>())
-    val language by optional("en-GB")
+    val language by optional("en_GB")
     val sendBugReports by optional(true)
 
     object DefaultProfile : ConfigSpec() {
@@ -87,7 +87,9 @@ class ClientConfig private constructor(private val path: Path, private val confi
          */
         fun loadFrom(path: Path): ClientConfig = with(Config { addSpec(ClientSpec) }) {
             try {
-                return ClientConfig(path, Files.newInputStream(path).use { from.yaml.inputStream(it) })
+                if (Files.exists(path)) {
+                    return ClientConfig(path, Files.newInputStream(path).use { from.yaml.inputStream(it) })
+                }
             } catch (ex: Exception) {
                 logger.log(Level.WARNING, ex) { "Unable to load config file" }
             }

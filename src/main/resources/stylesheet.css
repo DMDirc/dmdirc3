@@ -23,6 +23,10 @@
     -fx-prompt-text-fill: transparent;
 }
 
+.styled-text-area > .virtual-flow {
+    -flowless-gravity: rear;
+}
+
 .tree-view {
     -fx-background-color: transparent;
     -fx-pref-width: 175px;
@@ -165,6 +169,10 @@ ParagraphBox {
 
 .text.messagetype-ServerEvent {
     -fx-fill: #5b60a5;
+}
+
+.text.messagetype-Away {
+    -fx-fill: #737373;
 }
 
 .text.messagetype-Message {

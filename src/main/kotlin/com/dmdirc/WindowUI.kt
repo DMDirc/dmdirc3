@@ -6,8 +6,9 @@ import com.dmdirc.ClientSpec.Formatting.message
 import com.dmdirc.ClientSpec.Formatting.notice
 import com.dmdirc.ClientSpec.Formatting.serverEvent
 import com.dmdirc.Style.CustomStyle
-import com.dmdirc.ktirc.events.ChannelMembershipAdjustment
+import com.dmdirc.edgar.Edgar.tr
 import com.dmdirc.ktirc.events.IrcEvent
+import com.dmdirc.ui.nicklist.NickListView
 import com.uchuhimo.konf.Item
 import javafx.application.HostServices
 import javafx.beans.Observable
@@ -17,7 +18,6 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ListChangeListener
 import javafx.geometry.Orientation.VERTICAL
-import javafx.scene.control.ListView
 import javafx.scene.control.ScrollBar
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
@@ -51,7 +51,6 @@ class WindowModel(
     val name: Property<String> = SimpleStringProperty(initialName).threadAsserting()
     val title: Property<String> = SimpleStringProperty(initialName).threadAsserting()
     val unreadStatus: Property<MessageFlag?> = SimpleObjectProperty<MessageFlag?>(null).threadAsserting()
-    val nickList = NickListModel()
     val isConnection = type == WindowType.SERVER
     val sortKey = "${connectionId ?: ""} ${if (isConnection) "" else initialName.toLowerCase()}"
     val lines = mutableListOf<Array<StyledSpan>>().observable()
@@ -67,24 +66,33 @@ class WindowModel(
         }
     }
 
+    fun getTitle(): String {
+        val connectionName = if (connection?.networkName?.isBlank() != false) {
+            name.value
+        } else {
+            connection.networkName
+        }
+        return when {
+            isConnection -> tr("DMDirc: %s").format(connectionName)
+            else -> tr("DMDirc: %s | %s").format(name.value, connectionName)
+        }
+    }
+
     fun handleInput() {
         val texts = inputField.value.split("\n")
         texts.forEach { text ->
             if (text.isNotEmpty()) {
-                if (text.startsWith("/me ")) {
-                    connection?.sendAction(name.value, text.substring(4))
-                } else {
-                    connection?.sendMessage(
-                        name.value,
-                        text
-                    )
+                when {
+                    text.startsWith("/me ") -> connection?.sendAction(name.value, text.substring(4))
+                    text.trim() == "/away" -> connection?.sendAway()
+                    text.startsWith("/away ") -> connection?.sendAway(text.substring(6))
+                    else -> connection?.sendMessage(name.value, text)
                 }
             }
         }
     }
 
     fun handleEvent(event: IrcEvent) {
-        if (event is ChannelMembershipAdjustment) nickList.handleEvent(event)
         eventMapper.displayableText(event)?.let {
             addLine(event.timestamp, eventMapper.flags(event), it)
         }
@@ -111,7 +119,7 @@ class WindowModel(
 }
 
 enum class MessageFlag {
-    ServerEvent, ChannelEvent, Self, Message, Action, Notice, Highlight;
+    Away, ServerEvent, ChannelEvent, Self, Message, Action, Notice, Highlight;
 
     companion object {
         fun formatter(flags: Set<MessageFlag>): Item<String> = when {
@@ -124,7 +132,12 @@ enum class MessageFlag {
     }
 }
 
-class WindowUI(model: WindowModel, hostServices: HostServices, imageLoader: (String) -> ImageLoader) : AnchorPane() {
+class WindowUI(
+    model: WindowModel,
+    hostServices: HostServices,
+    nickListView: NickListView,
+    imageLoader: (String) -> ImageLoader
+) : AnchorPane() {
 
     private var scrollbar: ScrollBar? = null
     private val textArea = IrcTextArea({ url -> hostServices.showDocument(url) }, { url -> imageLoader(url) })
@@ -141,11 +154,7 @@ class WindowUI(model: WindowModel, hostServices: HostServices, imageLoader: (Str
                 }
             }
             if (!model.isConnection) {
-                right = ListView<String>(model.nickList.users).apply {
-                    isFocusTraversable = false
-                    styleClass.add("nick-list")
-                    prefWidth = 148.0
-                }
+                right = nickListView
             }
             bottom = inputField
             AnchorPane.setTopAnchor(this, 0.0)
@@ -159,17 +168,17 @@ class WindowUI(model: WindowModel, hostServices: HostServices, imageLoader: (Str
                 scrollbar?.valueProperty()?.value = scrollbar?.max
             }
         }
-        scrollbar?.addEventFilter(MouseEvent.MOUSE_PRESSED) { _ ->
+        scrollbar?.addEventFilter(MouseEvent.MOUSE_PRESSED) {
             runLater {
                 autoScroll = scrollbar?.valueProperty()?.value == scrollbar?.max
             }
         }
-        scrollbar?.addEventFilter(MouseEvent.MOUSE_RELEASED) { _ ->
+        scrollbar?.addEventFilter(MouseEvent.MOUSE_RELEASED) {
             runLater {
                 autoScroll = scrollbar?.valueProperty()?.value == scrollbar?.max
             }
         }
-        textArea.addEventFilter(ScrollEvent.SCROLL) { _ ->
+        textArea.addEventFilter(ScrollEvent.SCROLL) {
             GlobalScope.launch {
                 delay(100)
                 runLater {
@@ -182,12 +191,12 @@ class WindowUI(model: WindowModel, hostServices: HostServices, imageLoader: (Str
             while (change.next()) {
                 if (change.wasAdded()) {
                     change.addedSubList.forEach { line ->
+                        textArea.appendText("\n")
                         line.forEach { segment ->
                             val position = textArea.length
                             textArea.appendText(segment.content)
                             textArea.setStyle(position, textArea.length, segment.styles)
                         }
-                        textArea.appendText("\n")
                     }
                 }
             }
@@ -238,7 +247,6 @@ class MagicInput(private val modelText: Property<String>, model: WindowModel) : 
     private fun swap() {
         runLater {
             val focused = active?.focusedProperty()?.value ?: false
-            val pos = active?.caretPosition ?: 0
             if (active == single) {
                 single.textProperty().unbindBidirectional(modelText)
                 multi.textProperty().bindBidirectional(modelText)

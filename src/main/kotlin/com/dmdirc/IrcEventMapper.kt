@@ -1,6 +1,7 @@
 package com.dmdirc
 
 import com.dmdirc.MessageFlag.Action
+import com.dmdirc.MessageFlag.Away
 import com.dmdirc.MessageFlag.ChannelEvent
 import com.dmdirc.MessageFlag.Highlight
 import com.dmdirc.MessageFlag.Message
@@ -9,6 +10,7 @@ import com.dmdirc.MessageFlag.Self
 import com.dmdirc.MessageFlag.ServerEvent
 import com.dmdirc.ktirc.IrcClient
 import com.dmdirc.ktirc.events.ActionReceived
+import com.dmdirc.ktirc.events.ChannelAway
 import com.dmdirc.ktirc.events.ChannelJoined
 import com.dmdirc.ktirc.events.ChannelNickChanged
 import com.dmdirc.ktirc.events.ChannelParted
@@ -24,8 +26,9 @@ import com.dmdirc.ktirc.events.ServerConnectionError
 import com.dmdirc.ktirc.events.ServerDisconnected
 import com.dmdirc.ktirc.events.SourcedEvent
 import com.dmdirc.ktirc.events.TargetedEvent
+import com.dmdirc.ktirc.events.UserAway
 import com.dmdirc.ktirc.model.User
-import com.jukusoft.i18n.I.tr
+import com.dmdirc.edgar.Edgar.tr
 import java.time.format.DateTimeFormatter
 
 class IrcEventMapper(private val client: IrcClient) {
@@ -40,6 +43,8 @@ class IrcEventMapper(private val client: IrcClient) {
         }
 
         when (event) {
+            is ChannelAway -> yield(Away)
+            is UserAway -> yield(Away)
             is MessageReceived -> yield(Message)
             is ActionReceived -> yield(Action)
             is NoticeReceived -> yield(Notice)
@@ -82,6 +87,13 @@ class IrcEventMapper(private val client: IrcClient) {
 
         this is ChannelTopicDiscovered && topic.isNullOrEmpty() -> tr("there is no topic set")
         this is ChannelTopicDiscovered -> tr("the topic is: %s").format(topic)
+
+        this is ChannelAway && message == null && client.isLocalUser(user) -> tr("You are no longer away")
+        this is ChannelAway && message == null -> tr("%s is no longer away").format(formattedNickname)
+        this is ChannelAway && client.isLocalUser(user) && message == "" -> tr("You are away")
+        this is ChannelAway && message == "" -> tr("%s is away").format(formattedNickname)
+        this is ChannelAway && client.isLocalUser(user) -> tr("You are away: %s").format(message)
+        this is ChannelAway -> tr("%s is away: %s").format(formattedNickname, message)
 
         else -> null
     }

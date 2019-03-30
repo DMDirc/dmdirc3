@@ -12,8 +12,8 @@ plugins {
     jacoco
     kotlin("jvm").version("1.3.21")
     id("org.openjfx.javafxplugin").version("0.0.7")
-    id("name.remal.check-updates") version "1.0.114"
-    id("com.install4j.gradle") version "7.0.9"
+    id("name.remal.check-updates") version "1.0.115"
+    id("com.install4j.gradle") version "7.0.10"
     id("org.jmailen.kotlinter") version "1.22.0"
 }
 
@@ -34,6 +34,7 @@ repositories {
     mavenCentral()
     jcenter()
     maven("https://maven.ej-technologies.com/repository")
+    maven("https://dl.bintray.com/dmdirc/releases")
     mavenLocal()
 }
 java {
@@ -53,29 +54,29 @@ dependencies {
     implementation("org.controlsfx:controlsfx:9.0.0")
     implementation("org.fxmisc.richtext:richtextfx:0.9.3")
     implementation("com.dmdirc:ktirc:1.1.1")
-    implementation("com.uchuhimo:konf:0.13.1") {
+    implementation("com.uchuhimo:konf:0.13.2") {
         exclude(group = "com.moandjiezana.toml")
         exclude(group = "org.eclipse.jgit")
     }
     implementation("org.kodein.di:kodein-di-generic-jvm:6.1.0")
-    implementation("com.jukusoft:easy-i18n-gettext:1.2.0")
+    implementation("com.dmdirc:edgar:0.1.1")
     implementation("de.jensd:fontawesomefx-fontawesome:4.7.0-11")
     implementation("de.jensd:fontawesomefx-commons:11.0")
     implementation("de.jensd:fontawesomefx-controls:11.0")
     implementation("com.bugsnag:bugsnag:3.4.4")
     implementation("com.squareup.okhttp3:okhttp:3.14.0")
     
-    compileOnly("com.install4j:install4j-runtime:7.0.9")
+    compileOnly("com.install4j:install4j-runtime:7.0.10")
 
     runtime("org.openjfx:javafx-graphics:$javafx.version:win")
     runtime("org.openjfx:javafx-graphics:$javafx.version:linux")
     runtime("org.openjfx:javafx-graphics:$javafx.version:mac")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.4.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.4.1")
     testImplementation("io.mockk:mockk:1.9.2")
     testImplementation("com.google.jimfs:jimfs:1.1")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.0")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.1")
 }
 
 configurations.all {

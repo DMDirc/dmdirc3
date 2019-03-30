@@ -1,6 +1,7 @@
 package com.dmdirc
 
 import com.dmdirc.MessageFlag.Message
+import com.dmdirc.edgar.Edgar
 import com.dmdirc.ktirc.IrcClient
 import com.dmdirc.ktirc.events.ActionReceived
 import com.dmdirc.ktirc.events.ChannelJoined
@@ -18,7 +19,6 @@ import com.dmdirc.ktirc.events.ServerConnectionError
 import com.dmdirc.ktirc.events.ServerDisconnected
 import com.dmdirc.ktirc.model.ConnectionError
 import com.dmdirc.ktirc.model.User
-import com.jukusoft.i18n.I
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -26,8 +26,7 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.io.File
-import java.util.Locale
+import java.nio.file.Paths
 
 internal class WindowModelTest {
 
@@ -44,8 +43,8 @@ internal class WindowModelTest {
 
     @BeforeEach
     fun setup() {
-        I.init(File("translations"), Locale.ENGLISH, "messages")
-        I.setLanguage(Locale.forLanguageTag("en-GB"))
+        Edgar.init(Paths.get("translations"))
+        Edgar.setLanguage("en_GB")
         every { metaData.time } returns TestConstants.time
         PlatformWrappers.runLaterProvider = { it.run() }
         PlatformWrappers.fxThreadTester = { true }

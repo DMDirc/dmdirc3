@@ -1,9 +1,10 @@
 package com.dmdirc
 
-import com.jukusoft.i18n.I.tr
+import com.dmdirc.edgar.Edgar.tr
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EYE
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EYE_SLASH
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
+import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -11,6 +12,7 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.ObservableList
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
 import javafx.scene.control.ButtonBar.setButtonData
@@ -188,17 +190,19 @@ class ConnectionDetailsListCell : ListCell<ConnectionDetailsEditable>() {
 
 class ServerlistDialog(
     private val model: ServerListDialogContract.ViewModel,
-    private val parent: MainView
+    private val parent: ObjectProperty<Node>,
+    private val showing: Property<Boolean>
 ) : VBox() {
     fun show() {
-        parent.showDialog(this)
+        parent.value = this
+        showing.value = true
         model.show()
     }
 
     init {
         model.open.addListener { _, _, newValue ->
             if (newValue == false) {
-                parent.hideDialog()
+                showing.value = false
             }
         }
         styleClass.add("serverlist-dialog")
